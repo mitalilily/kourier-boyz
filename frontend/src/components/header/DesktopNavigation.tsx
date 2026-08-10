@@ -91,7 +91,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
 
   return (
     <nav
-      className={`hidden 2xl:flex items-center gap-1 rounded-[20px] border px-2 py-2 ${navShellClass}`}
+      className={`hidden lg:flex items-center gap-1 rounded-sm border px-2 py-2 ${navShellClass}`}
       aria-label="Main navigation"
     >
       <Link to={homeLink}>

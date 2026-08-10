@@ -251,7 +251,7 @@ const PlatformLanding = () => {
         </div>
       </section>
 
-      <section className="kb-section bg-white">
+      <section className="kb-section kb-pattern-route-grid">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
           <div className="max-w-3xl">
             <span className="kb-kicker">Choose your way in</span>
@@ -298,7 +298,7 @@ const PlatformLanding = () => {
         </div>
       </section>
 
-      <section className="kb-section bg-[#f4f3ef]">
+      <section className="kb-section kb-pattern-diagonal">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
             <div>
@@ -350,7 +350,7 @@ const PlatformLanding = () => {
         </div>
       </section>
 
-      <section className="kb-section bg-[#f4f3ef]">
+      <section className="kb-section kb-pattern-rings">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
           <div className="max-w-3xl"><span className="kb-kicker">Quick actions</span><h2 className="kb-title mt-3">Get an answer before you open a panel.</h2></div>
           <div className="mt-9 grid border border-black/10 bg-white lg:grid-cols-2">
@@ -366,7 +366,7 @@ const PlatformLanding = () => {
         </div>
       </section>
 
-      <section className="kb-section bg-white">
+      <section className="kb-section kb-pattern-weave">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
           <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
             <div><span className="kb-kicker">Designed for seller choice</span><h2 className="kb-title mt-3">Use the platform your way.</h2><p className="kb-copy mt-4">No forced bundle. Start with courier aggregation, marketplace selling, or both. Your operations remain useful at every stage.</p></div>
@@ -394,7 +394,7 @@ const PlatformLanding = () => {
         </div>
       </section>
 
-      <section className="kb-section bg-white">
+      <section className="kb-section kb-pattern-dot-matrix">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[0.65fr_1.35fr] lg:px-10">
           <div><span className="kb-kicker">Straight answers</span><h2 className="kb-title mt-3">Before you get started.</h2><p className="kb-copy mt-4">The marketplace and courier aggregator are connected, but never compulsory as a bundle.</p></div>
           <div className="border-t border-black/10">
@@ -408,7 +408,7 @@ const PlatformLanding = () => {
         </div>
       </section>
 
-      <section className="bg-[#b78115] py-14 text-white">
+      <section className="kb-pattern-gold-finale py-14 text-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-7 px-5 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-10">
           <div><div className="flex items-center gap-2 text-sm font-semibold uppercase"><Clock3 className="h-4 w-4" /> Ready when your business is</div><h2 className="mt-2 max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl">Shop, ship, or build your marketplace store today.</h2></div>
           <div className="flex flex-wrap gap-3"><Link to="/ship" className="kb-button bg-white text-[#1d1d1d]">Book a pickup <ArrowRight className="h-5 w-5" /></Link><Link to="/shop" className="kb-button border border-white/50 text-white">Browse the shop <ShoppingBag className="h-5 w-5" /></Link></div>

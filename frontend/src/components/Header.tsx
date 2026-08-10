@@ -11,7 +11,6 @@ import PlatformHeader from './PlatformHeader'
 import { DesktopNavigation } from './header/DesktopNavigation'
 import { HeaderActions } from './header/HeaderActions'
 import { LocationPopover } from './header/LocationPopover'
-import { MobileHeaderMenu } from './header/MobileHeaderMenu'
 import { PromotionalBanner } from './header/PromotionalBanner'
 import SearchBar from './header/SearchBar'
 import { useHeaderLocation } from './header/useHeaderLocation'
@@ -155,7 +154,7 @@ const StoreHeader: React.FC = () => {
                 />
               </Link>
 
-              <div className="hidden shrink-0 2xl:block">
+              <div className="hidden shrink-0 lg:block">
                 <LocationPopover
                   isLightBg={isLightBg}
                   selectedLocation={selectedLocation}
@@ -199,39 +198,24 @@ const StoreHeader: React.FC = () => {
               pathname={location.pathname}
             />
 
-            <div className="flex shrink-0 items-center gap-2 2xl:hidden">
-                <div className="shrink-0">
-                  <LocationPopover
-                    isLightBg={isLightBg}
-                    selectedLocation={selectedLocation}
-                    isOpen={isLocationPopoverOpen}
-                    onOpenChange={setIsLocationPopoverOpen}
-                    addressesLoading={addressesLoading}
-                    addressLocationPairs={addressLocationPairs}
-                    showAllAddresses={showAllAddresses}
-                    onToggleShowAllAddresses={toggleShowAllAddresses}
-                    onSelectAddress={handleAddressSelect}
-                    onUseCurrentLocation={handleUseCurrentLocation}
-                    isDetectingLocation={isDetectingLocation}
-                    pinInput={pinInput}
-                    onPinInputChange={handlePinInputChange}
-                    onManualPinSubmit={handleManualPinSubmit}
-                    locationError={locationError}
-                  />
-                </div>
-                <MobileHeaderMenu
-                  textClass={textClass}
-                  isLightBg={isLightBg}
-                  isScrolled={isScrolled}
-                  selectedLocation={selectedLocation}
-                  onMobileLocationChange={() => setIsLocationPopoverOpen(true)}
-                  searchQuery={searchQuery}
-                  onSearchChange={(value) => setSearchQuery(value)}
-                  parentCategories={parentCategories}
-                  pathname={location.pathname}
-                  isAuthenticated={isAuthenticated}
-                  onLogout={handleLogout}
-                />
+            <div className="shrink-0 lg:hidden">
+              <LocationPopover
+                isLightBg={isLightBg}
+                selectedLocation={selectedLocation}
+                isOpen={isLocationPopoverOpen}
+                onOpenChange={setIsLocationPopoverOpen}
+                addressesLoading={addressesLoading}
+                addressLocationPairs={addressLocationPairs}
+                showAllAddresses={showAllAddresses}
+                onToggleShowAllAddresses={toggleShowAllAddresses}
+                onSelectAddress={handleAddressSelect}
+                onUseCurrentLocation={handleUseCurrentLocation}
+                isDetectingLocation={isDetectingLocation}
+                pinInput={pinInput}
+                onPinInputChange={handlePinInputChange}
+                onManualPinSubmit={handleManualPinSubmit}
+                locationError={locationError}
+              />
             </div>
           </div>
         </div>
