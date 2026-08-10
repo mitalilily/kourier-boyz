@@ -44,7 +44,7 @@ const StructuredData = () => {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
         name: 'Product Categories',
-        description: "Shop by categories on Kourier Boyz - India's leading online shopping marketplace",
+        description: 'Browse marketplace categories available through Kourier Boyz',
         itemListElement: rootCategories.map((category, index) => ({
           '@type': 'ListItem',
           position: index + 1,

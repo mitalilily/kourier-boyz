@@ -16,10 +16,11 @@ import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 const navItemBaseClasses =
-  'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1.5 py-2 text-[10px] font-semibold leading-tight tracking-tight transition-all'
+  'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-sm px-1.5 py-2 text-[10px] font-semibold leading-tight transition-all'
 
 interface BottomLink {
   labelKey: string
+  label?: string
   href: string
   icon: React.ComponentType<{ size?: number }>
   requiresAuth?: boolean
@@ -68,14 +69,34 @@ const MobileBottomNav = () => {
 
   const activePath = location.pathname
 
+  const isShopExperience =
+    activePath === '/shop' ||
+    activePath === '/store' ||
+    activePath.startsWith('/product/') ||
+    activePath.startsWith('/products/') ||
+    activePath.startsWith('/shop-by-category') ||
+    activePath.startsWith('/search') ||
+    activePath === '/cart' ||
+    activePath.startsWith('/profile/orders') ||
+    activePath.startsWith('/profile/wishlist')
+
+  const experiencePrimaryLinks: BottomLink[] = isShopExperience
+    ? [
+        { labelKey: 'shop-home', label: 'Shop Home', href: '/shop', icon: Home },
+        { labelKey: 'main-home', label: 'Main Home', href: '/', icon: ShoppingBag },
+        { labelKey: 'navigation.wishlist', href: '/profile/wishlist', icon: Heart, requiresAuth: true },
+        { labelKey: 'navigation.cart', href: '/cart', icon: ShoppingCart },
+      ]
+    : primaryLinks
+
   const filteredPrimaryLinks = useMemo(() => {
-    return primaryLinks.map((link) => {
+    return experiencePrimaryLinks.map((link) => {
       if (link.requiresAuth && !isAuthenticated) {
         return { ...link, href: '/login?redirect=' + encodeURIComponent(link.href) }
       }
       return link
     })
-  }, [isAuthenticated])
+  }, [experiencePrimaryLinks, isAuthenticated])
 
   const filteredSecondaryLinks = useMemo(() => {
     return secondaryLinks.map((link) => {
@@ -103,21 +124,21 @@ const MobileBottomNav = () => {
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] backdrop-blur-lg shadow-[0_-6px_25px_rgba(15,23,42,0.12)]">
         <div className="mx-auto flex max-w-3xl items-center gap-1">
           {filteredPrimaryLinks.map((link) => {
-            const label = t(link.labelKey)
+            const label = link.label || t(link.labelKey)
             const Icon = link.icon
             const isActive =
               activePath === link.href || (link.href !== '/' && activePath.startsWith(link.href))
-            const textClass = isActive ? 'text-blue-600 font-semibold' : 'text-slate-600'
+            const textClass = isActive ? 'text-[#9a6b0c] font-semibold' : 'text-slate-600'
             return (
               <button
                 key={link.labelKey}
                 type="button"
                 onClick={() => handleNavClick(link.href)}
                 className={`${navItemBaseClasses} ${textClass} ${
-                  isActive ? 'bg-blue-50/50 rounded-lg' : ''
+                  isActive ? 'bg-[#f5ecd6]' : ''
                 } transition-colors duration-200`}
               >
-                <span className={isActive ? 'text-blue-600' : 'text-slate-600'}>
+                <span className={isActive ? 'text-[#a9730c]' : 'text-slate-600'}>
                   <Icon size={20} />
                 </span>
                 <span className="max-w-full truncate text-center">{label}</span>
@@ -127,7 +148,7 @@ const MobileBottomNav = () => {
                   </span>
                 ) : null}
                 {isActive && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-blue-600 rounded-full" />
+                  <span className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 bg-[#b78115]" />
                 )}
               </button>
             )

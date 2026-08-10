@@ -1,54 +1,66 @@
 import Layout from '@/components/Layout'
-import AboutUs from '@/pages/AboutUs'
-import BecomeASeller from '@/pages/BecomeASeller'
-import PrivacyPolicy from '@/pages/PrivacyPolicy'
-import ReturnRefundPolicy from '@/pages/ReturnRefundPolicy'
-import TermsAndConditions from '@/pages/TermsAndConditions'
-import BlogDetail from '@/pages/BlogDetail'
-import BlogList from '@/pages/BlogList'
-import Categories from '@/pages/Categories'
-import ContactHistory from '@/pages/ContactHistory'
-import ContactUs from '@/pages/ContactUs'
-import HelpCenter from '@/pages/HelpCenter'
-// import LiveChat from '@/pages/LiveChat'
-import BestSellersPage from '@/pages/BestSellersPage'
-import CreateTicket from '@/pages/CreateTicket'
-import Login from '@/pages/Login'
-import InvoiceView from '@/pages/InvoiceView'
-import OrderFeedbackPage from '@/pages/OrderFeedbackPage'
-import ProductDetail from '@/pages/ProductDetail'
-import ProductReviews from '@/pages/ProductReviews'
-import AccountSettings from '@/pages/profile/AccountSettings'
-import Addresses from '@/pages/profile/Addresses'
-import Notifications from '@/pages/profile/Notifications'
-import Orders from '@/pages/profile/Orders'
-import Payments from '@/pages/profile/Payments'
-import PersonalInfo from '@/pages/profile/PersonalInfo'
-import ProfileWishlist from '@/pages/profile/ProfileWishlist'
-import Returns from '@/pages/profile/Returns'
-import Security from '@/pages/profile/Security'
-import ProfileLayout from '@/pages/ProfileLayout'
-import Register from '@/pages/Register'
-import ResetPassword from '@/pages/ResetPassword'
-import SharedWishlist from '@/pages/SharedWishlist'
-import TicketDetail from '@/pages/TicketDetail'
-import Tickets from '@/pages/Tickets'
-import VerifyEmail from '@/pages/VerifyEmail'
-import Unsubscribe from '@/pages/Unsubscribe'
-import Wishlist from '@/pages/Wishlist'
+import PlatformLanding from '@/pages/PlatformLanding'
 import React, { lazy, Suspense, useEffect } from 'react'
 import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom'
-import Home from './components/Home/Home'
 import ProtectedRoute from './components/ProtectedRoute'
-import Cart from './pages/Cart'
-import CheckoutPage from './pages/CheckoutPage'
-import DealsPage from './pages/DealsPage'
-import ProfileHistory from './pages/profile/ProfileHistory'
-import ReviewPage from './pages/ReviewPage'
-import SearchResults from './pages/SearchResults'
 import { useAuthStore } from './store/authStore'
+
+const Home = lazy(() => import('./components/Home/Home'))
+const Login = lazy(() => import('@/pages/Login'))
+const Register = lazy(() => import('@/pages/Register'))
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'))
+const VerifyEmail = lazy(() => import('@/pages/VerifyEmail'))
+const Unsubscribe = lazy(() => import('@/pages/Unsubscribe'))
+const ShipWithUs = lazy(() => import('./pages/ShipWithUs'))
+const TrackShipment = lazy(() => import('./pages/TrackShipment'))
+const RateCalculator = lazy(() => import('@/pages/RateCalculator'))
+const ProfileLayout = lazy(() => import('@/pages/ProfileLayout'))
+const Orders = lazy(() => import('@/pages/profile/Orders'))
+const ProfileWishlist = lazy(() => import('@/pages/profile/ProfileWishlist'))
+const Returns = lazy(() => import('@/pages/profile/Returns'))
+const ProfileHistory = lazy(() => import('./pages/profile/ProfileHistory'))
+const Addresses = lazy(() => import('@/pages/profile/Addresses'))
+const Payments = lazy(() => import('@/pages/profile/Payments'))
+const PersonalInfo = lazy(() => import('@/pages/profile/PersonalInfo'))
+const Security = lazy(() => import('@/pages/profile/Security'))
+const AccountSettings = lazy(() => import('@/pages/profile/AccountSettings'))
+const Notifications = lazy(() => import('@/pages/profile/Notifications'))
+const Wishlist = lazy(() => import('@/pages/Wishlist'))
+const SharedWishlist = lazy(() => import('@/pages/SharedWishlist'))
+const OrderFeedbackPage = lazy(() => import('@/pages/OrderFeedbackPage'))
+const InvoiceView = lazy(() => import('@/pages/InvoiceView'))
+const Cart = lazy(() => import('./pages/Cart'))
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage'))
+const ReviewPage = lazy(() => import('./pages/ReviewPage'))
+const ProductDetail = lazy(() => import('@/pages/ProductDetail'))
+const ProductReviews = lazy(() => import('@/pages/ProductReviews'))
 const SellerStorefront = lazy(() => import('@/pages/SellerStorefront'))
 const SellerCategoryProducts = lazy(() => import('@/pages/SellerCategoryProducts'))
+const Categories = lazy(() => import('@/pages/Categories'))
+const DealsPage = lazy(() => import('./pages/DealsPage'))
+const BestSellersPage = lazy(() => import('@/pages/BestSellersPage'))
+const SearchResults = lazy(() => import('./pages/SearchResults'))
+const HelpCenter = lazy(() => import('@/pages/HelpCenter'))
+const Tickets = lazy(() => import('@/pages/Tickets'))
+const CreateTicket = lazy(() => import('@/pages/CreateTicket'))
+const TicketDetail = lazy(() => import('@/pages/TicketDetail'))
+const ContactUs = lazy(() => import('@/pages/ContactUs'))
+const ContactHistory = lazy(() => import('@/pages/ContactHistory'))
+const BlogList = lazy(() => import('@/pages/BlogList'))
+const BlogDetail = lazy(() => import('@/pages/BlogDetail'))
+const AboutUs = lazy(() => import('@/pages/AboutUs'))
+const TermsAndConditions = lazy(() => import('@/pages/TermsAndConditions'))
+const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'))
+const ReturnRefundPolicy = lazy(() => import('@/pages/ReturnRefundPolicy'))
+const BecomeASeller = lazy(() => import('@/pages/BecomeASeller'))
+
+const RouteFallback = () => (
+  <div className="min-h-[55vh] bg-[#f5f5f2] px-5 pb-16 pt-40" aria-busy="true">
+    <div className="mx-auto h-2 w-40 overflow-hidden bg-black/10">
+      <div className="h-full w-1/2 animate-pulse bg-[#b78115]" />
+    </div>
+  </div>
+)
 
 const ScrollToTop: React.FC = () => {
   const location = useLocation()
@@ -56,7 +68,7 @@ const ScrollToTop: React.FC = () => {
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
+      behavior: 'auto',
     })
   }, [location.pathname, location.search])
 
@@ -74,6 +86,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <ScrollToTop />
+      <Suspense fallback={<RouteFallback />}>
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
@@ -89,7 +102,12 @@ const App: React.FC = () => {
           element={
             <Layout>
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<PlatformLanding />} />
+                <Route path="/shop" element={<Home />} />
+                <Route path="/store" element={<Home />} />
+                <Route path="/ship" element={<ShipWithUs />} />
+                <Route path="/track" element={<TrackShipment />} />
+                <Route path="/rates" element={<RateCalculator />} />
                 <Route
                   path="/profile"
                   element={
@@ -237,6 +255,7 @@ const App: React.FC = () => {
           }
         />
       </Routes>
+      </Suspense>
     </Router>
   )
 }

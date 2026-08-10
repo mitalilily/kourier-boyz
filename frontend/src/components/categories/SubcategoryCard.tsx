@@ -11,7 +11,7 @@ interface SubcategoryCardProps {
 
 const SubcategoryCard: React.FC<SubcategoryCardProps> = ({ category }) => {
   const navigate = useNavigate()
-  const fallbackImage = '/logo.png'
+  const fallbackImage = '/brand/kourier-boyz-mark.png'
 
   const handleClick = () => {
     navigate(`/products/search?sort=relevance&categoryId=${category._id}`)

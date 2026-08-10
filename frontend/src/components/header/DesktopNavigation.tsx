@@ -54,7 +54,28 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
     }
   }, [categoriesDropdownOpen])
 
-  const isHomeActive = pathname === '/'
+  const isShopExperience =
+    pathname === '/shop' ||
+    pathname === '/store' ||
+    pathname.startsWith('/product/') ||
+    pathname.startsWith('/products/') ||
+    pathname.startsWith('/shop-by-category') ||
+    pathname.startsWith('/search') ||
+    pathname === '/cart' ||
+    pathname.startsWith('/profile/orders') ||
+    pathname.startsWith('/profile/wishlist')
+  const isHomeActive = isShopExperience ? pathname === '/shop' || pathname === '/store' : pathname === '/'
+  const homeLink = isShopExperience ? '/shop' : '/'
+  const homeLabel = isShopExperience ? 'Shop Home' : t('navigation.home')
+  const platformLinks = isShopExperience
+    ? [{ to: '/', label: 'Main Home', active: false }]
+    : [
+        { to: '/shop', label: 'Shop', active: pathname === '/shop' || pathname === '/store' },
+        { to: '/ship', label: 'Ship', active: pathname === '/ship' },
+        { to: '/track', label: 'Track', active: pathname === '/track' },
+        { to: '/rates', label: 'Rates', active: pathname === '/rates' },
+        { to: '/become-a-seller', label: 'Sell', active: pathname === '/become-a-seller' },
+      ]
   const isCategoriesActive = pathname.startsWith('/shop-by-category') || categoriesDropdownOpen
   const isOrdersActive = pathname === '/orders' || pathname.startsWith('/profile/orders')
   const isWishlistActive = pathname === '/profile/wishlist'
@@ -62,10 +83,10 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
     ? 'border-white/10 bg-white/6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
     : 'border-white/12 bg-slate-950/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
   const baseButtonClass =
-    'relative h-11 rounded-2xl px-4 text-sm font-medium cursor-pointer overflow-hidden text-white transition-all duration-300 hover:text-white'
+    'relative h-11 rounded-sm px-3 text-sm font-semibold cursor-pointer overflow-hidden text-white transition-all duration-300 hover:text-white'
   const activeSurfaceClass = isLightBg
-    ? 'absolute inset-0 rounded-2xl border border-amber-300/25 bg-white/12 shadow-[0_10px_24px_rgba(15,23,42,0.18)]'
-    : 'absolute inset-0 rounded-2xl border border-white/18 bg-white/10 shadow-[0_10px_24px_rgba(15,23,42,0.16)]'
+    ? 'absolute inset-0 rounded-sm border border-[#d6a936]/40 bg-white/10'
+    : 'absolute inset-0 rounded-sm border border-white/18 bg-white/10'
   const hoverSurfaceClass = isLightBg ? 'group-hover:bg-white/10' : 'group-hover:bg-white/8'
 
   return (
@@ -73,7 +94,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
       className={`hidden lg:flex items-center gap-1 rounded-[20px] border px-2 py-2 ${navShellClass}`}
       aria-label="Main navigation"
     >
-      <Link to="/">
+      <Link to={homeLink}>
         <motion.div className="relative group">
           <Button variant="ghost" className={`${baseButtonClass} ${isHomeActive ? 'font-semibold' : ''}`}>
             {isHomeActive && (
@@ -100,11 +121,11 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
               }}
               transition={{ duration: 0.2 }}
             >
-              {t('navigation.home')}
+              {homeLabel}
             </motion.span>
             {isHomeActive && (
               <motion.div
-                className="absolute bottom-1.5 left-4 right-4 h-0.5 rounded-full bg-linear-to-r from-amber-300 via-orange-300 to-sky-300"
+                className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-[#d6a936]"
                 layoutId="activeTabIndicator"
                 initial={false}
                 transition={{
@@ -117,6 +138,56 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
           </Button>
         </motion.div>
       </Link>
+
+      {platformLinks.map((item) => (
+        <Link key={item.to} to={item.to}>
+          <motion.div className="relative group">
+            <Button
+              variant="ghost"
+              className={`${baseButtonClass} ${item.active ? 'font-semibold' : ''}`}
+            >
+              {item.active && (
+                <motion.div
+                  layoutId="activeTab"
+                  className={activeSurfaceClass}
+                  initial={false}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 500,
+                    damping: 30,
+                  }}
+                />
+              )}
+              {!item.active && (
+                <motion.div
+                  className={`absolute inset-0 rounded-2xl bg-white/0 transition-colors duration-200 ${hoverSurfaceClass}`}
+                />
+              )}
+              <motion.span
+                className={`relative z-10 ${textClass}`}
+                animate={{
+                  color: '#FFFFFF',
+                }}
+                transition={{ duration: 0.2 }}
+              >
+                {item.label}
+              </motion.span>
+              {item.active && (
+                <motion.div
+                  className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-[#d6a936]"
+                  layoutId="activeTabIndicator"
+                  initial={false}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 500,
+                    damping: 30,
+                  }}
+                />
+              )}
+            </Button>
+          </motion.div>
+        </Link>
+      ))}
 
       <div
         className="relative"
@@ -172,7 +243,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
                 </motion.div>
                 {isCategoriesActive && (
                   <motion.div
-                    className="absolute bottom-1.5 left-4 right-4 h-0.5 rounded-full bg-linear-to-r from-amber-300 via-orange-300 to-sky-300"
+                    className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-[#d6a936]"
                     layoutId="activeTabIndicator"
                     initial={false}
                     transition={{
@@ -249,7 +320,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
                 </motion.span>
                 {isOrdersActive && (
                   <motion.div
-                    className="absolute bottom-1.5 left-4 right-4 h-0.5 rounded-full bg-linear-to-r from-amber-300 via-orange-300 to-sky-300"
+                    className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-[#d6a936]"
                     layoutId="activeTabIndicator"
                     initial={false}
                     transition={{
@@ -298,7 +369,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
                 </motion.span>
                 {isWishlistActive && (
                   <motion.div
-                    className="absolute bottom-1.5 left-4 right-4 h-0.5 rounded-full bg-linear-to-r from-amber-300 via-orange-300 to-sky-300"
+                    className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-[#d6a936]"
                     layoutId="activeTabIndicator"
                     initial={false}
                     transition={{

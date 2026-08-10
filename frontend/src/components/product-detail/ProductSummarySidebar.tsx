@@ -864,7 +864,7 @@ const ProductSummarySidebar: React.FC<ProductSummarySidebarProps> = ({
           {/* Kourier Boyz Fulfilled Delivery */}
           {/* <div className="flex items-center gap-1.5 sm:gap-2 pt-2 border-t border-gray-200">
             <img
-              src="/logo.png"
+              src="/brand/kourier-boyz-logo.png"
               alt="Kourier Boyz"
               className="w-4 h-4 sm:w-5 sm:h-5 object-contain shrink-0"
             />

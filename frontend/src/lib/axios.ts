@@ -70,6 +70,11 @@ const isPublicRoute = (): boolean => {
   // Public routes that should allow browsing without authentication
   const publicRoutes = [
     '/',
+    '/shop',
+    '/store',
+    '/ship',
+    '/track',
+    '/rates',
     '/login',
     '/register',
     '/reset-password',

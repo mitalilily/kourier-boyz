@@ -29,10 +29,10 @@ const HeroCinematicModern: React.FC = () => {
       <div className="absolute inset-0 flex flex-col items-start justify-center px-6 sm:px-10 md:px-20 lg:px-32">
         <div className="max-w-3xl">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-white font-bold leading-tight mb-4 md:mb-6">
-            Shop Smarter,
+            Discover Better,
             <br />
             <span className="bg-gradient-to-r from-yellow via-orange-400 to-pink-500 bg-clip-text text-transparent">
-              Live Better.
+              Delivered Better.
             </span>
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-gray-200 max-w-xl mb-6 md:mb-8 leading-relaxed">

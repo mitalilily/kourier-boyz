@@ -15,6 +15,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Product } from '../../api/products'
 import { useDealsProducts } from '../../api/products'
+import { demoProducts } from './demoStoreData'
 
 // Countdown Timer Component
 const CountdownTimer: React.FC<{ endDate?: string }> = ({ endDate }) => {
@@ -205,8 +206,12 @@ const DealCard: React.FC<{
 
 const DealsOfTheDay: React.FC = () => {
   const navigate = useNavigate()
-  const { data, isLoading } = useDealsProducts({ take: 12, scope: 'today' })
-  const deals = useMemo(() => data?.products || [], [data])
+  const { data } = useDealsProducts({ take: 12, scope: 'today' })
+  const apiDeals = useMemo(() => data?.products || [], [data])
+  const deals = useMemo(
+    () => (apiDeals.length > 0 ? apiDeals : demoProducts.filter((product) => product.discountPercent)),
+    [apiDeals],
+  )
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
@@ -279,23 +284,6 @@ const DealsOfTheDay: React.FC = () => {
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
     })
-  }
-
-  if (isLoading) {
-    return (
-      <div className="my-4">
-        <AuroraBackground className={auroraClassName} style={auroraStyle}>
-          <div className="relative z-10  mx-auto w-full px-4 py-8 md:py-10">
-            <div className="h-12 bg-white/70 rounded w-64 mb-6 animate-pulse" />
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-6 gap-4">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white/70 rounded-2xl h-[450px] animate-pulse" />
-              ))}
-            </div>
-          </div>
-        </AuroraBackground>
-      </div>
-    )
   }
 
   if (deals.length === 0) {

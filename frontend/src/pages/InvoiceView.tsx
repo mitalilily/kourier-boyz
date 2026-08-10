@@ -458,24 +458,24 @@ const InvoiceView = () => {
                         if (
                           branding.labelLogoUrl &&
                           target.src !== branding.labelLogoUrl &&
-                          !target.src.includes('logo-shaded.png')
+                          !target.src.includes('kourier-boyz-logo.png')
                         ) {
                           target.src = branding.labelLogoUrl
-                        } else if (!target.src.includes('logo-shaded.png')) {
-                          target.src = '/logo-shaded.png'
+                        } else if (!target.src.includes('kourier-boyz-logo.png')) {
+                          target.src = '/brand/kourier-boyz-logo.png'
                         }
                       }}
                     />
                   )}
                   {!branding.invoiceLogoUrl && !branding.labelLogoUrl && (
                     <img
-                      src="/logo.png"
+                      src="/brand/kourier-boyz-logo.png"
                       alt="Kourier Boyz"
                       className="ml-auto h-10 max-w-[150px] object-contain"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement
-                        if (!target.src.includes('logo-shaded.png')) {
-                          target.src = '/logo-shaded.png'
+                        if (!target.src.includes('kourier-boyz-logo.png')) {
+                          target.src = '/brand/kourier-boyz-logo.png'
                         }
                       }}
                     />

@@ -1,6 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
 import API from '../lib/axios'
 import type { CategoriesResponse, Category } from '../types/category'
+import { demoCategories } from '../components/Home/demoStoreData'
+
+const demoCategoriesResponse: CategoriesResponse = {
+  categories: demoCategories,
+  stats: {
+    total: demoCategories.length,
+    active: demoCategories.length,
+    inactive: 0,
+    top: demoCategories.filter((category) => category.top).length,
+  },
+}
 
 // Fetch all categories
 export const useCategories = (params?: {
@@ -37,9 +48,14 @@ export const useCategories = (params?: {
       }
 
       const url = queryParams.toString() ? `/categories?${queryParams}` : '/categories'
-      const response = await API.get(url)
-      return response.data
+      try {
+        const response = await API.get(url)
+        return response.data?.categories?.length ? response.data : demoCategoriesResponse
+      } catch {
+        return demoCategoriesResponse
+      }
     },
+    placeholderData: demoCategoriesResponse,
   })
 }
 
@@ -53,9 +69,18 @@ export const useCategory = (slug: string) => {
   return useQuery<Category>({
     queryKey: ['category', slug],
     queryFn: async () => {
-      const response = await API.get(`/categories/${slug}`)
-      return response.data
+      try {
+        const response = await API.get(`/categories/${slug}`)
+        return response.data
+      } catch {
+        const category = demoCategories.find(
+          (item) => item.slug === slug || item._id === slug,
+        )
+        if (!category) throw new Error('Category not found')
+        return category
+      }
     },
+    placeholderData: demoCategories.find((item) => item.slug === slug || item._id === slug),
     enabled: !!slug,
   })
 }

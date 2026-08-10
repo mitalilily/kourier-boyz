@@ -69,7 +69,7 @@ const ProductSEO: React.FC<ProductSEOProps> = ({ product, variant, selectedImage
         return getAbsoluteImageUrl(product.images[0])
       }
       // Fallback to a default image if available
-      return `${window.location.origin}/logo.png`
+      return `${window.location.origin}/brand/kourier-boyz-logo.png`
     }
 
     // Get description for OG tags

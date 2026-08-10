@@ -276,10 +276,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           value={searchQuery}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder={t('navigation.searchPlaceholder')}
-          className={`${inputClassName ?? ''} rounded-2xl border pl-14 pr-24 shadow-sm transition-all duration-300 ${
+          className={`${inputClassName ?? ''} rounded-sm border pl-14 pr-24 shadow-sm transition-all duration-300 ${
             isLightBg
-              ? 'border-white/12 bg-white/96 text-gray-900 placeholder:text-gray-500 focus:border-sky-300 focus:shadow-[0_14px_32px_rgba(15,23,42,0.16)]'
-              : 'border-white/12 bg-white/94 text-gray-900 placeholder:text-gray-500 backdrop-blur-md focus:border-sky-300 focus:shadow-[0_14px_32px_rgba(15,23,42,0.16)]'
+              ? 'border-white/12 bg-white/96 text-gray-900 placeholder:text-gray-500 focus:border-[#d4aa40] focus:shadow-[0_10px_24px_rgba(15,15,15,0.14)]'
+              : 'border-white/12 bg-white/94 text-gray-900 placeholder:text-gray-500 backdrop-blur-md focus:border-[#d4aa40] focus:shadow-[0_10px_24px_rgba(15,15,15,0.14)]'
           }`}
           onFocus={() => {
             // Show dropdown on focus to show recent/trending

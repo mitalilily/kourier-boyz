@@ -655,7 +655,7 @@ const ReviewPage: React.FC = () => {
           name: 'Kourier Boyz – Secure Checkout',
           order_id: rzpOrderId,
           description: 'Pay securely with UPI or card. Powered by Razorpay.',
-          image: '/logo-shaded.png',
+          image: '/brand/kourier-boyz-mark.png',
           prefill: {
             name: selectedAddress.fullName,
             contact: selectedAddress.phone,

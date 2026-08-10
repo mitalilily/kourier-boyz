@@ -71,13 +71,13 @@ const CategoriesSidebar: React.FC<CategoriesSidebarProps> = ({
                         }`}
                       >
                         <img
-                          src={category.mainImage || '/logo.png'}
+                          src={category.mainImage || '/brand/kourier-boyz-mark.png'}
                           alt={category.name}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                           loading="lazy"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement
-                            target.src = '/logo.png'
+                            target.src = '/brand/kourier-boyz-mark.png'
                           }}
                         />
                       </div>

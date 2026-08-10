@@ -7,7 +7,7 @@ import type { Category } from '../../types/category'
 import { Card } from '../ui/card'
 import { ScrollArea } from '../ui/scroll-area'
 
-const FALLBACK_IMAGE = '/logo.png'
+const FALLBACK_IMAGE = '/brand/kourier-boyz-mark.png'
 
 interface CategoriesPopoverProps {
   categories: Category[]

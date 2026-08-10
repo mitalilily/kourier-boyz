@@ -1,20 +1,25 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTopCategories } from '../../api/categories'
 import type { Category } from '../../types/category'
 import SectionHeading from '../ui/SectionHeading'
+import { demoCategories } from './demoStoreData'
 
 const TopCategoriesSection: React.FC = () => {
   const navigate = useNavigate()
-  const { data, isLoading } = useTopCategories()
+  const { data } = useTopCategories()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
   const [isCompactLayout, setIsCompactLayout] = useState(false)
 
-  const categories = data?.categories || []
+  const apiCategories = data?.categories || []
+  const categories = useMemo(
+    () => (apiCategories.length > 0 ? apiCategories : demoCategories),
+    [apiCategories],
+  )
 
   const flatCategories: typeof categories = []
   const seenIds = new Set<string>()
@@ -179,25 +184,6 @@ const TopCategoriesSection: React.FC = () => {
           <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent opacity-0 transition-transform duration-1000 group-hover:translate-x-full group-hover:opacity-100" />
         </div>
       </motion.div>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="bg-white py-16 my-4">
-        <div className=" mx-auto px-4">
-          <SectionHeading
-            title="Top"
-            italicPart="Categories"
-            subtitle="Shop our most popular categories"
-          />
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6">
-            {[...Array(isCompactLayout ? 4 : 5)].map((_, i) => (
-              <div key={i} className="bg-gray-200 rounded-2xl h-64 animate-pulse" />
-            ))}
-          </div>
-        </div>
-      </div>
     )
   }
 

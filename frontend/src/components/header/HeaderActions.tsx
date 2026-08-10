@@ -96,7 +96,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
                   : ''
               } ${
                 isLightBg
-                  ? 'border border-white/12 bg-linear-to-br from-sky-500 via-blue-500 to-slate-800 text-white hover:from-sky-400 hover:via-blue-500 hover:to-slate-700'
+                  ? 'border border-[#d3a738]/45 bg-[#2a2a2a] text-[#e0b43e] hover:bg-[#333]'
                   : 'border border-white/20 bg-white/12 text-white hover:bg-white/18 backdrop-blur-sm'
               }`}
             >
@@ -135,7 +135,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
               <Button
                 className={`h-11 rounded-2xl px-5 text-sm font-medium transition-all duration-300 shadow-lg cursor-pointer ${
                   isLightBg
-                    ? 'border border-sky-300/35 bg-linear-to-r from-amber-300 via-orange-300 to-sky-300 text-slate-950 hover:brightness-105 hover:shadow-xl'
+                    ? 'border border-[#e2bd5c] bg-[#d3a738] text-[#171717] hover:bg-[#e0b43e] hover:shadow-xl'
                     : 'border border-white/20 bg-white text-gray-900 hover:bg-gray-50 hover:shadow-xl'
                 }`}
               >

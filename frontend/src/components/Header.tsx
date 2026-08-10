@@ -104,7 +104,12 @@ const Header: React.FC = () => {
         return
       }
       // On desktop, on home page, use scroll-based logic: transparent when at top, gradient dark when scrolled
-      if (location.pathname === '/' || location.pathname === '/home') {
+      if (
+        location.pathname === '/' ||
+        location.pathname === '/home' ||
+        location.pathname === '/shop' ||
+        location.pathname === '/store'
+      ) {
         const threshold = 500
         setIsLightBg(window.scrollY > threshold)
         return
@@ -135,23 +140,34 @@ const Header: React.FC = () => {
 
   // Always use white text for dark theme
   const textClass = 'text-white'
+  const isShopExperience =
+    location.pathname === '/shop' ||
+    location.pathname === '/store' ||
+    location.pathname.startsWith('/product/') ||
+    location.pathname.startsWith('/products/') ||
+    location.pathname.startsWith('/shop-by-category') ||
+    location.pathname.startsWith('/search') ||
+    location.pathname === '/cart' ||
+    location.pathname.startsWith('/profile/orders') ||
+    location.pathname.startsWith('/profile/wishlist')
+  const logoLink = isShopExperience ? '/shop' : '/'
 
   // On mobile, always use scrolled colors regardless of scroll position
   const effectiveScrolled = isScrolled
 
-  // Dark theme: transparent when !isLightBg, gradient dark when isLightBg
+  // Branded charcoal surface keeps navigation legible over photography and store artwork.
   const headerBackground = isLightBg
-    ? 'linear-gradient(135deg, rgba(15,23,42,0.96), rgba(17,24,39,0.94) 48%, rgba(30,41,59,0.92))'
-    : 'linear-gradient(135deg, rgba(15,23,42,0.78), rgba(15,23,42,0.54) 52%, rgba(30,41,59,0.34))'
+    ? 'rgba(24,24,24,0.98)'
+    : 'rgba(24,24,24,0.91)'
 
   const headerBorder = isLightBg
-    ? '1px solid rgba(255,255,255,0.14)'
+    ? '1px solid rgba(224,180,62,0.36)'
     : effectiveScrolled
     ? '1px solid rgba(255,255,255,0.16)'
     : '1px solid rgba(255,255,255,0.12)'
 
   const headerShadow = isLightBg
-    ? '0 18px 45px rgba(2, 6, 23, 0.34), 0 4px 20px rgba(15, 23, 42, 0.28)'
+    ? '0 14px 32px rgba(15,15,15,0.22)'
     : effectiveScrolled
     ? '0 18px 45px rgba(2, 6, 23, 0.34), 0 4px 20px rgba(15, 23, 42, 0.28)'
     : '0 14px 38px rgba(2, 6, 23, 0.26), 0 4px 16px rgba(15, 23, 42, 0.18)'
@@ -172,7 +188,7 @@ const Header: React.FC = () => {
           className="w-full px-3 pt-2 transition-all duration-700 ease-in-out sm:px-4 lg:px-6"
         >
           <div
-            className={`relative flex w-full items-center justify-between gap-4 rounded-[22px] px-3 py-2.5 transition-all duration-700 ease-in-out sm:px-5 lg:px-6 ${
+            className={`relative flex w-full items-center justify-between gap-4 rounded-md px-3 py-2.5 transition-all duration-700 ease-in-out sm:px-5 lg:px-6 ${
               effectiveScrolled ? 'shadow-xl' : 'shadow-lg'
             }`}
             style={{
@@ -186,18 +202,17 @@ const Header: React.FC = () => {
               transition: 'all 0.5s cubic-bezier(0.4,0,0.2,1)',
             }}
           >
-            <div className="absolute inset-x-0 top-0 -z-10 h-20 rounded-[22px] bg-linear-to-r from-amber-400/8 via-transparent to-sky-400/10 blur-2xl" />
             <div className="flex min-w-0 items-center gap-3 sm:gap-5">
               <Link
-                to="/"
-                className="flex shrink-0 items-center rounded-2xl border border-white/10 bg-white/6 px-2.5 py-1.5 transition-all hover:scale-[1.02] hover:border-white/20 hover:bg-white/10"
+                to={logoLink}
+                className="flex shrink-0 items-center px-1 py-1 transition-opacity hover:opacity-90"
                 aria-label="Kourier Boyz Home"
                 style={{ height: '100%', display: 'flex', alignItems: 'center' }}
               >
                 <img
-                  src="/logo-shaded.png"
+                  src="/brand/kourier-boyz-logo-nav-cropped.png"
                   alt="Kourier Boyz"
-                  className="h-12 w-16 object-contain brightness-110 transition-all duration-300 group-hover:scale-110 sm:h-14 sm:w-20 md:h-16 md:w-24"
+                  className="h-11 w-44 object-contain drop-shadow-[0_1px_1px_rgba(255,255,255,0.16)] sm:w-48 xl:h-12 xl:w-52"
                 />
               </Link>
 
@@ -293,7 +308,7 @@ const Header: React.FC = () => {
           }}
         >
           <div
-            className="rounded-[20px] px-3 py-3 shadow-lg"
+            className="rounded-md px-3 py-3 shadow-lg"
             style={{
               background: headerBackground,
               backdropFilter: headerBackdrop,

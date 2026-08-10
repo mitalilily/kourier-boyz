@@ -77,7 +77,7 @@ const Home = () => {
             transition: margin-top 0.3s ease-in-out;
           }
         `}</style>
-        <div className="home-page-container min-h-screen">
+        <div className="home-page-container kb-store-shell min-h-screen">
         {/* Birthday Recap Modal - Show once per day if it's the user's birthday */}
         {isAuthenticated && (
           <BirthdayRecap

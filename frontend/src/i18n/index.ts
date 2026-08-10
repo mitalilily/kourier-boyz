@@ -59,17 +59,17 @@ const resources = {
         signUp: 'Sign up',
       },
       footer: {
-        joinCommunityTitle: 'Join our community',
+        joinCommunityTitle: 'Useful updates, no clutter',
         joinCommunitySubtitle:
-          'Get curated tips, how-to blogs, and product insights delivered straight to your inbox.',
+          'Get practical shipping guidance, seller updates, and selected marketplace offers.',
         emailPlaceholder: 'Enter your email',
         subscribe: 'Subscribe',
         brandDescription:
-          'Kourier Boyz delivers trusted quality with speed and care. We bring you products that simplify your lifestyle, with service you can rely on.',
-        contactPhoneLabel: '+1 (234) 567-890',
+          'Shop useful products, send parcels, and run marketplace orders with dependable delivery support.',
+        contactPhoneLabel: '',
         contactEmailLabel: 'support@kourierboyz.com',
-        contactAddress: '123 Commerce Street, Business City',
-        legalNotice: '© {{year}} Kourier Boyz — All rights reserved.',
+        contactAddress: '',
+        legalNotice: 'Copyright {{year}} Kourier Boyz. All rights reserved.',
         nav: {
           privacyPolicy: 'Privacy Policy',
           terms: 'Terms of Service',
@@ -162,10 +162,10 @@ const resources = {
         subscribe: 'सदस्यता लें',
         brandDescription:
           'टेटोज़ आपको भरोसेमंद गुणवत्ता तेज़ी और देखभाल के साथ प्रदान करता है। हम ऐसे उत्पाद लाते हैं जो आपके जीवन को आसान बनाते हैं और सेवा जिस पर आप भरोसा कर सकते हैं।',
-        contactPhoneLabel: '+91 98765 43210',
+        contactPhoneLabel: '',
         contactEmailLabel: 'support@kourierboyz.com',
-        contactAddress: '123 कॉमर्स स्ट्रीट, बिज़नेस सिटी',
-        legalNotice: '© {{year}} टेटोज़ — सर्वाधिकार सुरक्षित।',
+        contactAddress: '',
+        legalNotice: 'Copyright {{year}} Kourier Boyz. All rights reserved.',
         nav: {
           privacyPolicy: 'गोपनीयता नीति',
           terms: 'सेवा की शर्तें',

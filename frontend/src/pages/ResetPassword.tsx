@@ -254,7 +254,7 @@ const ResetPassword = () => {
         <Card className="bg-white/95 backdrop-blur-sm shadow-xl border border-slate-200/50 rounded-3xl">
           <CardHeader className="text-center space-y-1 px-6 pt-6 pb-4">
             <img
-              src="/logo-shaded.png"
+              src="/brand/kourier-boyz-logo.png"
               alt="Kourier Boyz"
               className="w-24 h-14 object-contain mb-3 mx-auto drop-shadow-lg"
             />

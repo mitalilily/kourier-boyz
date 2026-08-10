@@ -6,10 +6,18 @@ import { useTrendingProducts } from '../../api/products'
 import ProductCard from '../ui/ProductCard'
 import SectionHeading from '../ui/SectionHeading'
 import { getProductDisplayInfo } from '@/utils/productDisplay'
+import { demoProducts } from './demoStoreData'
 
 const TrendingProducts: React.FC = () => {
-  const { data, isLoading } = useTrendingProducts(20) // Fetch more products for scrolling
-  const trendingProducts = useMemo(() => data?.products || [], [data?.products])
+  const { data } = useTrendingProducts(20) // Fetch more products for scrolling
+  const apiProducts = useMemo(() => data?.products || [], [data?.products])
+  const trendingProducts = useMemo(
+    () =>
+      apiProducts.length > 0
+        ? apiProducts
+        : demoProducts.slice().sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)),
+    [apiProducts],
+  )
   const displayProducts = useMemo(() => {
     return trendingProducts.map((product) => {
       const display = getProductDisplayInfo(product)
@@ -71,21 +79,6 @@ const TrendingProducts: React.FC = () => {
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
     })
-  }
-
-  if (isLoading) {
-    return (
-      <div className="py-8">
-        <div className=" mx-auto px-4 md:px-8">
-          <div className="h-12 bg-gray-200 rounded w-64 mb-8 animate-pulse" />
-          <div className="flex gap-4 overflow-hidden">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="bg-gray-200 rounded-xl h-80 w-56 animate-pulse" />
-            ))}
-          </div>
-        </div>
-      </div>
-    )
   }
 
   if (displayProducts.length === 0) {

@@ -8,7 +8,21 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { Grid3x3, Heart, Home, LocateFixed, LogOut, Menu, Package, Sparkles } from 'lucide-react'
+import {
+  Calculator,
+  Grid3x3,
+  Heart,
+  Home,
+  LocateFixed,
+  LogOut,
+  Menu,
+  Package,
+  Search,
+  ShoppingBag,
+  Sparkles,
+  Store,
+  Truck,
+} from 'lucide-react'
 import type { FC, ReactElement } from 'react'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -47,6 +61,27 @@ export const MobileHeaderMenu: FC<MobileHeaderMenuProps> = ({
 }) => {
   const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null!)
+  const isShopExperience =
+    pathname === '/shop' ||
+    pathname === '/store' ||
+    pathname.startsWith('/product/') ||
+    pathname.startsWith('/products/') ||
+    pathname.startsWith('/shop-by-category') ||
+    pathname.startsWith('/search') ||
+    pathname === '/cart' ||
+    pathname.startsWith('/profile/orders') ||
+    pathname.startsWith('/profile/wishlist')
+  const homeLink = isShopExperience ? '/shop' : '/'
+  const homeLabel = isShopExperience ? 'Shop Home' : t('navigation.home')
+  const platformLinks = isShopExperience
+    ? [{ to: '/', label: 'Main Home', Icon: Home }]
+    : [
+        { to: '/shop', label: 'Shop', Icon: ShoppingBag },
+        { to: '/ship', label: 'Ship', Icon: Truck },
+        { to: '/track', label: 'Track', Icon: Search },
+        { to: '/rates', label: 'Rates', Icon: Calculator },
+        { to: '/become-a-seller', label: 'Sell', Icon: Store },
+      ]
 
   const renderMobileCategoryItem = (category: Category, level = 0): ReactElement => {
     const hasSubcategories = category.subcategories && category.subcategories.length > 0
@@ -163,18 +198,39 @@ export const MobileHeaderMenu: FC<MobileHeaderMenuProps> = ({
           <nav className="flex-1 overflow-y-auto px-4 py-4" aria-label="Mobile navigation">
             <div className="space-y-2">
             <SheetClose asChild>
-              <Link to="/">
+              <Link to={homeLink}>
                 <Button
                   variant="ghost"
                     className={`h-12 w-full justify-start rounded-2xl px-4 text-sm font-medium transition-colors ${
-                      pathname === '/' ? 'bg-slate-950 text-white hover:bg-slate-900' : 'bg-white'
+                      (isShopExperience ? pathname === '/shop' || pathname === '/store' : pathname === '/')
+                        ? 'bg-slate-950 text-white hover:bg-slate-900'
+                        : 'bg-white'
                     }`}
                 >
                   <Home className="mr-3 h-4 w-4" />
-                  {t('navigation.home')}
+                  {homeLabel}
                 </Button>
               </Link>
             </SheetClose>
+
+            {platformLinks.map((item) => {
+              const Icon = item.Icon
+              return (
+                <SheetClose asChild key={item.to}>
+                  <Link to={item.to}>
+                    <Button
+                      variant="ghost"
+                      className={`h-12 w-full justify-start rounded-2xl px-4 text-sm font-medium transition-colors ${
+                        pathname === item.to ? 'bg-slate-950 text-white hover:bg-slate-900' : 'bg-white'
+                      }`}
+                    >
+                      <Icon className="mr-3 h-4 w-4" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                </SheetClose>
+              )
+            })}
 
             {isAuthenticated ? (
               <>

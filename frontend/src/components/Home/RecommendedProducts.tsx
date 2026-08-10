@@ -7,6 +7,7 @@ import { useAuthStore } from '../../store/authStore'
 import ProductCard from '../ui/ProductCard'
 import SectionHeading from '../ui/SectionHeading'
 import { getProductDisplayInfo } from '@/utils/productDisplay'
+import { demoProducts } from './demoStoreData'
 
 const RecommendedProducts: React.FC = () => {
   const navigate = useNavigate()
@@ -19,7 +20,11 @@ const RecommendedProducts: React.FC = () => {
     enabled: isAuthenticated,
   })
 
-  const products = useMemo(() => data?.products ?? [], [data])
+  const apiProducts = useMemo(() => data?.products ?? [], [data])
+  const products = useMemo(
+    () => (apiProducts.length > 0 ? apiProducts : demoProducts.filter((product) => product.isFeatured)),
+    [apiProducts],
+  )
 
   const cardData = useMemo(() => {
     return products.map((product) => {
@@ -44,7 +49,7 @@ const RecommendedProducts: React.FC = () => {
   }, [products])
 
   const hasProducts = cardData.length > 0
-  const shouldRender = isAuthenticated && (isLoading || hasProducts)
+  const shouldRender = isLoading || hasProducts
 
   const handleProductClick = (id: string | number) => {
     navigate(`/product/${id}`)
