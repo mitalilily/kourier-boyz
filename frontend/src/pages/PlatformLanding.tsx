@@ -194,12 +194,12 @@ const PlatformLanding = () => {
                 </div>
                 <div className="mt-9 grid gap-4">
                   <Link to="/shop" className="kb-shop-entry-cta group">
-                    <span className="kb-shop-entry-cta-icon"><ShoppingBag className="h-6 w-6" /></span>
                     <span className="min-w-0 flex-1">
-                      <strong>Enter the marketplace</strong>
-                      <small>Shop new arrivals, useful finds, and today's best offers</small>
+                      <small>Marketplace</small>
+                      <strong>Explore the complete collection</strong>
+                      <span>Curated products, secure checkout, and doorstep delivery.</span>
                     </span>
-                    <span className="kb-shop-entry-cta-arrow"><ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" /></span>
+                    <span className="kb-shop-entry-cta-action">Shop now <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span>
                   </Link>
                   <Link to="/shop-by-category" className="kb-text-link w-fit">
                     Browse all categories <ArrowRight className="h-4 w-4" />
@@ -214,7 +214,7 @@ const PlatformLanding = () => {
                     <h3 className="mt-2 text-2xl font-semibold">A quick look inside</h3>
                   </div>
                   <Link to="/shop" className="kb-button kb-shop-preview-button hidden sm:inline-flex">
-                    Open full shop <ShoppingBag className="h-4 w-4" />
+                    View marketplace <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
                 <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-5">
@@ -248,7 +248,7 @@ const PlatformLanding = () => {
                   ))}
                 </div>
                 <Link to="/shop" className="kb-button kb-shop-preview-button mt-7 w-full sm:hidden">
-                  Open full shop <ShoppingBag className="h-4 w-4" />
+                  View marketplace <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>
