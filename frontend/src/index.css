@@ -639,6 +639,7 @@
   .kb-silver-section {
     background-color: #e4e5e5;
     background-image:
+      repeating-linear-gradient(92deg, rgba(76, 82, 87, 0.07) 0 1px, transparent 1px 14px),
       linear-gradient(112deg, rgba(255,255,255,0.94) 0%, rgba(222,224,225,0.9) 38%, rgba(248,248,247,0.96) 67%, rgba(196,199,201,0.9) 100%);
   }
 
@@ -849,16 +850,16 @@
   .kb-shop-pattern {
     background-color: #f8f8f6;
     background-image:
-      linear-gradient(rgba(183, 129, 21, 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(183, 129, 21, 0.045) 1px, transparent 1px);
+      linear-gradient(rgba(183, 129, 21, 0.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(183, 129, 21, 0.09) 1px, transparent 1px);
     background-size: 32px 32px;
   }
 
   .kb-pattern-route-grid {
     background-color: #fbfbf9;
     background-image:
-      linear-gradient(90deg, transparent 0 49%, rgba(183, 129, 21, 0.075) 49% 50%, transparent 50% 100%),
-      linear-gradient(0deg, transparent 0 49%, rgba(83, 91, 98, 0.065) 49% 50%, transparent 50% 100%),
+      linear-gradient(90deg, transparent 0 49%, rgba(183, 129, 21, 0.13) 49% 50%, transparent 50% 100%),
+      linear-gradient(0deg, transparent 0 49%, rgba(83, 91, 98, 0.11) 49% 50%, transparent 50% 100%),
       linear-gradient(135deg, rgba(255,255,255,0.82), rgba(239,241,241,0.48));
     background-size: 88px 88px, 88px 88px, 100% 100%;
   }
@@ -866,22 +867,22 @@
   .kb-pattern-diagonal {
     background-color: #f2f3f2;
     background-image:
-      repeating-linear-gradient(118deg, rgba(85, 94, 101, 0.055) 0 1px, transparent 1px 22px),
+      repeating-linear-gradient(118deg, rgba(85, 94, 101, 0.1) 0 1px, transparent 1px 22px),
       linear-gradient(90deg, rgba(255,255,255,0.88), rgba(224,226,226,0.42), rgba(255,255,255,0.76));
   }
 
   .kb-pattern-rings {
     background-color: #f7f6f2;
     background-image:
-      repeating-radial-gradient(circle at 88% 18%, transparent 0 34px, rgba(183,129,21,0.075) 35px 36px, transparent 37px 68px),
+      repeating-radial-gradient(circle at 88% 18%, transparent 0 34px, rgba(183,129,21,0.13) 35px 36px, transparent 37px 68px),
       linear-gradient(120deg, rgba(255,255,255,0.92), rgba(231,234,235,0.36));
   }
 
   .kb-pattern-weave {
     background-color: #f6f7f5;
     background-image:
-      linear-gradient(45deg, rgba(85, 105, 96, 0.048) 25%, transparent 25%, transparent 75%, rgba(85, 105, 96, 0.048) 75%),
-      linear-gradient(45deg, rgba(183, 129, 21, 0.04) 25%, transparent 25%, transparent 75%, rgba(183, 129, 21, 0.04) 75%),
+      linear-gradient(45deg, rgba(85, 105, 96, 0.085) 25%, transparent 25%, transparent 75%, rgba(85, 105, 96, 0.085) 75%),
+      linear-gradient(45deg, rgba(183, 129, 21, 0.075) 25%, transparent 25%, transparent 75%, rgba(183, 129, 21, 0.075) 75%),
       linear-gradient(180deg, rgba(255,255,255,0.76), rgba(238,241,238,0.76));
     background-position: 0 0, 18px 18px, 0 0;
     background-size: 36px 36px, 36px 36px, 100% 100%;
@@ -890,7 +891,7 @@
   .kb-pattern-dot-matrix {
     background-color: #fbfbfa;
     background-image:
-      radial-gradient(circle, rgba(84, 91, 97, 0.16) 1px, transparent 1.4px),
+      radial-gradient(circle, rgba(84, 91, 97, 0.24) 1.2px, transparent 1.6px),
       linear-gradient(110deg, rgba(255,255,255,0.96), rgba(235,237,237,0.48));
     background-size: 22px 22px, 100% 100%;
   }
@@ -898,7 +899,7 @@
   .kb-pattern-gold-finale {
     background-color: #a87310;
     background-image:
-      repeating-linear-gradient(122deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 18px),
+      repeating-linear-gradient(122deg, rgba(255,255,255,0.18) 0 1px, transparent 1px 18px),
       linear-gradient(90deg, #9b670b 0%, #bf8b20 48%, #8f5f0a 100%);
     border-block: 1px solid rgba(91, 57, 4, 0.32);
   }
@@ -907,8 +908,8 @@
     background-color: #efefec;
     background-image: repeating-linear-gradient(
       112deg,
-      rgba(255, 255, 255, 0.55) 0,
-      rgba(255, 255, 255, 0.55) 1px,
+      rgba(255, 255, 255, 0.78) 0,
+      rgba(255, 255, 255, 0.78) 1px,
       transparent 1px,
       transparent 9px
     );
@@ -1087,7 +1088,7 @@
   .kb-footer-link {
     position: relative;
     width: fit-content;
-    color: rgba(255, 255, 255, 0.58);
+    color: #515754;
     font-size: 0.875rem;
     transition: color 180ms ease, transform 180ms ease;
   }
@@ -1107,7 +1108,7 @@
 
   .kb-footer-link:hover {
     transform: translateX(3px);
-    color: #fff;
+    color: #8c6210;
   }
 
   .kb-footer-link:hover::after {
@@ -1123,7 +1124,24 @@
   }
 
   .kb-footer-contact:hover {
-    color: #dfb743;
+    color: #8c6210;
+  }
+
+  .kb-footer-surface {
+    background-color: #f0f1ef;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(142, 101, 17, 0.16) 1.1px, transparent 1.5px),
+      repeating-linear-gradient(118deg, rgba(83, 91, 88, 0.07) 0 1px, transparent 1px 20px),
+      linear-gradient(108deg, rgba(255, 255, 255, 0.96), rgba(224, 227, 225, 0.78) 52%, rgba(249, 249, 247, 0.94));
+    background-size: 28px 28px, auto, 100% 100%;
+  }
+
+  .kb-footer-cta {
+    background-color: #ead8a8;
+    background-image:
+      repeating-linear-gradient(125deg, rgba(116, 82, 14, 0.09) 0 1px, transparent 1px 18px),
+      linear-gradient(96deg, rgba(255, 250, 232, 0.92), rgba(222, 192, 115, 0.78), rgba(249, 241, 215, 0.9));
+    background-size: auto, 100% 100%;
   }
 
   .kb-field {
@@ -1215,10 +1233,17 @@
     font-weight: 600;
   }
 
-  .kb-shop-pattern,
-  .kb-metal-pattern {
-    animation: none;
-  }
+  .kb-shop-pattern { animation: kb-pattern-drift 34s ease-in-out infinite alternate; }
+  .kb-pattern-route-grid { animation: kb-pattern-drift 42s ease-in-out infinite alternate-reverse; }
+  .kb-pattern-diagonal { animation: kb-pattern-drift 48s ease-in-out infinite alternate; }
+  .kb-silver-section { animation: kb-pattern-drift 54s ease-in-out infinite alternate-reverse; }
+  .kb-pattern-rings { animation: kb-pattern-drift 58s ease-in-out infinite alternate; }
+  .kb-pattern-weave { animation: kb-pattern-drift 46s ease-in-out infinite alternate-reverse; }
+  .kb-metal-pattern { animation: kb-pattern-drift 60s ease-in-out infinite alternate; }
+  .kb-pattern-dot-matrix { animation: kb-pattern-drift 52s ease-in-out infinite alternate-reverse; }
+  .kb-pattern-gold-finale { animation: kb-pattern-drift 44s ease-in-out infinite alternate; }
+  .kb-footer-surface { animation: kb-pattern-drift 58s ease-in-out infinite alternate; }
+  .kb-footer-cta { animation: kb-pattern-drift 46s ease-in-out infinite alternate-reverse; }
 
   .kb-stage-marker {
     animation: kb-stage-pulse 3.6s ease-in-out infinite;
@@ -1256,6 +1281,11 @@
 @keyframes kb-hero-breathe {
   from { transform: scale(1); }
   to { transform: scale(1.025); }
+}
+
+@keyframes kb-pattern-drift {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 48px 28px, -36px 22px, 0 0; }
 }
 
 @supports (animation-timeline: view()) {
@@ -1319,6 +1349,15 @@
   .kb-hero-image,
   .kb-shop-pattern,
   .kb-metal-pattern,
+  .kb-silver-section,
+  .kb-pattern-route-grid,
+  .kb-pattern-diagonal,
+  .kb-pattern-rings,
+  .kb-pattern-weave,
+  .kb-pattern-dot-matrix,
+  .kb-pattern-gold-finale,
+  .kb-footer-surface,
+  .kb-footer-cta,
   .kb-stage-marker {
     animation: none !important;
   }
