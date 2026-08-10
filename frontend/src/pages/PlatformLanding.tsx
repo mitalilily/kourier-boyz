@@ -16,6 +16,7 @@ import {
   Search,
   ShoppingBag,
   Sparkles,
+  Star,
   Store,
   Truck,
   Users,
@@ -26,13 +27,10 @@ import {
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
-const categories = ['Fashion', 'Electronics', 'Home & Living', 'Beauty', 'Gifts', 'Travel']
-
 const products = [
-  { name: 'Street Flex Sneakers', price: 'Rs. 1,499', image: '/home-banner.png', slug: 'street-flex-sneakers' },
-  { name: 'PulseFit Smart Watch', price: 'Rs. 2,999', image: '/products/watch.webp', slug: 'smart-watch-series-5' },
-  { name: 'Modern Accent Chair', price: 'Rs. 5,799', image: '/products/chair.jpg', slug: 'modern-accent-chair' },
-  { name: 'Everyday Cotton Tee', price: 'Rs. 499', image: '/products/tshirt.jpg', slug: 'classic-everyday-cotton-t-shirt' },
+  { name: 'PulseFit Smart Watch', price: 'Rs. 2,999', image: '/products/watch.webp', slug: 'smart-watch-series-5', badge: 'Trending', rating: '4.8' },
+  { name: 'Modern Accent Chair', price: 'Rs. 5,799', image: '/products/chair.jpg', slug: 'modern-accent-chair', badge: 'New arrival', rating: '4.7' },
+  { name: 'Everyday Cotton Tee', price: 'Rs. 499', image: '/products/tshirt.jpg', slug: 'classic-everyday-cotton-t-shirt', badge: 'Everyday pick', rating: '4.9' },
 ]
 
 const capabilities = [
@@ -80,7 +78,6 @@ const faqs = [
 
 const PlatformLanding = () => {
   const navigate = useNavigate()
-  const sellerUrl = import.meta.env.VITE_SELLER_URL || 'http://localhost:5175'
   const [trackingNumber, setTrackingNumber] = useState('')
   const [activeJourney, setActiveJourney] = useState<'buyer' | 'shipper' | 'seller'>('buyer')
 
@@ -104,16 +101,16 @@ const PlatformLanding = () => {
       title: 'Ship orders from wherever you make the sale.',
       copy: 'Bring orders from your website, social media, another marketplace, retail store, or spreadsheets. Selling here is never compulsory.',
       points: ['Compare courier options', 'Generate AWB and labels', 'Track COD and delivery exceptions'],
-      cta: 'Start shipping',
-      href: '/ship',
+      cta: 'Compare shipping rates',
+      href: '/rates',
     },
     seller: {
       eyebrow: 'For marketplace brands',
       title: 'Run your storefront and fulfilment from one account.',
       copy: 'Unlock catalogue, inventory, marketplace orders, promotions, and connected shipping when your brand is ready.',
       points: ['Product and inventory management', 'Marketplace order operations', 'Integrated pickup and tracking'],
-      cta: 'Open seller panel',
-      href: sellerUrl,
+      cta: 'Ship your first order',
+      href: '/ship',
     },
   }
 
@@ -121,41 +118,135 @@ const PlatformLanding = () => {
 
   return (
     <main className="kb-site min-h-screen text-[#171717]">
-      <section className="kb-hero relative min-h-[720px] overflow-hidden bg-[#f4f3ef] pt-32 lg:min-h-[780px] lg:pt-28">
+      <section className="kb-hero relative min-h-[790px] overflow-hidden bg-[#f4f3ef] pt-28 sm:pt-32 lg:min-h-[860px] lg:pt-28">
         <img
           src="/brand/kourier-boyz-commerce-hero.webp"
           alt="Kourier Boyz marketplace products and delivery network"
-          className="absolute inset-0 h-full w-full object-cover object-[68%_center]"
+          className="kb-hero-image absolute inset-0 h-full w-full object-cover object-[69%_center]"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,#f7f6f2_0%,rgba(247,246,242,0.98)_36%,rgba(247,246,242,0.72)_54%,rgba(247,246,242,0.08)_82%)]" />
-        <div className="relative z-10 mx-auto flex min-h-[610px] max-w-7xl items-center px-5 py-12 sm:px-8 lg:px-10">
-          <div className="max-w-[650px]">
-            <div className="kb-eyebrow"><BadgeCheck className="h-4 w-4" /> Marketplace and shipping, together</div>
-            <h1 className="mt-6 max-w-[630px] text-[43px] font-semibold leading-[1.08] tracking-normal sm:text-6xl lg:text-[68px]">
-              Sell it here. Ship it from anywhere.
+        <div className="kb-hero-wash absolute inset-0 bg-[linear-gradient(90deg,#f8f7f3_0%,rgba(248,247,243,0.985)_34%,rgba(248,247,243,0.78)_49%,rgba(248,247,243,0.08)_76%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(248,247,243,0.9)_0%,transparent_28%)]" />
+
+        <div className="relative z-10 mx-auto flex min-h-[680px] max-w-7xl items-center px-5 py-12 sm:px-8 lg:min-h-[730px] lg:px-10">
+          <div className="max-w-[690px]">
+            <div className="kb-eyebrow kb-hero-intro"><span className="kb-live-dot" /> One platform, always in motion</div>
+            <h1 className="kb-hero-heading mt-7 max-w-[680px] text-[52px] font-extrabold leading-[0.98] sm:text-[72px] lg:text-[88px]">
+              <span className="block"><span className="kb-hero-editorial text-[#9a6b0d]">Shop</span> it.</span>
+              <span className="block">We'll <span className="kb-hero-editorial text-[#b78115]">move</span> it.</span>
             </h1>
-            <p className="mt-6 max-w-[590px] text-lg leading-8 text-[#4e4e4a] sm:text-xl">
-              One platform for people who shop, businesses that sell, and every parcel that needs to reach a doorstep.
+            <p className="mt-7 max-w-[590px] text-lg leading-8 text-[#4e4e4a] sm:text-xl">
+              Discover the next thing you love, open a storefront for your brand, or ship an order made anywhere. Commerce and delivery finally move as one.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link to="/shop" className="kb-button kb-button-gold"><ShoppingBag className="h-5 w-5" /> Shop products</Link>
-              <Link to="/ship" className="kb-button kb-button-ink"><Truck className="h-5 w-5" /> Ship an order</Link>
+              <Link to="/shop" className="kb-button kb-button-gold"><ShoppingBag className="h-5 w-5" /> Enter the marketplace</Link>
+              <Link to="/ship" className="kb-button kb-button-ink"><Truck className="h-5 w-5" /> Send a parcel</Link>
             </div>
-            <div className="mt-8 flex flex-wrap gap-x-7 gap-y-3 text-sm font-medium text-[#333]">
-              {['29,000+ pincodes', 'Multiple courier options', 'Independent tools for every seller'].map((item) => (
-                <span key={item} className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-[#a9730c]" />{item}</span>
+            <div className="kb-hero-route mt-9 max-w-[620px]">
+              <div className="kb-hero-route-line"><span /></div>
+              {[
+                [Store, 'Order'],
+                [PackageCheck, 'Packed'],
+                [Truck, 'Moving'],
+                [MapPin, 'Delivered'],
+              ].map(([Icon, label]) => (
+                <div key={label as string} className="kb-hero-route-stop">
+                  <span><Icon className="h-4 w-4" /></span>
+                  <strong>{label as string}</strong>
+                </div>
               ))}
             </div>
           </div>
         </div>
-        <div className="relative z-10 border-y border-black/10 bg-white/94">
+        <div className="relative z-10 border-y border-black/10 bg-white/72 backdrop-blur-xl">
           <div className="mx-auto grid max-w-7xl grid-cols-2 px-5 sm:grid-cols-4 sm:px-8 lg:px-10">
             {[['10L+', 'Customers served'], ['50L+', 'Deliveries completed'], ['29K+', 'Pincodes covered'], ['24/7', 'Shipment visibility']].map(([value, label]) => (
-              <div key={label} className="border-r border-black/10 px-3 py-5 first:border-l sm:py-6">
+              <div key={label} className="kb-hero-metric border-r border-black/10 px-3 py-5 first:border-l sm:py-6">
                 <div className="text-2xl font-semibold text-[#9a6b0d]">{value}</div>
                 <div className="mt-1 text-xs font-semibold uppercase text-[#686864]">{label}</div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="kb-section kb-shop-pattern border-b border-black/10">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="kb-store-entry overflow-hidden border border-black/10 bg-white shadow-[0_24px_70px_rgba(25,25,25,0.09)]">
+            <div className="grid lg:grid-cols-[0.72fr_1.28fr]">
+              <div className="kb-silver-panel flex flex-col justify-between p-7 text-[#202224] sm:p-9 lg:p-11">
+                <div>
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase text-[#dfb743]">
+                    <span className="h-2 w-2 bg-[#dfb743]" /> Marketplace now open
+                  </span>
+                  <h2 className="mt-5 max-w-md text-3xl font-semibold leading-tight sm:text-4xl">
+                    Good products, ready to find a place in your day.
+                  </h2>
+                  <p className="mt-5 max-w-md text-base leading-7 text-[#565a5e]">
+                    Explore useful finds from independent brands, with secure checkout, clear order updates, and delivery built into the experience.
+                  </p>
+                  <div className="mt-7 grid gap-3 text-sm font-medium text-[#303336] sm:grid-cols-2 lg:grid-cols-1">
+                    {['Curated multi-category catalogue', 'Order tracking from dispatch to door', 'Clear prices and easy returns'].map((item) => (
+                      <span key={item} className="inline-flex items-center gap-3">
+                        <Check className="h-4 w-4 shrink-0 text-[#dfb743]" /> {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-9 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
+                  <Link to="/shop" className="kb-button kb-button-gold">
+                    Shop today's picks <ArrowRight className="h-5 w-5" />
+                  </Link>
+                  <Link to="/shop-by-category" className="kb-button border border-black/15 bg-white/42 text-[#202224] hover:border-[#b78115]/60 hover:bg-white/72">
+                    Browse all categories
+                  </Link>
+                </div>
+              </div>
+
+              <div className="p-6 sm:p-8 lg:p-10">
+                <div className="flex items-end justify-between gap-5 border-b border-black/10 pb-5">
+                  <div>
+                    <span className="kb-kicker">Fresh from the shop</span>
+                    <h3 className="mt-2 text-2xl font-semibold">A quick look inside</h3>
+                  </div>
+                  <Link to="/shop" className="kb-text-link hidden sm:inline-flex">
+                    View all products <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+                <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-5">
+                  {products.map((product, index) => (
+                    <Link
+                      key={product.name}
+                      to={`/product/${product.slug}`}
+                      className={`kb-store-preview-product group ${index === 2 ? 'col-span-2 sm:col-span-1' : ''}`}
+                    >
+                      <div className="relative aspect-[4/5] overflow-hidden bg-[#efefeb]">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]"
+                        />
+                        <span className="absolute left-3 top-3 bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase text-[#5d450f] shadow-sm backdrop-blur-md">
+                          {product.badge}
+                        </span>
+                      </div>
+                      <div className="pt-4">
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#806014]">
+                          <Star className="h-3.5 w-3.5 fill-[#d8af3d] text-[#b78115]" /> {product.rating}
+                        </span>
+                        <p className="text-sm font-semibold leading-5 sm:text-base">{product.name}</p>
+                        <div className="mt-2 flex items-center justify-between gap-2">
+                          <span className="font-semibold">{product.price}</span>
+                          <ArrowRight className="h-4 w-4 text-[#a9730c] transition-transform group-hover:translate-x-1" />
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                <Link to="/shop" className="kb-text-link mt-7 sm:hidden">
+                  View all products <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -216,11 +307,16 @@ const PlatformLanding = () => {
             </div>
             <p className="kb-copy lg:justify-self-end">Kourier Boyz does not ask a seller to rebuild the business around a tool. It connects the orders, parcels, and storefronts already in motion.</p>
           </div>
+          <div className="mt-7 flex flex-wrap items-center gap-4 border-y border-black/10 py-5">
+            <span className="text-sm font-semibold text-[#575753]">Already have orders to dispatch?</span>
+            <Link to="/rates" className="kb-button kb-button-gold">Compare courier rates <ArrowRight className="h-4 w-4" /></Link>
+            <span className="text-sm text-[#74746e]">No marketplace listing required.</span>
+          </div>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {sellingScenarios.map(([Icon, title, copy, label], index) => (
               <article key={title as string} className={`kb-lift-card ${scenarioHoverStyles[index]} group flex min-h-[310px] flex-col border border-black/10 bg-white p-6 shadow-[0_10px_30px_rgba(25,25,25,0.055)]`}>
                 <div className="flex items-start justify-between gap-5">
-                  <span className="flex h-12 w-12 items-center justify-center bg-[#1d1d1c] text-[#dfb743]"><Icon className="h-5 w-5" /></span>
+                  <span className="kb-silver-icon flex h-12 w-12 items-center justify-center text-[#8a620d]"><Icon className="h-5 w-5" /></span>
                   <span className="text-xs font-semibold text-[#9a6b0d]">0{index + 1}</span>
                 </div>
                 <div className="mt-auto pt-10">
@@ -234,46 +330,19 @@ const PlatformLanding = () => {
         </div>
       </section>
 
-      <section className="kb-section kb-shop-pattern">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
-            <div className="max-w-2xl">
-              <span className="kb-kicker">Kourier Boyz Marketplace</span>
-              <h2 className="kb-title mt-3">A useful store, built around dependable delivery.</h2>
-              <p className="kb-copy mt-4">Browse everyday products from growing brands with clear prices, order history, returns, and shipment updates.</p>
-            </div>
-            <Link to="/shop" className="kb-text-link">Enter the marketplace <ArrowRight className="h-4 w-4" /></Link>
-          </div>
-          <Link to="/shop" className="mt-8 flex h-14 max-w-3xl items-center gap-3 border border-black/15 bg-white px-5 shadow-sm">
-            <Search className="h-5 w-5 text-[#9a6b0d]" /><span className="text-[#686864]">Search products, categories, and stores</span><ArrowRight className="ml-auto h-5 w-5" />
-          </Link>
-          <div className="mt-5 flex gap-2 overflow-x-auto pb-2">
-            {categories.map((category) => <Link key={category} to={`/products/search?q=${encodeURIComponent(category)}`} className="kb-chip">{category}</Link>)}
-          </div>
-          <div className="mt-9 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
-            {products.map((product) => (
-              <Link key={product.name} to={`/product/${product.slug}`} className="kb-product kb-hover-image group">
-                <div className="aspect-[4/3] overflow-hidden bg-[#ecece8]"><img src={product.image} alt={product.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.025]" /></div>
-                <div className="p-4"><p className="min-h-10 text-sm font-semibold sm:text-base">{product.name}</p><div className="mt-3 flex items-end justify-between gap-2"><span className="text-lg font-semibold">{product.price}</span><span className="text-xs font-semibold text-[#8a620d]">Easy returns</span></div></div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="kb-section bg-[#1d1d1c] text-white">
+      <section className="kb-section kb-silver-section text-[#202224]">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
           <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr]">
             <div>
-              <span className="kb-kicker text-[#dfb743]">Operations, connected</span>
-              <h2 className="kb-title mt-3 text-white">The practical tools behind every order.</h2>
-              <p className="mt-5 text-lg leading-8 text-white/65">Marketplace or not, your team gets a clear path from order to delivery without stitching together separate systems.</p>
+              <span className="kb-kicker text-[#8a620d]">Operations, connected</span>
+              <h2 className="kb-title mt-3 text-[#202224]">The practical tools behind every order.</h2>
+              <p className="mt-5 text-lg leading-8 text-[#606469]">Marketplace or not, your team gets a clear path from order to delivery without stitching together separate systems.</p>
               <Link to="/rates" className="kb-button kb-button-gold mt-8"><Calculator className="h-5 w-5" /> Compare rates</Link>
             </div>
-            <div className="grid border-l border-t border-white/15 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid border-l border-t border-black/12 sm:grid-cols-2 lg:grid-cols-3">
               {capabilities.map(([Icon, title, copy]) => (
-                <div key={title as string} className="kb-lift-card kb-hover-icon border-b border-r border-white/15 bg-[#1d1d1c] p-6">
-                  <Icon className="h-7 w-7 text-[#dfb743]" /><h3 className="mt-5 text-lg font-semibold">{title as string}</h3><p className="mt-2 text-sm leading-6 text-white/60">{copy as string}</p>
+                <div key={title as string} className="kb-lift-card kb-hover-icon border-b border-r border-black/12 bg-white/46 p-6 backdrop-blur-sm">
+                  <Icon className="h-7 w-7 text-[#9a6b0d]" /><h3 className="mt-5 text-lg font-semibold">{title as string}</h3><p className="mt-2 text-sm leading-6 text-[#64686c]">{copy as string}</p>
                 </div>
               ))}
             </div>
@@ -307,7 +376,7 @@ const PlatformLanding = () => {
                 [Store, 'Marketplace only', 'List products, manage stock, receive orders, and use your preferred fulfilment setup.'],
                 [Zap, 'Marketplace + shipping', 'Connect catalogue, buyer orders, pickup booking, tracking, returns, and reporting end to end.'],
               ].map(([Icon, title, copy]) => (
-                <div key={title as string} className="grid gap-4 py-7 sm:grid-cols-[48px_1fr]"><span className="flex h-11 w-11 items-center justify-center bg-[#1d1d1c] text-[#dfb743]"><Icon className="h-5 w-5" /></span><div><h3 className="text-xl font-semibold">{title as string}</h3><p className="mt-2 leading-7 text-[#686864]">{copy as string}</p></div></div>
+                <div key={title as string} className="grid gap-4 py-7 sm:grid-cols-[48px_1fr]"><span className="kb-silver-icon flex h-11 w-11 items-center justify-center text-[#8a620d]"><Icon className="h-5 w-5" /></span><div><h3 className="text-xl font-semibold">{title as string}</h3><p className="mt-2 leading-7 text-[#686864]">{copy as string}</p></div></div>
               ))}
             </div>
           </div>

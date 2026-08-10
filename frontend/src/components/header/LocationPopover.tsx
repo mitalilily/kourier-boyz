@@ -52,9 +52,9 @@ export const LocationPopover: React.FC<LocationPopoverProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className={`group flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-300 ${
+          className={`group flex h-11 w-11 items-center justify-center gap-2 overflow-hidden rounded-sm px-0 text-xs font-medium transition-all duration-300 sm:w-[142px] sm:justify-start sm:px-3 xl:w-[154px] ${
             isLightBg
-              ? "bg-gray-50 text-gray-900 hover:bg-gray-100 border border-gray-200/50 hover:border-gray-200"
+              ? "border border-black/8 bg-white/46 text-gray-900 hover:border-black/14 hover:bg-white/72"
               : "bg-white/10 text-white hover:bg-white/20 border border-white/20 hover:border-white/30 backdrop-blur-sm"
           }`}
         >
@@ -62,7 +62,7 @@ export const LocationPopover: React.FC<LocationPopoverProps> = ({
             size={14} 
             className={`flex-shrink-0 ${!isLightBg ? 'text-primary' : 'text-blue-600'}`}
           />
-          <div className="hidden md:flex items-center gap-2 min-w-0">
+          <div className="hidden min-w-0 items-center gap-2 md:flex">
             {selectedLocation?.postalCode ? (
               <span className={`text-sm font-bold ${
                 !isLightBg ? 'text-white' : 'text-gray-900'
@@ -83,7 +83,7 @@ export const LocationPopover: React.FC<LocationPopoverProps> = ({
               </span>
             )}
           </div>
-          <span className="md:hidden text-xs font-semibold truncate">
+          <span className="hidden truncate text-xs font-semibold sm:inline md:hidden">
             {selectedLocation?.postalCode ?? selectedLocation?.label?.split("·")[0]?.trim() ?? "Location"}
           </span>
         </Button>

@@ -118,7 +118,7 @@ export const MobileHeaderMenu: FC<MobileHeaderMenuProps> = ({
   }
 
   return (
-    <div className="flex items-center gap-2 md:hidden">
+    <div className="flex items-center gap-2">
       <Sheet>
         <SheetTrigger asChild>
           <Button
@@ -126,7 +126,7 @@ export const MobileHeaderMenu: FC<MobileHeaderMenuProps> = ({
             size="icon"
             className={`h-11 w-11 rounded-2xl border transition-all duration-300 ${textClass} ${
               isLightBg
-                ? 'border-white/12 bg-white/8 hover:bg-white/14'
+                ? 'border-black/10 bg-white/46 text-[#1d1d1c] hover:bg-white/78'
                 : 'border-white/16 bg-white/10 hover:bg-white/16'
             }`}
             aria-label={t('navigation.toggleMobileMenu')}

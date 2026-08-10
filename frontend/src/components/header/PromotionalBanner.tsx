@@ -5,11 +5,26 @@ import { Link } from 'react-router-dom'
 import { getActiveAnnouncements, type Announcement } from '../../api/announcements'
 import { useAuthStore } from '../../store/authStore'
 
+const marketplaceOffer: Announcement = {
+  _id: 'marketplace-launch-offer',
+  title: 'Marketplace launch offer',
+  message: 'Up to 35% off selected fashion, home, and tech picks',
+  link: '/shop-by-category',
+  linkText: 'Explore the offer',
+  backgroundColor: '#d8af3d',
+  textColor: '#171717',
+  isActive: true,
+  dismissible: false,
+  targetAudience: 'all',
+  createdAt: '2026-08-10T00:00:00.000Z',
+  updatedAt: '2026-08-10T00:00:00.000Z',
+}
+
 export const PromotionalBanner: React.FC = () => {
   const { isAuthenticated } = useAuthStore()
-  const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const [announcements, setAnnouncements] = useState<Announcement[]>([marketplaceOffer])
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [, setBannerHeight] = useState(0)
   // Measure and store banner height dynamically - MUST be before early returns
   const bannerRef = useRef<HTMLDivElement>(null)
@@ -17,7 +32,6 @@ export const PromotionalBanner: React.FC = () => {
   useEffect(() => {
     const fetchAnnouncements = async () => {
       try {
-        setIsLoading(true)
         const data = await getActiveAnnouncements(isAuthenticated)
 
         if (data.announcements && data.announcements.length > 0) {
@@ -79,7 +93,7 @@ export const PromotionalBanner: React.FC = () => {
             }
           })
 
-          setAnnouncements(validAnnouncements)
+          setAnnouncements([marketplaceOffer, ...validAnnouncements])
         }
       } catch (error) {
         console.error('Error fetching announcements:', error)

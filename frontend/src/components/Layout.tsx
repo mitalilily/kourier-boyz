@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import { isShopPath } from '@/lib/navigation'
 import CategoriesNav from './CategoriesNav'
 import FeedbackProvider from './feedback/FeedbackProvider'
 import Footer from './Footer'
@@ -15,6 +16,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation()
   const isProfilePage = location.pathname.startsWith('/profile')
   const isSellerStorefront = location.pathname.startsWith('/seller/')
+  const isShopExperience = isShopPath(location.pathname)
   const [showHeader, setShowHeader] = useState(true)
 
   useEffect(() => {
@@ -51,10 +53,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         )}
 
-        <main className="flex-1 bg-gray-50 pt-42 sm:pt-44 md:pt-0 pb-28 md:pb-0">
+        <main
+          className={`flex-1 bg-gray-50 ${
+            isShopExperience ? 'pb-28 pt-42 sm:pt-44 md:pb-0 md:pt-0' : 'pb-0 pt-0'
+          }`}
+        >
           {children}
         </main>
-        <MobileBottomNav />
+        {isShopExperience && <MobileBottomNav />}
         <Footer />
       </div>
     </FeedbackProvider>

@@ -3,10 +3,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useCart } from '../api/cart'
 import { useCategories } from '../api/categories'
-import { useIsMobile } from '../hooks/useIsMobile'
 import { useAuthStore } from '../store/authStore'
 import type { Category } from '../types/category'
 import { guestCartUtils } from '../utils/guestCart'
+import { isShopPath } from '../lib/navigation'
+import PlatformHeader from './PlatformHeader'
 import { DesktopNavigation } from './header/DesktopNavigation'
 import { HeaderActions } from './header/HeaderActions'
 import { LocationPopover } from './header/LocationPopover'
@@ -15,7 +16,7 @@ import { PromotionalBanner } from './header/PromotionalBanner'
 import SearchBar from './header/SearchBar'
 import { useHeaderLocation } from './header/useHeaderLocation'
 
-const Header: React.FC = () => {
+const StoreHeader: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { isAuthenticated, user, logout } = useAuthStore()
@@ -57,9 +58,7 @@ const Header: React.FC = () => {
   }, [categoriesData?.categories])
 
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isLightBg, setIsLightBg] = useState(false)
-  const [isTabletOrMobile, setIsTabletOrMobile] = useState(false)
-  const isMobile = useIsMobile()
+  const isLightBg = true
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null!)
 
@@ -86,42 +85,6 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Detect mobile and tablet (width < 1024px, which is lg breakpoint)
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsTabletOrMobile(window.innerWidth < 1024)
-    }
-    checkScreenSize()
-    window.addEventListener('resize', checkScreenSize)
-    return () => window.removeEventListener('resize', checkScreenSize)
-  }, [])
-
-  useEffect(() => {
-    const handleBgCheck = () => {
-      // Always use dark background on mobile and tablet
-      if (isTabletOrMobile) {
-        setIsLightBg(true)
-        return
-      }
-      // On desktop, on home page, use scroll-based logic: transparent when at top, gradient dark when scrolled
-      if (
-        location.pathname === '/' ||
-        location.pathname === '/home' ||
-        location.pathname === '/shop' ||
-        location.pathname === '/store'
-      ) {
-        const threshold = 500
-        setIsLightBg(window.scrollY > threshold)
-        return
-      }
-      // For all other pages on desktop, always use dark gradient background (isLightBg = true)
-      setIsLightBg(true)
-    }
-    window.addEventListener('scroll', handleBgCheck)
-    handleBgCheck()
-    return () => window.removeEventListener('scroll', handleBgCheck)
-  }, [location.pathname, isTabletOrMobile])
-
   const queryClient = useQueryClient()
 
   const handleLogout = () => {
@@ -138,42 +101,18 @@ const Header: React.FC = () => {
     navigate('/', { replace: true })
   }
 
-  // Always use white text for dark theme
-  const textClass = 'text-white'
-  const isShopExperience =
-    location.pathname === '/shop' ||
-    location.pathname === '/store' ||
-    location.pathname.startsWith('/product/') ||
-    location.pathname.startsWith('/products/') ||
-    location.pathname.startsWith('/shop-by-category') ||
-    location.pathname.startsWith('/search') ||
-    location.pathname === '/cart' ||
-    location.pathname.startsWith('/profile/orders') ||
-    location.pathname.startsWith('/profile/wishlist')
-  const logoLink = isShopExperience ? '/shop' : '/'
+  const textClass = 'text-[#1d1d1c]'
+  const logoLink = '/shop'
 
   // On mobile, always use scrolled colors regardless of scroll position
   const effectiveScrolled = isScrolled
 
-  // Branded charcoal surface keeps navigation legible over photography and store artwork.
-  const headerBackground = isLightBg
-    ? 'rgba(24,24,24,0.98)'
-    : 'rgba(24,24,24,0.91)'
-
-  const headerBorder = isLightBg
-    ? '1px solid rgba(224,180,62,0.36)'
-    : effectiveScrolled
-    ? '1px solid rgba(255,255,255,0.16)'
-    : '1px solid rgba(255,255,255,0.12)'
-
-  const headerShadow = isLightBg
-    ? '0 14px 32px rgba(15,15,15,0.22)'
-    : effectiveScrolled
-    ? '0 18px 45px rgba(2, 6, 23, 0.34), 0 4px 20px rgba(15, 23, 42, 0.28)'
-    : '0 14px 38px rgba(2, 6, 23, 0.26), 0 4px 16px rgba(15, 23, 42, 0.18)'
-
-  // Blur effect for both - stronger when transparent
-  const headerBackdrop = isLightBg ? 'blur(20px) saturate(180%)' : 'blur(20px) saturate(180%)'
+  const headerBackground = 'rgba(255,255,255,0.82)'
+  const headerBorder = '1px solid rgba(255,255,255,0.76)'
+  const headerShadow = effectiveScrolled
+    ? '0 18px 48px rgba(40,40,36,0.15), inset 0 1px 0 rgba(255,255,255,0.94)'
+    : '0 14px 40px rgba(40,40,36,0.12), inset 0 1px 0 rgba(255,255,255,0.94)'
+  const headerBackdrop = 'blur(26px) saturate(175%)'
 
   return (
     <>
@@ -188,7 +127,7 @@ const Header: React.FC = () => {
           className="w-full px-3 pt-2 transition-all duration-700 ease-in-out sm:px-4 lg:px-6"
         >
           <div
-            className={`relative flex w-full items-center justify-between gap-4 rounded-md px-3 py-2.5 transition-all duration-700 ease-in-out sm:px-5 lg:px-6 ${
+            className={`relative mx-auto flex w-full max-w-[1480px] items-center justify-between gap-2 rounded-md px-3 py-2.5 transition-all duration-700 ease-in-out sm:px-4 xl:gap-3 xl:px-5 ${
               effectiveScrolled ? 'shadow-xl' : 'shadow-lg'
             }`}
             style={{
@@ -202,7 +141,7 @@ const Header: React.FC = () => {
               transition: 'all 0.5s cubic-bezier(0.4,0,0.2,1)',
             }}
           >
-            <div className="flex min-w-0 items-center gap-3 sm:gap-5">
+            <div className="flex min-w-0 shrink-0 items-center gap-3 xl:gap-4">
               <Link
                 to={logoLink}
                 className="flex shrink-0 items-center px-1 py-1 transition-opacity hover:opacity-90"
@@ -212,31 +151,29 @@ const Header: React.FC = () => {
                 <img
                   src="/brand/kourier-boyz-logo-nav-cropped.png"
                   alt="Kourier Boyz"
-                  className="h-11 w-44 object-contain drop-shadow-[0_1px_1px_rgba(255,255,255,0.16)] sm:w-48 xl:h-12 xl:w-52"
+                  className="h-11 w-40 object-contain sm:w-44 xl:h-12 xl:w-48"
                 />
               </Link>
 
-              {!isMobile && (
-                <div className="shrink-0">
-                  <LocationPopover
-                    isLightBg={isLightBg}
-                    selectedLocation={selectedLocation}
-                    isOpen={isLocationPopoverOpen}
-                    onOpenChange={setIsLocationPopoverOpen}
-                    addressesLoading={addressesLoading}
-                    addressLocationPairs={addressLocationPairs}
-                    showAllAddresses={showAllAddresses}
-                    onToggleShowAllAddresses={toggleShowAllAddresses}
-                    onSelectAddress={handleAddressSelect}
-                    onUseCurrentLocation={handleUseCurrentLocation}
-                    isDetectingLocation={isDetectingLocation}
-                    pinInput={pinInput}
-                    onPinInputChange={handlePinInputChange}
-                    onManualPinSubmit={handleManualPinSubmit}
-                    locationError={locationError}
-                  />
-                </div>
-              )}
+              <div className="hidden shrink-0 2xl:block">
+                <LocationPopover
+                  isLightBg={isLightBg}
+                  selectedLocation={selectedLocation}
+                  isOpen={isLocationPopoverOpen}
+                  onOpenChange={setIsLocationPopoverOpen}
+                  addressesLoading={addressesLoading}
+                  addressLocationPairs={addressLocationPairs}
+                  showAllAddresses={showAllAddresses}
+                  onToggleShowAllAddresses={toggleShowAllAddresses}
+                  onSelectAddress={handleAddressSelect}
+                  onUseCurrentLocation={handleUseCurrentLocation}
+                  isDetectingLocation={isDetectingLocation}
+                  pinInput={pinInput}
+                  onPinInputChange={handlePinInputChange}
+                  onManualPinSubmit={handleManualPinSubmit}
+                  locationError={locationError}
+                />
+              </div>
             </div>
 
             <DesktopNavigation
@@ -262,8 +199,7 @@ const Header: React.FC = () => {
               pathname={location.pathname}
             />
 
-            {isMobile && (
-              <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2 2xl:hidden">
                 <div className="shrink-0">
                   <LocationPopover
                     isLightBg={isLightBg}
@@ -296,14 +232,13 @@ const Header: React.FC = () => {
                   isAuthenticated={isAuthenticated}
                   onLogout={handleLogout}
                 />
-              </div>
-            )}
+            </div>
           </div>
         </div>
 
         {/* Mobile/Tablet Search Bar - Part of Header */}
         <div
-          className="lg:hidden w-full px-3 pb-2.5 pt-2 transition-all duration-500 ease-in-out sm:px-4 lg:px-6"
+          className="w-full px-3 pb-2.5 pt-2 transition-all duration-500 ease-in-out sm:px-4 2xl:hidden"
           style={{
           }}
         >
@@ -331,6 +266,11 @@ const Header: React.FC = () => {
       </header>
     </>
   )
+}
+
+const Header: React.FC = () => {
+  const location = useLocation()
+  return isShopPath(location.pathname) ? <StoreHeader /> : <PlatformHeader />
 }
 
 export default Header

@@ -80,18 +80,18 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
   const isOrdersActive = pathname === '/orders' || pathname.startsWith('/profile/orders')
   const isWishlistActive = pathname === '/profile/wishlist'
   const navShellClass = isLightBg
-    ? 'border-white/10 bg-white/6 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+    ? 'border-black/8 bg-white/42 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]'
     : 'border-white/12 bg-slate-950/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
   const baseButtonClass =
-    'relative h-11 rounded-sm px-3 text-sm font-semibold cursor-pointer overflow-hidden text-white transition-all duration-300 hover:text-white'
+    'relative h-11 rounded-sm px-3 text-sm font-semibold cursor-pointer overflow-hidden text-[#1d1d1c] transition-all duration-300 hover:text-[#1d1d1c]'
   const activeSurfaceClass = isLightBg
-    ? 'absolute inset-0 rounded-sm border border-[#d6a936]/40 bg-white/10'
+    ? 'absolute inset-0 rounded-sm border border-[#d6a936]/45 bg-white/62'
     : 'absolute inset-0 rounded-sm border border-white/18 bg-white/10'
-  const hoverSurfaceClass = isLightBg ? 'group-hover:bg-white/10' : 'group-hover:bg-white/8'
+  const hoverSurfaceClass = isLightBg ? 'group-hover:bg-white/62' : 'group-hover:bg-white/8'
 
   return (
     <nav
-      className={`hidden lg:flex items-center gap-1 rounded-[20px] border px-2 py-2 ${navShellClass}`}
+      className={`hidden 2xl:flex items-center gap-1 rounded-[20px] border px-2 py-2 ${navShellClass}`}
       aria-label="Main navigation"
     >
       <Link to={homeLink}>
@@ -117,7 +117,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
             <motion.span
               className={`relative z-10 ${textClass}`}
               animate={{
-                color: '#FFFFFF',
+                color: isLightBg ? '#1d1d1c' : '#FFFFFF',
               }}
               transition={{ duration: 0.2 }}
             >
@@ -166,7 +166,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
               <motion.span
                 className={`relative z-10 ${textClass}`}
                 animate={{
-                  color: '#FFFFFF',
+                  color: isLightBg ? '#1d1d1c' : '#FFFFFF',
                 }}
                 transition={{ duration: 0.2 }}
               >
@@ -225,17 +225,17 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
                 <motion.span
                   className={`relative z-10 flex items-center gap-2 ${textClass}`}
                   animate={{
-                    color: '#FFFFFF',
+                    color: isLightBg ? '#1d1d1c' : '#FFFFFF',
                   }}
                   transition={{ duration: 0.2 }}
                 >
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-xl border border-white/12 bg-white/10">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-sm border border-black/10 bg-white/62">
                     <Grid3x3 className="h-4 w-4" />
                   </span>
                   {t('navigation.categories')}
                 </motion.span>
                 <motion.div
-                  className="relative z-10 ml-1 text-white/80"
+                  className={`relative z-10 ml-1 ${isLightBg ? 'text-black/55' : 'text-white/80'}`}
                   animate={{ rotate: categoriesDropdownOpen ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -312,7 +312,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
                 <motion.span
                   className={`relative z-10 ${textClass}`}
                   animate={{
-                    color: '#FFFFFF',
+                    color: isLightBg ? '#1d1d1c' : '#FFFFFF',
                   }}
                   transition={{ duration: 0.2 }}
                 >
@@ -361,7 +361,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
                 <motion.span
                   className={`relative z-10 ${textClass}`}
                   animate={{
-                    color: '#FFFFFF',
+                    color: isLightBg ? '#1d1d1c' : '#FFFFFF',
                   }}
                   transition={{ duration: 0.2 }}
                 >

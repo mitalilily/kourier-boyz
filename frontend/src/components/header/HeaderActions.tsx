@@ -59,7 +59,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
   }, [profileImage])
 
   return (
-    <div className="flex min-w-0 items-center gap-2 md:gap-3">
+    <div className="hidden min-w-0 items-center gap-2 2xl:flex 2xl:gap-3">
       <div className="hidden md:flex items-center" ref={containerRef}>
         <SearchBar
           searchQuery={searchQuery}
@@ -68,11 +68,11 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
           isLightBg={isLightBg}
           isAuthenticated={isAuthenticated}
           containerClassName="items-center"
-          inputClassName="w-80 lg:w-[350px]"
+          inputClassName="w-60 lg:w-64 2xl:w-[350px]"
         />
       </div>
 
-      <div className="hidden md:flex items-center gap-2 rounded-[20px] border border-white/10 bg-white/6 px-2.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+      <div className="hidden items-center gap-2 rounded-sm border border-black/8 bg-white/42 px-2 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)] md:flex">
         {/* <LanguageSelector
           buttonClassName={`${textClass} rounded-2xl px-4 py-2 text-xs font-medium transition-all duration-300 ${
             isScrolled
@@ -96,7 +96,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
                   : ''
               } ${
                 isLightBg
-                  ? 'border border-[#d3a738]/45 bg-[#2a2a2a] text-[#e0b43e] hover:bg-[#333]'
+                  ? 'border border-black/10 bg-white/62 text-[#9a6b0d] hover:bg-white/86'
                   : 'border border-white/20 bg-white/12 text-white hover:bg-white/18 backdrop-blur-sm'
               }`}
             >
@@ -124,7 +124,7 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
                 variant="ghost"
                 className={`h-11 rounded-2xl px-4 text-sm font-medium transition-all duration-300 cursor-pointer ${textClass} ${
                   isLightBg
-                    ? 'border border-white/10 bg-white/6 hover:bg-white/12'
+                    ? 'border border-black/10 bg-white/48 text-[#1d1d1c] hover:bg-white/82'
                     : 'border border-white/10 bg-white/6 hover:bg-white/14'
                 }`}
               >
