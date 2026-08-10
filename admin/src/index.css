@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+/* Loading State Animations */
+@keyframes spin-reverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes spin-fast {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-ring-1 {
+  animation: spin 1s linear infinite;
+}
+
+.spinner-ring-2 {
+  animation: spin-reverse 0.8s linear infinite;
+}
+
+.spinner-ring-3 {
+  animation: spin-fast 0.6s linear infinite;
+}
+
+/* Unauthorized Page Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.icon-container {
+  animation: float 3s ease-in-out infinite;
+}
+
+.lock-icon {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Dashboard Table Styles */
+.dashboard-table .ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+}
+
+.dashboard-table .ant-table-tbody > tr > td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dashboard-table .ant-table-tbody > tr:hover > td {
+  background: #f9fafb;
+}
+
+.dashboard-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none;
+}
+
+/* Stat Card Animations */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-value-animate {
+  animation: countUp 0.3s ease-out;
+}
+
+/* Stat Card Styles */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  transform: translate(30%, -30%);
+}
+
+/* Dashboard background */
+.dashboard-bg {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+}
+
+/* Chart Container Styles */
+.recharts-wrapper {
+  font-family: inherit;
+}
+
+.recharts-legend-item-text {
+  color: #6b7280 !important;
+  font-size: 12px !important;
+}
+
+/* Quick Action Cards */
+.quick-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

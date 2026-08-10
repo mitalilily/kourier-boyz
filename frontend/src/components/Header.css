@@ -1,0 +1,28 @@
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-20deg);
+  }
+  50% {
+    transform: translateX(100%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(100%) skewX(-20deg);
+  }
+}
+
+.header-shimmer {
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.0) 0%,
+    rgba(255,255,255,0.25) 50%,
+    rgba(255,255,255,0.0) 100%
+  );
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  transform: translateX(-100%) skewX(-20deg);
+  pointer-events: none;
+  animation: shimmer 2.5s infinite;
+}

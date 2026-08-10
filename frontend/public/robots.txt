@@ -1,0 +1,35 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and seller management panels (backend access)
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /profile/
+
+# Allow important pages including seller storefronts
+Allow: /
+Allow: /shop-by-category
+Allow: /seller/
+
+# Sitemap location (update with your actual domain)
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Specific bot instructions
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Block bad bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
