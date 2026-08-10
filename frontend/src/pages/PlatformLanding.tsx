@@ -192,12 +192,17 @@ const PlatformLanding = () => {
                     ))}
                   </div>
                 </div>
-                <div className="mt-9 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
-                  <Link to="/shop" className="kb-button kb-button-gold">
-                    Shop today's picks <ArrowRight className="h-5 w-5" />
+                <div className="mt-9 grid gap-4">
+                  <Link to="/shop" className="kb-shop-entry-cta group">
+                    <span className="kb-shop-entry-cta-icon"><ShoppingBag className="h-6 w-6" /></span>
+                    <span className="min-w-0 flex-1">
+                      <strong>Enter the marketplace</strong>
+                      <small>Shop new arrivals, useful finds, and today's best offers</small>
+                    </span>
+                    <span className="kb-shop-entry-cta-arrow"><ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" /></span>
                   </Link>
-                  <Link to="/shop-by-category" className="kb-button border border-black/15 bg-white/42 text-[#202224] hover:border-[#b78115]/60 hover:bg-white/72">
-                    Browse all categories
+                  <Link to="/shop-by-category" className="kb-text-link w-fit">
+                    Browse all categories <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
               </div>
@@ -208,8 +213,8 @@ const PlatformLanding = () => {
                     <span className="kb-kicker">Fresh from the shop</span>
                     <h3 className="mt-2 text-2xl font-semibold">A quick look inside</h3>
                   </div>
-                  <Link to="/shop" className="kb-text-link hidden sm:inline-flex">
-                    View all products <ArrowRight className="h-4 w-4" />
+                  <Link to="/shop" className="kb-button kb-shop-preview-button hidden sm:inline-flex">
+                    Open full shop <ShoppingBag className="h-4 w-4" />
                   </Link>
                 </div>
                 <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-5">
@@ -242,8 +247,8 @@ const PlatformLanding = () => {
                     </Link>
                   ))}
                 </div>
-                <Link to="/shop" className="kb-text-link mt-7 sm:hidden">
-                  View all products <ArrowRight className="h-4 w-4" />
+                <Link to="/shop" className="kb-button kb-shop-preview-button mt-7 w-full sm:hidden">
+                  Open full shop <ShoppingBag className="h-4 w-4" />
                 </Link>
               </div>
             </div>
