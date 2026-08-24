@@ -1,8 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { GoogleOAuthProvider } from '@react-oauth/google'
 import { App as AntApp, ConfigProvider } from 'antd'
 import AppRoutes from './routes'
-import { GOOGLE_CLIENT_ID } from './config/googleAuth'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,8 +15,7 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-        <ConfigProvider
+      <ConfigProvider
           theme={{
             token: {
               colorPrimary: '#B78115',
@@ -47,12 +44,11 @@ function App() {
               },
             },
           }}
-        >
-          <AntApp>
-            <AppRoutes />
-          </AntApp>
-        </ConfigProvider>
-      </GoogleOAuthProvider>
+      >
+        <AntApp>
+          <AppRoutes />
+        </AntApp>
+      </ConfigProvider>
     </QueryClientProvider>
   )
 }

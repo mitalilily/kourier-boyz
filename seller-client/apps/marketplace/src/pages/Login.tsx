@@ -5,12 +5,10 @@ import {
   MailOutlined,
   StopOutlined,
 } from '@ant-design/icons'
-import { useGoogleLogin } from '@react-oauth/google'
 import { Alert, App, Button, Card, Checkbox, Divider, Form, Input, Spin, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useGoogleOAuth, useLogin } from '../api/authQueries'
-import { GOOGLE_REDIRECT_URI } from '../config/googleAuth'
+import { useLogin } from '../api/authQueries'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -21,7 +19,7 @@ const Login = () => {
   const { message } = App.useApp()
   const navigate = useNavigate()
   const loginMutation = useLogin()
-  const googleOAuthMutation = useGoogleOAuth()
+  const googleOAuthMutation = { isPending: false }
   const [form] = Form.useForm()
   const [deactivationError, setDeactivationError] = useState<{
     message: string
@@ -42,56 +40,15 @@ const Login = () => {
   }, [form])
 
   useEffect(() => {
-    if (loginMutation.isSuccess || googleOAuthMutation.isSuccess) {
+    if (loginMutation.isSuccess) {
       message.success('🎉 Welcome back!')
       navigate('/dashboard')
     }
-  }, [loginMutation.isSuccess, googleOAuthMutation.isSuccess, navigate, message])
+  }, [loginMutation.isSuccess, navigate, message])
 
-  const handleGoogleLogin = useGoogleLogin({
-    onSuccess: async (codeResponse) => {
-      try {
-        await googleOAuthMutation.mutateAsync(codeResponse.code)
-      } catch (error: unknown) {
-        // Error handling is done in the mutation
-        const axiosError = error as {
-          code?: string
-          message?: string
-          response?: {
-            data?: {
-              error?: string
-              message?: string
-            }
-          }
-        }
-        
-        // Check for network errors (backend not running)
-        if (axiosError.code === 'ERR_NETWORK' || axiosError.message === 'Network Error') {
-          message.error({
-            content: 'Cannot connect to the Kourier Boyz backend. Please try again shortly.',
-            duration: 8,
-          })
-        } else {
-          const errorMessage = axiosError.response?.data?.message || axiosError.response?.data?.error || 'Google sign-in failed'
-          message.error(errorMessage)
-        }
-        console.error('Google OAuth login error:', error)
-      }
-    },
-    onError: (error) => {
-      // Handle OAuth popup errors (user cancellation, etc.)
-      // The error object from @react-oauth/google may have different structures
-      // If user cancels, we don't need to show an error
-      const errorMessage = error?.error_description || error?.error
-      if (errorMessage && (errorMessage.includes('popup_closed') || errorMessage.includes('user_cancelled'))) {
-        // User closed the popup - don't show an error
-        return
-      }
-      message.error('Google sign-in was cancelled or failed')
-    },
-    flow: 'auth-code',
-    redirect_uri: GOOGLE_REDIRECT_URI, // Explicitly set redirect URI to match backend
-  })
+  const handleGoogleLogin = () => {
+    message.info('Use email and password to access the demo seller panel.')
+  }
 
   // Keep error state when mutation resets (don't clear on success)
   useEffect(() => {

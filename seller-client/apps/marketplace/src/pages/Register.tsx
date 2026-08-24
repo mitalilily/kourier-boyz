@@ -9,7 +9,6 @@ import {
   PhoneOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { useGoogleLogin } from '@react-oauth/google'
 import {
   Alert,
   App,
@@ -29,8 +28,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAgreementByType } from '../api/agreementQueries'
 import type { RegisterData } from '../api/auth'
-import { useGoogleOAuth, useRegister } from '../api/authQueries'
-import { GOOGLE_REDIRECT_URI } from '../config/googleAuth'
+import { useRegister } from '../api/authQueries'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -121,7 +119,7 @@ const Register = () => {
   const { message } = App.useApp()
   const navigate = useNavigate()
   const registerMutation = useRegister()
-  const googleOAuthMutation = useGoogleOAuth()
+  const googleOAuthMutation = { isPending: false }
   const [form] = Form.useForm()
   const passwordValue = Form.useWatch('password', form)
   const passwordChecks = getPasswordChecks(passwordValue)
@@ -152,29 +150,9 @@ const Register = () => {
     }
   }, [registerMutation.isSuccess, navigate, message])
 
-  useEffect(() => {
-    if (googleOAuthMutation.isSuccess) {
-      message.success('🎉 Registration successful! Please complete your KYC.')
-      // Auto-login and redirect to KYC page
-      setTimeout(() => navigate('/submit-kyc'), 1500)
-    }
-  }, [googleOAuthMutation.isSuccess, navigate, message])
-
-  const handleGoogleSignUp = useGoogleLogin({
-    onSuccess: async (codeResponse) => {
-      try {
-        await googleOAuthMutation.mutateAsync(codeResponse.code)
-      } catch (error) {
-        // Error handling is done in the mutation
-        console.error('Google OAuth signup error:', error)
-      }
-    },
-    onError: () => {
-      message.error('Google sign-up was cancelled or failed')
-    },
-    flow: 'auth-code',
-    redirect_uri: GOOGLE_REDIRECT_URI, // Explicitly set redirect URI to match backend
-  })
+  const handleGoogleSignUp = () => {
+    message.info('Use the seller registration form to create a demo account.')
+  }
 
   useEffect(() => {
     if (registerMutation.isError) {
