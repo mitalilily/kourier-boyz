@@ -1,0 +1,528 @@
+{
+  "seedVersion": "2026-06-30-delhivery-b2b-basic-matrix-sync",
+  "serviceProvider": "delhivery",
+  "planName": "Basic",
+  "zoneCodes": ["N1", "N2", "E", "NE", "W1", "W2", "S1", "S2", "Central"],
+  "matrixByCode": {
+    "N1": {
+      "N1": 7.55,
+      "N2": 8.2,
+      "E": 13.5,
+      "NE": 20.4,
+      "W1": 9.4,
+      "W2": 12,
+      "S1": 15.3,
+      "S2": 17.8,
+      "Central": 10.1
+    },
+    "N2": {
+      "N1": 9.3,
+      "N2": 7.8,
+      "E": 15.7,
+      "NE": 22.9,
+      "W1": 12.1,
+      "W2": 13.3,
+      "S1": 17.1,
+      "S2": 18.9,
+      "Central": 11.5
+    },
+    "E": {
+      "N1": 10.9,
+      "N2": 12.1,
+      "E": 9.4,
+      "NE": 15.9,
+      "W1": 11.9,
+      "W2": 11.4,
+      "S1": 12.4,
+      "S2": 15.9,
+      "Central": 11.6
+    },
+    "NE": {
+      "N1": 14.3,
+      "N2": 19.2,
+      "E": 9.1,
+      "NE": 10.6,
+      "W1": 15.4,
+      "W2": 18.4,
+      "S1": 16,
+      "S2": 19.5,
+      "Central": 14.3
+    },
+    "W1": {
+      "N1": 10.9,
+      "N2": 13.6,
+      "E": 16.5,
+      "NE": 23.7,
+      "W1": 6.5,
+      "W2": 9.8,
+      "S1": 14.7,
+      "S2": 16.2,
+      "Central": 11.5
+    },
+    "W2": {
+      "N1": 11.9,
+      "N2": 14.2,
+      "E": 14.8,
+      "NE": 21,
+      "W1": 7.8,
+      "W2": 7.7,
+      "S1": 11.7,
+      "S2": 13.7,
+      "Central": 10.2
+    },
+    "S1": {
+      "N1": 14.8,
+      "N2": 15.8,
+      "E": 14.6,
+      "NE": 21.5,
+      "W1": 10.9,
+      "W2": 9,
+      "S1": 8.6,
+      "S2": 8.9,
+      "Central": 12.4
+    },
+    "S2": {
+      "N1": 18,
+      "N2": 21.2,
+      "E": 16.7,
+      "NE": 26,
+      "W1": 11.1,
+      "W2": 9.1,
+      "S1": 9.1,
+      "S2": 7.1,
+      "Central": 14.2
+    },
+    "Central": {
+      "N1": 9.6,
+      "N2": 10.6,
+      "E": 14.3,
+      "NE": 23.4,
+      "W1": 8,
+      "W2": 9.1,
+      "S1": 13.6,
+      "S2": 17.1,
+      "Central": 8.7
+    }
+  },
+  "mappedAdditionalCharges": {
+    "awbCharges": 100,
+    "cftFactor": 4500,
+    "minimumChargeableAmount": 300,
+    "minimumChargeableWeight": 20,
+    "minimumChargeableMethod": "whichever_is_higher",
+    "freeStorageDays": 4,
+    "demurragePerAwbDay": 100,
+    "demurragePerKgDay": 1,
+    "demurrageMethod": "whichever_is_higher",
+    "publicHolidayPickupCharge": 0,
+    "fuelSurchargePercentage": 0,
+    "greenTax": 0,
+    "odaCharges": 500,
+    "odaPerKgCharge": 3,
+    "odaMethod": "whichever_is_higher",
+    "csdDeliveryCharge": 0,
+    "timeSpecificPerKg": 3,
+    "timeSpecificPerAwb": 500,
+    "timeSpecificMethod": "whichever_is_higher",
+    "mallDeliveryPerKg": 3,
+    "mallDeliveryPerAwb": 500,
+    "mallDeliveryMethod": "whichever_is_higher",
+    "deliveryReattemptPerKg": 1,
+    "deliveryReattemptPerAwb": 100,
+    "deliveryReattemptMethod": "whichever_is_higher",
+    "handlingSinglePiece": 0,
+    "handlingBelow100Kg": 0,
+    "handling100To200Kg": 0,
+    "handlingAbove200Kg": 3,
+    "insuranceCharge": 0,
+    "codFixedAmount": 50,
+    "codPercentage": 1,
+    "codMethod": "whichever_is_higher",
+    "rovFixedAmount": 150,
+    "rovPercentage": 0.25,
+    "rovMethod": "whichever_is_higher",
+    "liabilityLimit": 5000,
+    "liabilityMethod": "whichever_is_lower"
+  },
+  "specialNotes": [
+    "Additional INR 5/kg to be charged for deliveries in J&K ( excluding Jammu city ), Himachal Pradesh ( except Baddi city ) & All of NE (except GAU)"
+  ],
+  "workbookChargeRows": [
+    {
+      "key": "processing",
+      "remark": "Processing charge /LR",
+      "calculation": "LR",
+      "unitCharge": 100,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "fsc",
+      "remark": "Add \"%age\" for FSC in percentage and add \"per kg\" for FSC in per kg in Column C",
+      "calculation": "%age",
+      "unitCharge": 0,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "rov_owner",
+      "remark": "Risk as %age of dcn and Minimum price per LR (If its CARRIER RISK, keep these values ZERO)",
+      "calculation": "dcn",
+      "unitCharge": 0,
+      "min": 50,
+      "max": null
+    },
+    {
+      "key": "rov_carrier",
+      "remark": "Risk as %age of dcn and Minimum price per LR (If its OWNER RISK, keep these values ZERO)",
+      "calculation": "dcn",
+      "unitCharge": 0.25,
+      "min": 150,
+      "max": null
+    },
+    {
+      "key": "divisor",
+      "remark": "Volumetric Weight (in kg) will be calculated: L*B*H/divisor - where LBH in cms",
+      "calculation": "base_mul",
+      "unitCharge": 4500,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "handling",
+      "remark": "Package Handling Charges",
+      "calculation": "100-250kg",
+      "unitCharge": 0,
+      "min": 0,
+      "max": null
+    },
+    {
+      "key": "handling",
+      "remark": "Package Handling Charges",
+      "calculation": "250-400kg",
+      "unitCharge": 1,
+      "min": 0,
+      "max": null
+    },
+    {
+      "key": "handling",
+      "remark": "Package Handling Charges",
+      "calculation": ">=400kg",
+      "unitCharge": 3,
+      "min": 0,
+      "max": null
+    },
+    {
+      "key": "ODA Pincode",
+      "remark": "Enter 1 to apply ODA based on Destination Pincode; Enter 2 to apply ODA based on Pickup Pincode; Enter 3 to apply ODA based on Pickup and Destination Pincode",
+      "calculation": null,
+      "unitCharge": 1,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "pickup_oda_list",
+      "remark": "Enter pincodes exempted from pickup based ODA",
+      "calculation": null,
+      "unitCharge": null,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "dlv_oda_list",
+      "remark": "Enter pincodes exempted from delivery based ODA",
+      "calculation": null,
+      "unitCharge": null,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "demurrage_charge",
+      "remark": "Choose \"per kg\" OR \"LR\"",
+      "calculation": "per kg",
+      "unitCharge": 1,
+      "min": 100,
+      "max": null
+    },
+    {
+      "key": "demurrage_free_store_period",
+      "remark": "number of days beyond first delivery attempt",
+      "calculation": "days",
+      "unitCharge": 4,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "floor_delivery",
+      "remark": "per kg or Min. per LR - whichever is higher",
+      "calculation": "per kg",
+      "unitCharge": 0,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "mall_delivery",
+      "remark": "Mall Delivery Charges",
+      "calculation": "LR",
+      "unitCharge": 3,
+      "min": 500,
+      "max": null
+    },
+    {
+      "key": "Fuel Base Rate",
+      "remark": "This is the base rate of fuel as agreed and documented in the contract",
+      "calculation": "Rs. per litre",
+      "unitCharge": 92.72,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Fuel Hike Threshold",
+      "remark": "The threshold is defined in either %age or Rs. per litre. If the difference between Base Rate and Current Fuel rate is more than the threshold value (percentage change or INR), only then is DPH charged",
+      "calculation": "Rs. per litre",
+      "unitCharge": 0,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Fuel Hike Duration",
+      "remark": "This is the duration over which the average will be taken to get the Current Fuel Rates. Possible values can be, Enter \"1\" for option: Current Billing Month, Enter \"2\" for option: Previous Billing Month, Enter \"3\" for option: 1st day of Current Billing Month",
+      "calculation": null,
+      "unitCharge": 1,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Change in Fuel Rate",
+      "remark": "This value can be defined in either Rs. per litre or %age. For every increase/decrease in the Current Fuel Rate by the provided value the Total Freight will change",
+      "calculation": "Rs. per litre",
+      "unitCharge": 3,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Change in Freight",
+      "remark": "This value can be defined in either Rs. per kg or %age. This is the value by which the Total Freight will change if the Current Fuel Rate changes by the value mentioned under \"Change in Fuel Rate\".",
+      "calculation": "%age",
+      "unitCharge": 2,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Fuel Hike Location",
+      "remark": "Please refer to the City v/s ID mapping in column K and L to provide the location input in terms of IDs",
+      "calculation": null,
+      "unitCharge": "1,2,3,4",
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Fuel Hike Application",
+      "remark": "Enter 1 to apply DPH on Base Freight only. Enter 2 to apply DPH on ODA + Base Freight",
+      "calculation": null,
+      "unitCharge": 1,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Fuel Hike Logic",
+      "remark": "Enter 1 to not consider negative DPH charge due to Current Fuel Rate < Fuel Base Rate; Enter 2 to consider negative DPH charge due to Current Fuel Rate < Fuel Base Rate;",
+      "calculation": null,
+      "unitCharge": 1,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "csd_army_delivery",
+      "remark": "CSD / Army Delivery Charges",
+      "calculation": "per kg",
+      "unitCharge": 3,
+      "min": 500,
+      "max": null
+    },
+    {
+      "key": "pod_charges_options",
+      "remark": "Way of sharing POD chosen (Options: \"pod_hard\", \"pod_cd\", \"pod_link\")",
+      "calculation": null,
+      "unitCharge": "pod_link",
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "pod_charges",
+      "remark": "Charge for sharing POD",
+      "calculation": "LR",
+      "unitCharge": 0,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "re_attempt_free_attempts",
+      "remark": "Number of free attempts",
+      "calculation": null,
+      "unitCharge": 2,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "re_attempt_charge",
+      "remark": "If charge is \"per kg\" then write \"per kg\" under CALCULATION and if charge is \"per LR\" then write \"per PUR\" under CALCULATION",
+      "calculation": "per kg",
+      "unitCharge": 1,
+      "min": 100,
+      "max": null
+    },
+    {
+      "key": "sun_hol_delivery",
+      "remark": "Sunday_public holiday delivery charge",
+      "calculation": "LR",
+      "unitCharge": 0,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "fm_cost",
+      "remark": "For Coloaders: Max (per kg x weight, Min. price per LR); If charge is \"per kg\" then write \"per kg\" under CALCULATION and if charge is \"per PUR\" then write \"LR\" under CALCULATION",
+      "calculation": "per kg",
+      "unitCharge": 0,
+      "min": 0,
+      "max": null
+    },
+    {
+      "key": "lm_cost",
+      "remark": "For Coloaders: Max (per kg x weight, Min. price per LR)",
+      "calculation": "per kg",
+      "unitCharge": 0,
+      "min": 0,
+      "max": null
+    },
+    {
+      "key": "to_pay",
+      "remark": "per LR charge for to_pay shipment",
+      "calculation": "LR",
+      "unitCharge": 100,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "cheque_handling",
+      "remark": "per LR charge for cheque_handling",
+      "calculation": "LR",
+      "unitCharge": 300,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "cash_handling",
+      "remark": "Applicable for clients for whom cash handling is included (% of Collectable Cash amount): Max (%age of COD, Min. charge per LR)",
+      "calculation": "%age",
+      "unitCharge": 0,
+      "min": 100,
+      "max": null
+    },
+    {
+      "key": "apt_handling",
+      "remark": "per kg charge for appointment deliveries",
+      "calculation": "base_kg",
+      "unitCharge": 3,
+      "min": 500,
+      "max": null
+    },
+    {
+      "key": "min_chg_wt",
+      "remark": "Minimum Charged Weight per LR",
+      "calculation": "LR",
+      "unitCharge": 20,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "max_dead_wt",
+      "remark": "Max Dead weight/package",
+      "calculation": null,
+      "unitCharge": 0,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "green_tax",
+      "remark": null,
+      "calculation": "base_kg",
+      "unitCharge": 0,
+      "min": 80,
+      "max": null
+    },
+    {
+      "key": "Minimum chargeable freight amount ( Base Freight +AWB+FM )",
+      "remark": null,
+      "calculation": "LR",
+      "unitCharge": 300,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "intra_city_rate",
+      "remark": "Rate to be considered for intracity movement",
+      "calculation": "per kg",
+      "unitCharge": 0,
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Weight Rule",
+      "remark": null,
+      "calculation": null,
+      "unitCharge": "max_dead_vol_wt",
+      "min": 0,
+      "max": null
+    },
+    {
+      "key": "Invoice Type",
+      "remark": "Options: pickup,delivery",
+      "calculation": null,
+      "unitCharge": "delivery",
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Billing Cycle",
+      "remark": "Options: weekly,bi-monthly,monthly",
+      "calculation": null,
+      "unitCharge": "bi-monthly",
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "Round-off",
+      "remark": "Yes (If the client's charged weight needs to be rounded-off)",
+      "calculation": null,
+      "unitCharge": "yes",
+      "min": null,
+      "max": null
+    },
+    {
+      "key": "billing_start_date",
+      "remark": "The date of the month from which the billing will start (e.g. 12)",
+      "calculation": "date",
+      "unitCharge": 1,
+      "min": null,
+      "max": null
+    }
+  ],
+  "odaSlabs": [
+    {
+      "lowerLimitKg": 0,
+      "upperLimitKg": 500,
+      "perKgCharge": 3,
+      "minCharge": 500,
+      "maxCharge": null
+    },
+    {
+      "lowerLimitKg": 500,
+      "upperLimitKg": 9999999999,
+      "perKgCharge": 3,
+      "minCharge": 500,
+      "maxCharge": null
+    }
+  ]
+}

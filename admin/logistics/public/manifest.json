@@ -1,0 +1,15 @@
+{
+  "short_name": "Kourier Boyz Admin",
+  "name": "Kourier Boyz Admin Control Center",
+  "icons": [
+    {
+      "src": "brand/kourier-boyz-mark.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/logistics/",
+  "display": "standalone",
+  "theme_color": "#B78115",
+  "background_color": "#F8F8F6"
+}

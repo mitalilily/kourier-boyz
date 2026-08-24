@@ -41,7 +41,7 @@ export interface AdminSellerShipment {
     tracking_link?: string
     estimated_delivery_date?: string
   }
-  courierCart?: {
+  kourierBoyzLogistics?: {
     courier_id?: number
     order_id?: string
     order_number?: string

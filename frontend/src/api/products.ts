@@ -905,8 +905,8 @@ export const useClearViewingHistory = () => {
   });
 };
 
-// CourierCart Serviceability Types
-export interface CourierCartCourier {
+// KourierBoyzLogistics Serviceability Types
+export interface KourierBoyzLogisticsCourier {
   courier_id: number;
   courier_name: string;
   rate?: number;
@@ -920,8 +920,8 @@ export interface CourierCartCourier {
 export interface ServiceabilityResponse {
   success: boolean;
   data: {
-    courier: CourierCartCourier | null;
-    couriers: CourierCartCourier[];
+    courier: KourierBoyzLogisticsCourier | null;
+    couriers: KourierBoyzLogisticsCourier[];
     origin_pincode?: string;
     destination_pincode: string;
     payment_type: string;

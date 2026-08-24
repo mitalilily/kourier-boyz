@@ -1,0 +1,13 @@
+{
+  "name": "kourier-boyz-platform",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build:frontend": "npm run build --prefix frontend",
+    "build:client": "npm run build --prefix seller-client",
+    "build:admin": "npm run build --prefix admin",
+    "build:tracking": "npm run build --prefix tracking",
+    "build:backend": "npm run build --prefix backend",
+    "build": "npm run build:frontend && npm run build:client && npm run build:admin && npm run build:tracking && npm run build:backend"
+  }
+}

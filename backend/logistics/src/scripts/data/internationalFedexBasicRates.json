@@ -1,0 +1,1220 @@
+{
+  "source": "kourier-boyz intl fedex rate basic.xlsx",
+  "currency": "INR",
+  "originZone": "IN",
+  "couriers": [
+    "FedEx",
+    "UPS",
+    "DHL",
+    "Self Network"
+  ],
+  "zones": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q"
+  ],
+  "countries": [
+    {
+      "countryName": "Afghanistan",
+      "countryKey": "afghanistan",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Albania",
+      "countryKey": "albania",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Algeria",
+      "countryKey": "algeria",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "American Samoa",
+      "countryKey": "american-samoa",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Andorra",
+      "countryKey": "andorra",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Angola",
+      "countryKey": "angola",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Anguilla",
+      "countryKey": "anguilla",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Antigua & Barbuda",
+      "countryKey": "antigua-and-barbuda",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Argentina",
+      "countryKey": "argentina",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Armenia",
+      "countryKey": "armenia",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Aruba",
+      "countryKey": "aruba",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Australia",
+      "countryKey": "australia",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Austria",
+      "countryKey": "austria",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Azerbaijan",
+      "countryKey": "azerbaijan",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Bahama",
+      "countryKey": "bahama",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Bahrain",
+      "countryKey": "bahrain",
+      "zoneCode": "M"
+    },
+    {
+      "countryName": "Bangladesh",
+      "countryKey": "bangladesh",
+      "zoneCode": "B"
+    },
+    {
+      "countryName": "Barbados",
+      "countryKey": "barbados",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Belarus",
+      "countryKey": "belarus",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Belgium",
+      "countryKey": "belgium",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Belize",
+      "countryKey": "belize",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Benin",
+      "countryKey": "benin",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Bermuda",
+      "countryKey": "bermuda",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Bhutan",
+      "countryKey": "bhutan",
+      "zoneCode": "B"
+    },
+    {
+      "countryName": "Bolivia",
+      "countryKey": "bolivia",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Bonaire, St Eustatius and Saba",
+      "countryKey": "bonaire-st-eustatius-and-saba",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Bosnia-Herzegovina",
+      "countryKey": "bosnia-herzegovina",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Botswana",
+      "countryKey": "botswana",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Brazil",
+      "countryKey": "brazil",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "British Virgin Islands",
+      "countryKey": "british-virgin-islands",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Brunei",
+      "countryKey": "brunei",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Bulgaria",
+      "countryKey": "bulgaria",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Burkina Faso",
+      "countryKey": "burkina-faso",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Burundi",
+      "countryKey": "burundi",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Cambodia",
+      "countryKey": "cambodia",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Cameroon",
+      "countryKey": "cameroon",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Canada",
+      "countryKey": "canada",
+      "zoneCode": "L"
+    },
+    {
+      "countryName": "Cape Verde",
+      "countryKey": "cape-verde",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Cayman Islands",
+      "countryKey": "cayman-islands",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Central African Republic",
+      "countryKey": "central-african-republic",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Chad",
+      "countryKey": "chad",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Chile",
+      "countryKey": "chile",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "China",
+      "countryKey": "china",
+      "zoneCode": "D"
+    },
+    {
+      "countryName": "Colombia",
+      "countryKey": "colombia",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Congo",
+      "countryKey": "congo",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Congo, Dem Rep Of",
+      "countryKey": "congo-dem-rep-of",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Cook Islands",
+      "countryKey": "cook-islands",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Costa Rica",
+      "countryKey": "costa-rica",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Côte D'ivoire (Ivory Coast)",
+      "countryKey": "cote-d-ivoire-ivory-coast",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Croatia",
+      "countryKey": "croatia",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Curacao",
+      "countryKey": "curacao",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Cyprus",
+      "countryKey": "cyprus",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Czech Republic",
+      "countryKey": "czech-republic",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Denmark",
+      "countryKey": "denmark",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Djibouti",
+      "countryKey": "djibouti",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Dominica",
+      "countryKey": "dominica",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Dominican Republic",
+      "countryKey": "dominican-republic",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "East Timor",
+      "countryKey": "east-timor",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Ecuador",
+      "countryKey": "ecuador",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Egypt",
+      "countryKey": "egypt",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "El Salvador",
+      "countryKey": "el-salvador",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Equatorial Guinea",
+      "countryKey": "equatorial-guinea",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Eritrea",
+      "countryKey": "eritrea",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Estonia",
+      "countryKey": "estonia",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Ethiopia",
+      "countryKey": "ethiopia",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Faeroe Islands",
+      "countryKey": "faeroe-islands",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Fiji",
+      "countryKey": "fiji",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Finland",
+      "countryKey": "finland",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "France",
+      "countryKey": "france",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "French Guiana",
+      "countryKey": "french-guiana",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "French Polynesia",
+      "countryKey": "french-polynesia",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Gabon",
+      "countryKey": "gabon",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Gambia",
+      "countryKey": "gambia",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Georgia",
+      "countryKey": "georgia",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Germany",
+      "countryKey": "germany",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Ghana",
+      "countryKey": "ghana",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Gibraltar",
+      "countryKey": "gibraltar",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Greece",
+      "countryKey": "greece",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Greenland",
+      "countryKey": "greenland",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Grenada",
+      "countryKey": "grenada",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Guadeloupe",
+      "countryKey": "guadeloupe",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Guam",
+      "countryKey": "guam",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Guatemala",
+      "countryKey": "guatemala",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Guinea",
+      "countryKey": "guinea",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Guinea-Bissau",
+      "countryKey": "guinea-bissau",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Guyana",
+      "countryKey": "guyana",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Haiti",
+      "countryKey": "haiti",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Honduras",
+      "countryKey": "honduras",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Hong Kong",
+      "countryKey": "hong-kong",
+      "zoneCode": "D"
+    },
+    {
+      "countryName": "Hungary",
+      "countryKey": "hungary",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Iceland",
+      "countryKey": "iceland",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Indonesia",
+      "countryKey": "indonesia",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Iran",
+      "countryKey": "iran",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Iraq",
+      "countryKey": "iraq",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Ireland",
+      "countryKey": "ireland",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Israel",
+      "countryKey": "israel",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Italy",
+      "countryKey": "italy",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Jamaica",
+      "countryKey": "jamaica",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Japan",
+      "countryKey": "japan",
+      "zoneCode": "H"
+    },
+    {
+      "countryName": "Jordan",
+      "countryKey": "jordan",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Kazakhstan",
+      "countryKey": "kazakhstan",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Kenya",
+      "countryKey": "kenya",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Kiribati",
+      "countryKey": "kiribati",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Kuwait",
+      "countryKey": "kuwait",
+      "zoneCode": "M"
+    },
+    {
+      "countryName": "Kyrgyzstan",
+      "countryKey": "kyrgyzstan",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Laos",
+      "countryKey": "laos",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Latvia",
+      "countryKey": "latvia",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Lebanon",
+      "countryKey": "lebanon",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Lesotho",
+      "countryKey": "lesotho",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Liberia",
+      "countryKey": "liberia",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Libya",
+      "countryKey": "libya",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Liechtenstein",
+      "countryKey": "liechtenstein",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Lithuania",
+      "countryKey": "lithuania",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Luxembourg",
+      "countryKey": "luxembourg",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Macau",
+      "countryKey": "macau",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Macedonia",
+      "countryKey": "macedonia",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Madagascar",
+      "countryKey": "madagascar",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Malawi",
+      "countryKey": "malawi",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Malaysia",
+      "countryKey": "malaysia",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Maldives",
+      "countryKey": "maldives",
+      "zoneCode": "B"
+    },
+    {
+      "countryName": "Mali",
+      "countryKey": "mali",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Malta",
+      "countryKey": "malta",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Marshall Islands",
+      "countryKey": "marshall-islands",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Martinique",
+      "countryKey": "martinique",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Mauritania",
+      "countryKey": "mauritania",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Mauritius",
+      "countryKey": "mauritius",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Mexico",
+      "countryKey": "mexico",
+      "zoneCode": "G"
+    },
+    {
+      "countryName": "Micronesia",
+      "countryKey": "micronesia",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Moldova, Republic of",
+      "countryKey": "moldova-republic-of",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Monaco",
+      "countryKey": "monaco",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Mongolia",
+      "countryKey": "mongolia",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Monserrat",
+      "countryKey": "monserrat",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Montenegro",
+      "countryKey": "montenegro",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Morocco",
+      "countryKey": "morocco",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Mozambique",
+      "countryKey": "mozambique",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Myanmar",
+      "countryKey": "myanmar",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Namibia",
+      "countryKey": "namibia",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Nepal",
+      "countryKey": "nepal",
+      "zoneCode": "B"
+    },
+    {
+      "countryName": "Netherlands",
+      "countryKey": "netherlands",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "New Caledonia",
+      "countryKey": "new-caledonia",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "New Zealand",
+      "countryKey": "new-zealand",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Nicaragua",
+      "countryKey": "nicaragua",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Niger",
+      "countryKey": "niger",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Nigeria",
+      "countryKey": "nigeria",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Norway",
+      "countryKey": "norway",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Oman",
+      "countryKey": "oman",
+      "zoneCode": "M"
+    },
+    {
+      "countryName": "Pakistan",
+      "countryKey": "pakistan",
+      "zoneCode": "B"
+    },
+    {
+      "countryName": "Palau",
+      "countryKey": "palau",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Palestine Authority",
+      "countryKey": "palestine-authority",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Panama",
+      "countryKey": "panama",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Papua New Guinea",
+      "countryKey": "papua-new-guinea",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Paraguay",
+      "countryKey": "paraguay",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Peru",
+      "countryKey": "peru",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Philippines",
+      "countryKey": "philippines",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Poland",
+      "countryKey": "poland",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Portugal",
+      "countryKey": "portugal",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Puerto Rico",
+      "countryKey": "puerto-rico",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Qatar",
+      "countryKey": "qatar",
+      "zoneCode": "M"
+    },
+    {
+      "countryName": "Réunion",
+      "countryKey": "reunion",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Romania",
+      "countryKey": "romania",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Russian Federation",
+      "countryKey": "russian-federation",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Rwanda",
+      "countryKey": "rwanda",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Saint Lucia",
+      "countryKey": "saint-lucia",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Saipan",
+      "countryKey": "saipan",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Samoa",
+      "countryKey": "samoa",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Saudi Arabia",
+      "countryKey": "saudi-arabia",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Senegal",
+      "countryKey": "senegal",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Serbia",
+      "countryKey": "serbia",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Seychelles",
+      "countryKey": "seychelles",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Sierra Leone",
+      "countryKey": "sierra-leone",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Singapore",
+      "countryKey": "singapore",
+      "zoneCode": "B"
+    },
+    {
+      "countryName": "Slovakia",
+      "countryKey": "slovakia",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Slovenia",
+      "countryKey": "slovenia",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Solomon Islands",
+      "countryKey": "solomon-islands",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "South Africa",
+      "countryKey": "south-africa",
+      "zoneCode": "K"
+    },
+    {
+      "countryName": "South Korea",
+      "countryKey": "south-korea",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Spain",
+      "countryKey": "spain",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Sri Lanka",
+      "countryKey": "sri-lanka",
+      "zoneCode": "B"
+    },
+    {
+      "countryName": "St. Kitts and Nevis",
+      "countryKey": "st-kitts-and-nevis",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "St. Maarten",
+      "countryKey": "st-maarten",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "St. Martin",
+      "countryKey": "st-martin",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "St. Vincent & the Grenadines",
+      "countryKey": "st-vincent-and-the-grenadines",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Sudan",
+      "countryKey": "sudan",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Suriname",
+      "countryKey": "suriname",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Swaziland",
+      "countryKey": "swaziland",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Sweden",
+      "countryKey": "sweden",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Switzerland",
+      "countryKey": "switzerland",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Syrian Arab Republic",
+      "countryKey": "syrian-arab-republic",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Taiwan",
+      "countryKey": "taiwan",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Tanzania, United Republic of",
+      "countryKey": "tanzania-united-republic-of",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Thailand",
+      "countryKey": "thailand",
+      "zoneCode": "D"
+    },
+    {
+      "countryName": "Togo",
+      "countryKey": "togo",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Tonga",
+      "countryKey": "tonga",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Trinidad & Tobago",
+      "countryKey": "trinidad-and-tobago",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Tunisia",
+      "countryKey": "tunisia",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Turkey",
+      "countryKey": "turkey",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Turkmenistan",
+      "countryKey": "turkmenistan",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Turks & Caicos Islands",
+      "countryKey": "turks-and-caicos-islands",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Tuvalu",
+      "countryKey": "tuvalu",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "U. S. A.",
+      "countryKey": "u-s-a",
+      "zoneCode": "G"
+    },
+    {
+      "countryName": "U.S. Virgin Islands",
+      "countryKey": "u-s-virgin-islands",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Uganda",
+      "countryKey": "uganda",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Ukraine",
+      "countryKey": "ukraine",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "United Arab Emirates",
+      "countryKey": "united-arab-emirates",
+      "zoneCode": "A"
+    },
+    {
+      "countryName": "United Kingdom",
+      "countryKey": "united-kingdom",
+      "zoneCode": "F"
+    },
+    {
+      "countryName": "Uruguay",
+      "countryKey": "uruguay",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "USA - Mayaguez",
+      "countryKey": "usa-mayaguez",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Uzbekistan",
+      "countryKey": "uzbekistan",
+      "zoneCode": "I"
+    },
+    {
+      "countryName": "Vanuatu",
+      "countryKey": "vanuatu",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Venezuela",
+      "countryKey": "venezuela",
+      "zoneCode": "J"
+    },
+    {
+      "countryName": "Vietnam",
+      "countryKey": "vietnam",
+      "zoneCode": "E"
+    },
+    {
+      "countryName": "Yemen",
+      "countryKey": "yemen",
+      "zoneCode": "C"
+    },
+    {
+      "countryName": "Zambia",
+      "countryKey": "zambia",
+      "zoneCode": "N"
+    },
+    {
+      "countryName": "Zimbabwe",
+      "countryKey": "zimbabwe",
+      "zoneCode": "N"
+    }
+  ],
+  "sections": [
+    {
+      "code": "pak",
+      "label": "Pak",
+      "rows": [
+        {
+          "weight": 0.5,
+          "rates": {
+            "A": 1478.55,
+            "B": 1621.35,
+            "C": 1766.25,
+            "D": 1915.95,
+            "E": 2226,
+            "F": 1985.1,
+            "G": 1985.85,
+            "H": 2091.45,
+            "I": 2157.9,
+            "J": 2335.65,
+            "K": 1910.4,
+            "L": 2135.25,
+            "M": 1593.6,
+            "N": 2487.15,
+            "O": 2487.15,
+            "P": 2487.15,
+            "Q": 2487.15
+          }
+        },
+        {
+          "weight": 1,
+          "rates": {
+            "A": 1689.15,
+            "B": 2038.95,
+            "C": 2141.25,
+            "D": 2293.8,
+            "E": 2712.9,
+            "F": 2296.05,
+            "G": 2286.75,
+            "H": 2519.1,
+            "I": 2548.65,
+            "J": 2584.95,
+            "K": 2140.65,
+            "L": 2458.8,
+            "M": 1820.7,
+            "N": 2786.85,
+            "O": 2786.85,
+            "P": 2786.85,
+            "Q": 2786.85
+          }
+        },
+        {
+          "weight": 1.5,
+          "rates": {
+            "A": 1927.5,
+            "B": 2455.5,
+            "C": 2517.9,
+            "D": 2703.75,
+            "E": 3199.65,
+            "F": 2606.1,
+            "G": 2590.05,
+            "H": 2948.1,
+            "I": 2979,
+            "J": 2875.8,
+            "K": 2373.6,
+            "L": 2784.9,
+            "M": 2077.5,
+            "N": 3090.15,
+            "O": 3090.15,
+            "P": 3090.15,
+            "Q": 3090.15
+          }
+        },
+        {
+          "weight": 2,
+          "rates": {
+            "A": 2165.85,
+            "B": 2872.65,
+            "C": 2894.4,
+            "D": 3114,
+            "E": 3686.4,
+            "F": 2916.3,
+            "G": 2893.35,
+            "H": 3377.1,
+            "I": 3409.2,
+            "J": 3166.8,
+            "K": 2606.55,
+            "L": 3111,
+            "M": 2334.3,
+            "N": 3393.45,
+            "O": 3393.45,
+            "P": 3393.45,
+            "Q": 3393.45
+          }
+        },
+        {
+          "weight": 2.5,
+          "rates": {
+            "A": 2404.2,
+            "B": 3289.8,
+            "C": 3270.9,
+            "D": 3524.4,
+            "E": 4173.3,
+            "F": 3226.35,
+            "G": 3196.65,
+            "H": 3806.1,
+            "I": 3839.55,
+            "J": 3457.8,
+            "K": 2839.5,
+            "L": 3437.1,
+            "M": 2591.25,
+            "N": 3696.75,
+            "O": 3696.75,
+            "P": 3696.75,
+            "Q": 3696.75
+          }
+        }
+      ]
+    }
+  ]
+}

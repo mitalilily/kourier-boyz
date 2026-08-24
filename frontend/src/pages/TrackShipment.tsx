@@ -7,7 +7,7 @@ interface TrackingEvent { status?: string; message?: string; location?: string; 
 interface TrackingResult {
   order?: { orderNumber?: string; status?: string }
   shipment?: { awb?: string; status?: string; courier?: string; trackingEvents?: TrackingEvent[] }
-  courierCart?: { status?: string; current_location?: string; estimated_delivery?: string; tracking_events?: TrackingEvent[] } | null
+  kourierBoyzLogistics?: { status?: string; current_location?: string; estimated_delivery?: string; tracking_events?: TrackingEvent[] } | null
 }
 
 const TrackShipment = () => {
@@ -17,7 +17,7 @@ const TrackShipment = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const events = [...(result?.courierCart?.tracking_events || []), ...(result?.shipment?.trackingEvents || [])]
+  const events = [...(result?.kourierBoyzLogistics?.tracking_events || []), ...(result?.shipment?.trackingEvents || [])]
     .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())
 
   const handleTrack = async (event: FormEvent) => {
@@ -65,7 +65,7 @@ const TrackShipment = () => {
                 <div className="grid gap-3 sm:grid-cols-3">
                   <div className="border border-black/10 bg-[#f7f7f4] p-4"><div className="text-xs font-bold text-[#666]">Order</div><div className="mt-1 font-black">{result.order?.orderNumber || trackingId}</div></div>
                   <div className="border border-black/10 bg-[#f7f7f4] p-4"><div className="text-xs font-bold text-[#666]">AWB</div><div className="mt-1 font-black">{result.shipment?.awb || trackingId}</div></div>
-                  <div className="border border-[#d4ba80] bg-[#f8f1df] p-4"><div className="text-xs font-bold text-[#8a620d]">Status</div><div className="mt-1 font-black capitalize">{(result.courierCart?.status || result.shipment?.status || result.order?.status || 'Pending').replace(/_/g, ' ')}</div></div>
+                  <div className="border border-[#d4ba80] bg-[#f8f1df] p-4"><div className="text-xs font-bold text-[#8a620d]">Status</div><div className="mt-1 font-black capitalize">{(result.kourierBoyzLogistics?.status || result.shipment?.status || result.order?.status || 'Pending').replace(/_/g, ' ')}</div></div>
                 </div>
                 <div className="mt-7 space-y-4">
                   {(events.length ? events : [{ status: result.shipment?.status || result.order?.status || 'Order received', message: 'Tracking updates will appear as the shipment moves.', timestamp: new Date() }]).map((item, index) => (

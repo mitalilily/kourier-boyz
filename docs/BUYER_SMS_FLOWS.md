@@ -201,7 +201,7 @@ This document provides a comprehensive A-to-Z overview of all SMS/text message f
 - **Template ID**: Not specified (uses default)
 - **Message Format**: 
   - If tracking link available: `Your order {orderNumber} has been shipped! Track it here: {trackingLink} - Kourier Boyz`
-  - If AWB available: `Your order {orderNumber} has been shipped! AWB: {awb}. Track at couriercart.in - Kourier Boyz`
+  - If AWB available: `Your order {orderNumber} is on the way. AWB: {awb}. Track at kourierboyz.com/track.`
   - Otherwise: `Your order {orderNumber} has been shipped! You will receive tracking details soon. - Kourier Boyz`
 - **Code Location**: `backend/src/utils/orderStatus.ts` (lines 268-285)
 
@@ -215,31 +215,31 @@ This document provides a comprehensive A-to-Z overview of all SMS/text message f
 
 ---
 
-### 4.3 Shipment Confirmation via CourierCart Webhook
-**Flow**: CourierCart webhook confirms shipment - buyer receives SMS
+### 4.3 Shipment Confirmation via Kourier Boyz Logistics Webhook
+**Flow**: Kourier Boyz Logistics confirms shipment and the buyer receives an SMS.
 
-**Trigger**: CourierCart webhook event `shipped` or `booked`
+**Trigger**: Kourier Boyz Logistics webhook event `shipped` or `booked`
 
 **SMS Details**:
 - **Template ID**: `1507163272018834682`
-- **Template Content**: `"Hi {#var#}. Tracking details of your order no. {#var#} has been shipped via Couriercart with tracking ID {#var#}. Team KOURIER_BOYZ"`
-- **Message Format**: `Hi {buyerName}. Tracking details of your order no. {orderNumber} has been shipped via Couriercart with tracking ID {trackingId}. Team KOURIER_BOYZ`
+- **Template Content**: `"Hi {#var#}. Your Kourier Boyz order {#var#} is on the way. Tracking ID: {#var#}."`
+- **Message Format**: `Hi {buyerName}. Your Kourier Boyz order {orderNumber} is on the way. Tracking ID: {trackingId}.`
 - **Code Location**: `backend/src/controllers/webhook.controller.ts` (lines 240-252)
 
 **User Journey**:
-1. CourierCart processes shipment
+1. Kourier Boyz Logistics processes shipment
 2. Webhook received with tracking details
 3. SMS sent to buyer with tracking ID
 4. Order status updated in system
 
-**Timing**: Sent when CourierCart confirms shipment
+**Timing**: Sent when Kourier Boyz Logistics confirms shipment
 
 ---
 
 ### 4.4 Out for Delivery SMS
 **Flow**: Order status changes to "out for delivery" - buyer receives SMS
 
-**Trigger**: CourierCart webhook event `out_for_delivery`
+**Trigger**: Kourier Boyz Logistics webhook event `out_for_delivery`
 
 **SMS Details**:
 - **Template ID**: Not specified (uses default)
@@ -248,7 +248,7 @@ This document provides a comprehensive A-to-Z overview of all SMS/text message f
 
 **User Journey**:
 1. Courier partner picks up order for delivery
-2. CourierCart webhook updates status to "out_for_delivery"
+2. Kourier Boyz Logistics webhook updates status to "out_for_delivery"
 3. SMS sent to buyer
 4. Email notification also sent
 
@@ -259,7 +259,7 @@ This document provides a comprehensive A-to-Z overview of all SMS/text message f
 ### 4.5 Order Delivered SMS
 **Flow**: Order marked as delivered - buyer receives confirmation SMS
 
-**Trigger**: CourierCart webhook event `delivered`
+**Trigger**: Kourier Boyz Logistics webhook event `delivered`
 
 **SMS Details**:
 - **Template ID**: `1507163272034422325`
@@ -269,7 +269,7 @@ This document provides a comprehensive A-to-Z overview of all SMS/text message f
 
 **User Journey**:
 1. Courier delivers order to buyer
-2. CourierCart webhook confirms delivery
+2. Kourier Boyz Logistics webhook confirms delivery
 3. SMS sent to buyer with delivery confirmation
 4. Email notification also sent
 5. In-app notification created
@@ -310,7 +310,7 @@ This document provides a comprehensive A-to-Z overview of all SMS/text message f
 |------------|---------|----------------|
 | `1507163272041260154` | Account creation OTP | `Hi {name}, Your One Time Password for account creation is {OTP}. Team KOURIER_BOYZ` |
 | `1507163272005565259` | Order confirmation | `Hi {name}, Thanks for placing your order no. {orderNumber}, will update you about tracking details. Team KOURIER_BOYZ` |
-| `1507163272018834682` | Shipment confirmation | `Hi {name}. Tracking details of your order no. {orderNumber} has been shipped via Couriercart with tracking ID {trackingId}. Team KOURIER_BOYZ` |
+| `1507163272018834682` | Shipment confirmation | `Hi {name}. Your Kourier Boyz order {orderNumber} is on the way. Tracking ID: {trackingId}.` |
 | `1507163272034422325` | Delivery confirmation | `Hi {name}, Your order no. {orderNumber} has been delivered. Thank you for Shopping with us. Keep Shopping with KOURIER_BOYZ` |
 | `1507163272063107126` | Seller new order (not buyer) | `Dear Seller, you have got a new order no. {orderNumber}, request to process the same at the earliest and update on portal. Team KOURIER_BOYZ` |
 

@@ -1,0 +1,4 @@
+ALTER TABLE "kyc" DROP COLUMN IF EXISTS "selfieUrl";
+ALTER TABLE "kyc" DROP COLUMN IF EXISTS "selfieStatus";
+ALTER TABLE "kyc" DROP COLUMN IF EXISTS "selfieRejectionReason";
+ALTER TABLE "kyc" DROP COLUMN IF EXISTS "selfieMime";

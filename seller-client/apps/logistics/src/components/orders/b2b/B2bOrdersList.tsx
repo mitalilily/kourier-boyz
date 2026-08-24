@@ -1,0 +1,215 @@
+import { Button, Stack, Typography } from '@mui/material'
+import { saveAs } from 'file-saver'
+import { useState } from 'react'
+import type { ReactNode } from 'react'
+import moment from 'moment'
+import { downloadBulkOrderDocumentsZip } from '../../../api/order.service'
+import { useB2BOrdersByUser, useGenerateManifest } from '../../../hooks/Orders/useOrders'
+import type { B2BOrder } from '../../../types/generic.types'
+import {
+  getOrderCourierDisplayName,
+  getOrderSourceChipStatus,
+  getOrderSourceLabel,
+} from '../../../utils/orderSource'
+import StatusChip from '../../UI/chip/StatusChip'
+import DataTable, { type Column } from '../../UI/table/DataTable'
+import TableSkeleton from '../../UI/table/TableSkeleton'
+import { OrderExpandedRow } from '../OrderExpandedRow'
+import { getArchiveFileNameFromHeaders, getDocumentReference } from '../bulkActionUtils'
+
+export const statusColorMap: Record<string, 'success' | 'pending' | 'error' | 'info'> = {
+  delivered: 'success',
+  processing: 'pending',
+  cancelled: 'error',
+  pending: 'info',
+  shipment_booked: 'info',
+  manifest_generated: 'success',
+}
+
+interface B2BOrdersListProps {
+  page: number
+  rowsPerPage: number
+  setPage: (page: number) => void
+  setRowsPerPage: (rows: number) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  filters: any
+}
+
+const getCourierDisplayName = (order: B2BOrder) =>
+  getOrderCourierDisplayName({
+    ...order,
+    courier_partner: order.courier_partner,
+  }) || '-'
+
+const B2BOrdersList = ({
+  page,
+  rowsPerPage,
+  setPage,
+  setRowsPerPage,
+  filters,
+}: B2BOrdersListProps) => {
+  const { data, isLoading, isFetching, isError } = useB2BOrdersByUser(
+    page,
+    rowsPerPage,
+    filters,
+  )
+  const { mutate: triggerManifest, isPending: isGeneratingManifest } = useGenerateManifest()
+  const [manifestingAwb, setManifestingAwb] = useState<string | null>(null)
+  const [downloadingManifestOrderId, setDownloadingManifestOrderId] = useState<string | null>(null)
+
+  const handleGenerateManifest = (order: B2BOrder) => {
+    if (!order.awb_number) return
+    setManifestingAwb(order.awb_number)
+    triggerManifest(
+      { awbs: [order.awb_number], type: 'b2b' },
+      {
+        onSettled: () => {
+          setManifestingAwb((current) => (current === order.awb_number ? null : current))
+        },
+      },
+    )
+  }
+
+  const handleDownloadManifest = async (order: B2BOrder) => {
+    const orderId = String(order.id || '')
+    if (!orderId) return
+
+    setDownloadingManifestOrderId(orderId)
+    try {
+      const { blob, headers } = await downloadBulkOrderDocumentsZip([orderId], 'manifest')
+      const archiveName = getArchiveFileNameFromHeaders(
+        headers,
+        `kourier-boyz-manifest-${order.order_number || order.awb_number || orderId}.zip`,
+      )
+      saveAs(blob, archiveName)
+    } finally {
+      setDownloadingManifestOrderId((current) => (current === orderId ? null : current))
+    }
+  }
+
+  const columns: Column<B2BOrder>[] = [
+    {
+      label: 'Source',
+      id: 'source',
+      render: (_, row) => (
+        <StatusChip
+          label={getOrderSourceLabel(row)}
+          status={getOrderSourceChipStatus(row)}
+        />
+      ),
+    },
+    { label: 'Order #', id: 'order_number' },
+    { label: 'AWB', id: 'awb_number' },
+    { label: 'Buyer', id: 'buyer_name' },
+    { label: 'Amount', id: 'order_amount', render: (v) => `₹${Number(v)?.toFixed(2)}` },
+    {
+      label: 'Courier',
+      id: 'courier_partner',
+      minWidth: 170,
+      render: (_value, row) => getCourierDisplayName(row),
+    },
+    {
+      label: 'Status',
+      id: 'order_status',
+      render: (v) => <StatusChip label={v} status={statusColorMap[v] || 'info'} />,
+    },
+    { label: 'Order Date', id: 'order_date', render: (v) => moment(v).format('DD MMM YYYY') },
+    { label: 'Last Updated', id: 'updated_at', render: (v) => moment(v).format('DD MMM YYYY') },
+    {
+      label: 'Actions',
+      id: 'id',
+      showCellTooltip: false,
+      render: (_, row) => {
+        const courierText = (row.courier_partner || '').toLowerCase()
+        const integrationText = (((row as any).integration_type as string) || '').toLowerCase()
+        const isXpressbees =
+          integrationText === 'xpressbees' || courierText.includes('xpressbees')
+        const isEkart = integrationText === 'ekart' || courierText.includes('ekart')
+
+        const canManifest = !!row.awb_number && !row.manifest && (isXpressbees || isEkart)
+
+        const actions: ReactNode[] = []
+
+        if (canManifest) {
+          const isThisManifesting = isGeneratingManifest && manifestingAwb === row.awb_number
+          actions.push(
+            <Button
+              key="manifest"
+              size="small"
+              variant="contained"
+              disabled={isThisManifesting}
+              onClick={(e) => {
+                e.stopPropagation()
+                handleGenerateManifest(row)
+              }}
+            >
+              {isThisManifesting ? 'Manifesting…' : 'Manifest'}
+            </Button>,
+          )
+        }
+
+        const manifestReference = getDocumentReference(row as any, 'manifest')
+        const hasManifestDocument = Boolean(manifestReference.key || manifestReference.url)
+
+        if (hasManifestDocument) {
+          const isDownloading = downloadingManifestOrderId === String(row.id)
+          actions.push(
+            <Button
+              key="view-manifest"
+              size="small"
+              variant="outlined"
+              disabled={isDownloading}
+              onClick={(e) => {
+                e.stopPropagation()
+                handleDownloadManifest(row)
+              }}
+            >
+              {isDownloading ? 'Downloading...' : 'Manifest'}
+            </Button>,
+          )
+        }
+
+        if (!actions.length) return null
+
+        return <Stack direction="row" spacing={1}>{actions}</Stack>
+      },
+    },
+  ]
+
+  if (isError)
+    return (
+      <Typography color="error" textAlign="center" py={4}>
+        Failed to fetch B2B orders
+      </Typography>
+    )
+
+  return (
+    <Stack spacing={2}>
+      {isLoading && !data ? (
+        <TableSkeleton title="Loading B2B orders" />
+      ) : (
+        <DataTable<B2BOrder>
+          rows={data?.orders || []}
+          columns={columns}
+          title="My B2B Orders"
+          loading={isFetching}
+          loadingLabel="Updating B2B orders..."
+          emptyMessage="No B2B orders match the current filters."
+          pagination
+          currentPage={page - 1}
+          expandable
+          renderExpandedRow={(row) => <OrderExpandedRow type="b2b" row={row} />}
+          defaultRowsPerPage={rowsPerPage}
+          totalCount={data?.totalCount || 0}
+          onPageChange={(newPage) => setPage(newPage + 1)}
+          onRowsPerPageChange={(newLimit) => {
+            setRowsPerPage(newLimit)
+            setPage(1)
+          }}
+        />
+      )}
+    </Stack>
+  )
+}
+
+export default B2BOrdersList

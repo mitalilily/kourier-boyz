@@ -1,0 +1,86 @@
+:root {
+  --brand-orange: #555d61;
+  --brand-orange-dark: #303537;
+  --brand-orange-light: #9aa1a4;
+  --brand-blue: #b78115;
+  --brand-blue-dark: #8f650f;
+  --brand-blue-light: #dfb743;
+  --brand-teal: #737b77;
+  --brand-teal-light: #b6bcba;
+  --brand-ink: #202321;
+  --brand-text: #4f5552;
+  --brand-muted: #6a706d;
+  --brand-surface: rgba(255, 255, 255, 0.92);
+  --brand-border: rgba(183, 129, 21, 0.18);
+  --brand-shadow: 0 20px 40px rgba(20, 20, 20, 0.08);
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    linear-gradient(135deg, rgba(183, 129, 21, 0.07), rgba(255, 255, 255, 0) 42%),
+    repeating-linear-gradient(115deg, rgba(79, 85, 82, 0.025) 0 1px, transparent 1px 26px),
+    linear-gradient(180deg, #f8f8f6 0%, #eef0ee 100%);
+  background-attachment: fixed;
+  color: var(--brand-ink);
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img {
+  max-width: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(183, 129, 21, 0.04);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(183, 129, 21, 0.78), rgba(79, 85, 82, 0.72));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(183, 129, 21, 0.94), rgba(79, 85, 82, 0.88));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(183, 129, 21, 0.78) rgba(183, 129, 21, 0.04);
+}

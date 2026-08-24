@@ -1,0 +1,364 @@
+// routes/shippingRateRoutes.ts
+import { Router } from 'express'
+import {
+  bookDelhiveryLtlLastMileAppointmentController,
+  cancelDelhiveryLtlPickupRequestController,
+  cancelDelhiveryLtlShipmentController,
+  createDelhiveryLtlPickupRequestController,
+  createDelhiveryLtlManifestController,
+  createDelhiveryLtlClientWarehouseController,
+  generateDelhiveryLtlDocumentsController,
+  getCourierCredentialsController,
+  getDelhiveryLtlGeneratedDocumentStatusController,
+  getDelhiveryLtlLrCopyController,
+  getDelhiveryLtlShippingLabelUrlsController,
+  getDelhiveryLtlManifestStatusController,
+  getDelhiveryLtlShipmentUpdateStatusController,
+  trackDelhiveryLtlShipmentController,
+  updateDelhiveryLtlShipmentController,
+  deleteShippingRateController,
+  estimateDelhiveryLtlFreightController,
+  fetchAvailableCouriersForAdmin,
+  getAllCouriersController,
+  getDelhiveryLtlExpectedTatController,
+  getDelhiveryLtlFreightChargesController,
+  getShippingRatesController,
+  importShippingRatesController,
+  checkDelhiveryLtlServiceabilityController,
+  loginDelhiveryLtlController,
+  logoutDelhiveryLtlController,
+  requestDelhiveryLtlPasswordResetController,
+  updateDelhiveryLtlClientWarehouseController,
+  updateDelhiveryCredentialsController,
+  updateDtdcCredentialsController,
+  updateEkartCredentialsController,
+  updateInnofulfillCredentialsController,
+  updateMovinCredentialsController,
+  updateApptmyzCredentialsController,
+  updateAmazonCredentialsController,
+  updateXpressbeesAwbRangeController,
+  updateXpressbeesCredentialsController,
+  updateShippingRateController,
+} from '../../controllers/admin/courier.controller'
+import {
+  apptmyzCancelOrdersController,
+  apptmyzCancelReasonsController,
+  apptmyzCreateOrderController,
+  apptmyzCreatePickupRequestsController,
+  apptmyzDeliverySlotsController,
+  apptmyzGenerateDocketsController,
+  apptmyzGenerateTokenController,
+  apptmyzListOrdersController,
+  apptmyzServiceabilityController,
+  apptmyzTrackOrdersController,
+  apptmyzTruckTypesController,
+  apptmyzUpdateDeliveryAppointmentController,
+  apptmyzUpdateOrderDetailsController,
+} from '../../controllers/admin/apptmyz.controller'
+import {
+  createEkartWebhookController,
+  estimateEkartPricingController,
+  getEkartBulkServiceabilityController,
+  listEkartAddressesController,
+  listEkartWebhooksController,
+  updateEkartWebhookController,
+} from '../../controllers/admin/ekart.controller'
+import { isAdminMiddleware } from '../../middlewares/isAdmin'
+import { requireAuth } from '../../middlewares/requireAuth'
+import { upload } from '../../middlewares/upload'
+
+const router = Router()
+
+router.get('/shipping-rates', getShippingRatesController)
+router.get('/list', getAllCouriersController)
+
+router.put(
+  '/shipping-rate/:id/:planId',
+  requireAuth,
+  isAdminMiddleware,
+  updateShippingRateController,
+)
+router.post(
+  '/shipping-rates/import',
+  requireAuth,
+  isAdminMiddleware,
+  upload.single('file'),
+  importShippingRatesController,
+)
+router.post('/available', requireAuth, fetchAvailableCouriersForAdmin)
+router.get('/credentials', requireAuth, isAdminMiddleware, getCourierCredentialsController)
+router.put(
+  '/credentials/delhivery',
+  requireAuth,
+  isAdminMiddleware,
+  updateDelhiveryCredentialsController,
+)
+router.post(
+  '/credentials/delhivery/ltl/password-reset',
+  requireAuth,
+  isAdminMiddleware,
+  requestDelhiveryLtlPasswordResetController,
+)
+router.post(
+  '/credentials/delhivery/ltl/login',
+  requireAuth,
+  isAdminMiddleware,
+  loginDelhiveryLtlController,
+)
+router.get(
+  '/credentials/delhivery/ltl/logout',
+  requireAuth,
+  isAdminMiddleware,
+  logoutDelhiveryLtlController,
+)
+router.get(
+  '/credentials/delhivery/ltl/serviceability',
+  requireAuth,
+  isAdminMiddleware,
+  checkDelhiveryLtlServiceabilityController,
+)
+router.get(
+  '/credentials/delhivery/ltl/tat',
+  requireAuth,
+  isAdminMiddleware,
+  getDelhiveryLtlExpectedTatController,
+)
+router.post(
+  '/credentials/delhivery/ltl/freight-estimate',
+  requireAuth,
+  isAdminMiddleware,
+  estimateDelhiveryLtlFreightController,
+)
+router.get(
+  '/credentials/delhivery/ltl/freight-charges',
+  requireAuth,
+  isAdminMiddleware,
+  getDelhiveryLtlFreightChargesController,
+)
+router.post(
+  '/credentials/delhivery/ltl/client-warehouse',
+  requireAuth,
+  isAdminMiddleware,
+  createDelhiveryLtlClientWarehouseController,
+)
+router.patch(
+  '/credentials/delhivery/ltl/client-warehouse',
+  requireAuth,
+  isAdminMiddleware,
+  updateDelhiveryLtlClientWarehouseController,
+)
+router.post(
+  '/credentials/delhivery/ltl/manifest',
+  requireAuth,
+  isAdminMiddleware,
+  upload.any(),
+  createDelhiveryLtlManifestController,
+)
+router.get(
+  '/credentials/delhivery/ltl/manifest',
+  requireAuth,
+  isAdminMiddleware,
+  getDelhiveryLtlManifestStatusController,
+)
+router.put(
+  '/credentials/delhivery/ltl/lrn/:lrn',
+  requireAuth,
+  isAdminMiddleware,
+  upload.any(),
+  updateDelhiveryLtlShipmentController,
+)
+router.get(
+  '/credentials/delhivery/ltl/lrn/update/status',
+  requireAuth,
+  isAdminMiddleware,
+  getDelhiveryLtlShipmentUpdateStatusController,
+)
+router.delete(
+  '/credentials/delhivery/ltl/lrn/:lrn',
+  requireAuth,
+  isAdminMiddleware,
+  cancelDelhiveryLtlShipmentController,
+)
+router.get(
+  '/credentials/delhivery/ltl/lrn/track',
+  requireAuth,
+  isAdminMiddleware,
+  trackDelhiveryLtlShipmentController,
+)
+router.get(
+  '/credentials/delhivery/ltl/labels/:size/:lrn',
+  requireAuth,
+  isAdminMiddleware,
+  getDelhiveryLtlShippingLabelUrlsController,
+)
+router.get(
+  '/credentials/delhivery/ltl/lr-copy/:lrn',
+  requireAuth,
+  isAdminMiddleware,
+  getDelhiveryLtlLrCopyController,
+)
+router.post(
+  '/credentials/delhivery/ltl/generate/:docType',
+  requireAuth,
+  isAdminMiddleware,
+  generateDelhiveryLtlDocumentsController,
+)
+router.get(
+  '/credentials/delhivery/ltl/generate/:docType/status/:jobId',
+  requireAuth,
+  isAdminMiddleware,
+  getDelhiveryLtlGeneratedDocumentStatusController,
+)
+router.post(
+  '/credentials/delhivery/ltl/appointments/lm',
+  requireAuth,
+  isAdminMiddleware,
+  bookDelhiveryLtlLastMileAppointmentController,
+)
+router.post(
+  '/credentials/delhivery/ltl/pickup-requests',
+  requireAuth,
+  isAdminMiddleware,
+  createDelhiveryLtlPickupRequestController,
+)
+router.delete(
+  '/credentials/delhivery/ltl/pickup-requests/:pickupId',
+  requireAuth,
+  isAdminMiddleware,
+  cancelDelhiveryLtlPickupRequestController,
+)
+router.put(
+  '/credentials/ekart',
+  requireAuth,
+  isAdminMiddleware,
+  updateEkartCredentialsController,
+)
+router.put(
+  '/credentials/dtdc',
+  requireAuth,
+  isAdminMiddleware,
+  updateDtdcCredentialsController,
+)
+router.put(
+  '/credentials/movin',
+  requireAuth,
+  isAdminMiddleware,
+  updateMovinCredentialsController,
+)
+router.put(
+  '/credentials/apptmyz',
+  requireAuth,
+  isAdminMiddleware,
+  updateApptmyzCredentialsController,
+)
+router.put(
+  '/credentials/amazon',
+  requireAuth,
+  isAdminMiddleware,
+  updateAmazonCredentialsController,
+)
+router.post('/credentials/apptmyz/login', requireAuth, isAdminMiddleware, apptmyzGenerateTokenController)
+router.post('/credentials/apptmyz/orders', requireAuth, isAdminMiddleware, apptmyzCreateOrderController)
+router.get(
+  '/credentials/apptmyz/dockets/:travelMode/:count',
+  requireAuth,
+  isAdminMiddleware,
+  apptmyzGenerateDocketsController,
+)
+router.post('/credentials/apptmyz/track', requireAuth, isAdminMiddleware, apptmyzTrackOrdersController)
+router.get(
+  '/credentials/apptmyz/orders/:startDate/:endDate',
+  requireAuth,
+  isAdminMiddleware,
+  apptmyzListOrdersController,
+)
+router.post('/credentials/apptmyz/cancel', requireAuth, isAdminMiddleware, apptmyzCancelOrdersController)
+router.get('/credentials/apptmyz/cancel-reasons', requireAuth, isAdminMiddleware, apptmyzCancelReasonsController)
+router.get('/credentials/apptmyz/delivery-slots', requireAuth, isAdminMiddleware, apptmyzDeliverySlotsController)
+router.get('/credentials/apptmyz/truck-types', requireAuth, isAdminMiddleware, apptmyzTruckTypesController)
+router.get(
+  '/credentials/apptmyz/serviceability/:pincode',
+  requireAuth,
+  isAdminMiddleware,
+  apptmyzServiceabilityController,
+)
+router.post(
+  '/credentials/apptmyz/appointments/delivery',
+  requireAuth,
+  isAdminMiddleware,
+  apptmyzUpdateDeliveryAppointmentController,
+)
+router.post(
+  '/credentials/apptmyz/orders/edit',
+  requireAuth,
+  isAdminMiddleware,
+  apptmyzUpdateOrderDetailsController,
+)
+router.post(
+  '/credentials/apptmyz/pickup-requests',
+  requireAuth,
+  isAdminMiddleware,
+  apptmyzCreatePickupRequestsController,
+)
+router.get(
+  '/credentials/ekart/serviceability/bulk/:type',
+  requireAuth,
+  isAdminMiddleware,
+  getEkartBulkServiceabilityController,
+)
+router.get(
+  '/credentials/ekart/addresses',
+  requireAuth,
+  isAdminMiddleware,
+  listEkartAddressesController,
+)
+router.get(
+  '/credentials/ekart/webhooks',
+  requireAuth,
+  isAdminMiddleware,
+  listEkartWebhooksController,
+)
+router.post(
+  '/credentials/ekart/webhooks',
+  requireAuth,
+  isAdminMiddleware,
+  createEkartWebhookController,
+)
+router.put(
+  '/credentials/ekart/webhooks/:webhookId',
+  requireAuth,
+  isAdminMiddleware,
+  updateEkartWebhookController,
+)
+router.post(
+  '/credentials/ekart/pricing/estimate',
+  requireAuth,
+  isAdminMiddleware,
+  estimateEkartPricingController,
+)
+router.put(
+  '/credentials/xpressbees',
+  requireAuth,
+  isAdminMiddleware,
+  updateXpressbeesCredentialsController,
+)
+router.put(
+  '/credentials/innofulfill',
+  requireAuth,
+  isAdminMiddleware,
+  updateInnofulfillCredentialsController,
+)
+router.put(
+  '/credentials/xpressbees/awb-range',
+  requireAuth,
+  isAdminMiddleware,
+  updateXpressbeesAwbRangeController,
+)
+router.delete(
+  '/shipping-rates/:planId/:id',
+  requireAuth,
+  isAdminMiddleware,
+  deleteShippingRateController,
+)
+
+export default router

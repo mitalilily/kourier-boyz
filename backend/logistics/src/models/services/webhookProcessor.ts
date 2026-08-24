@@ -1,0 +1,3480 @@
+// services/webhookProcessor.ts
+import axios from 'axios'
+import dayjs from 'dayjs'
+import { and, eq, gt, isNotNull, or, sql } from 'drizzle-orm'
+import { sendWebhookEvent } from '../../services/webhookDelivery.service'
+import { db } from '../client'
+import { b2b_orders } from '../schema/b2bOrders'
+import { b2c_orders } from '../schema/b2cOrders'
+import { invoicePreferences } from '../schema/invoicePreferences'
+import { ndr_events } from '../schema/ndr'
+import { rto_events } from '../schema/rto'
+import { userProfiles } from '../schema/userProfile'
+import { wallets, walletTransactions } from '../schema/wallet'
+import { createCodRemittance } from './codRemittance.service'
+import { extractWeightProofFromWebhook } from './courierProofFetcher.service'
+import {
+  calculateChargedWeight,
+  calculateVolumetricWeight,
+} from './courierWeightCalculation.service'
+import { generateInvoicePDF } from './invoice.service'
+import { recordNdrEvent } from './ndr.service'
+import { createNotificationService } from './notifications.service'
+import { recordRtoEvent } from './rto.service'
+import { logTrackingEvent } from './trackingEvents.service'
+import { presignDownload, presignUpload } from './upload.service'
+import {
+  formatPickupAddress,
+  loadInvoiceAssets,
+  normalizePickupDetails,
+} from './invoiceHelpers'
+import { createWalletTransaction } from './wallet.service'
+import { createWeightDiscrepancy } from './weightReconciliation.service'
+import { resolveInvoiceNumber } from './invoiceNumber.service'
+import { syncShopifyStatusForLocalOrder } from './shopify.service'
+import { syncWooCommerceTrackingNoteForLocalOrder } from './woocommerce.service'
+import {
+  computeB2CFreightForOrder,
+  getCancellationRefundReason,
+  getOrderRefundOutstanding,
+  ORIGINAL_WALLET_DEBIT_REASONS,
+} from './shiprocket.service'
+
+const WEBHOOK_INVOICE_UPLOAD_TIMEOUT_MS = 60000
+
+const normalizeWebhookText = (...parts: unknown[]) =>
+  parts
+    .map((part) => String(part || '').trim().toLowerCase())
+    .filter(Boolean)
+    .join(' | ')
+
+const hasNdrSignal = (...parts: unknown[]) => {
+  const text = normalizeWebhookText(...parts)
+  if (!text) return false
+
+  const ndrMarkers = [
+    'ndr',
+    'undelivered',
+    'unsuccessful delivery',
+    'not delivered',
+    'delivery attempted',
+    'attempted',
+    'attempt failed',
+    'reattempt',
+    're-attempt',
+    'customer not available',
+    'customer unavailable',
+    'consignee not available',
+    'consignee unavailable',
+    'consignee refused',
+    'future delivery request',
+    'future delivery requested',
+    'door locked',
+    'premises closed',
+    'address issue',
+    'address incomplete',
+    'incorrect address',
+    'refused',
+    'otp not shared',
+    'otp failed',
+  ]
+
+  return ndrMarkers.some((marker) => text.includes(marker))
+}
+
+const normalizeComparableText = (value: unknown) => String(value || '').trim().toLowerCase()
+
+const pickWebhookText = (...values: unknown[]) => {
+  for (const value of values) {
+    if (value === null || value === undefined) continue
+    if (typeof value === 'object') continue
+    const text = String(value).trim()
+    if (text) return text
+  }
+  return ''
+}
+
+const DELHIVERY_NDR_STATUS_CODES = new Set([
+  'EOD-3',
+  'EOD-6',
+  'EOD-11',
+  'EOD-15',
+  'EOD-16',
+  'EOD-43',
+  'EOD-69',
+  'EOD-74',
+  'EOD-86',
+  'EOD-104',
+  'ST-108',
+])
+
+const normalizeDelhiveryStatusCode = (value: unknown) =>
+  String(value || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+const hasDelhiveryNdrStatusCode = (...parts: unknown[]) =>
+  parts.some((part) => DELHIVERY_NDR_STATUS_CODES.has(normalizeDelhiveryStatusCode(part)))
+
+const normalizeWebhookWeightGrams = (value: unknown) => {
+  const numericValue = Number(value ?? 0)
+  if (!Number.isFinite(numericValue) || numericValue <= 0) return null
+  return numericValue > 50 ? Math.round(numericValue) : Math.round(numericValue * 1000)
+}
+
+const resolveNdrStatus = (status: unknown, ...signalParts: unknown[]) => {
+  const normalizedStatus = normalizeComparableText(status)
+  if (normalizedStatus === 'undelivered') return 'undelivered'
+  if (normalizedStatus === 'ndr') return 'ndr'
+
+  const signalText = normalizeWebhookText(...signalParts)
+  if (signalText.includes('undelivered') || signalText.includes('not delivered')) {
+    return 'undelivered'
+  }
+
+  return 'ndr'
+}
+
+const shouldSkipDuplicateNdrEvent = async (params: {
+  orderId: string
+  status: string
+  reason?: string | null
+  remarks?: string | null
+  attemptNo?: string | null
+}) => {
+  const [latest] = await db
+    .select({
+      id: ndr_events.id,
+      created_at: ndr_events.created_at,
+      status: ndr_events.status,
+      reason: ndr_events.reason,
+      remarks: ndr_events.remarks,
+      attempt_no: ndr_events.attempt_no,
+    })
+    .from(ndr_events)
+    .where(eq(ndr_events.order_id, params.orderId))
+    .orderBy(sql`${ndr_events.created_at} desc`)
+    .limit(1)
+
+  if (!latest?.created_at) return false
+
+  const ageMs = Date.now() - new Date(latest.created_at).getTime()
+  const withinDuplicateWindow = ageMs >= 0 && ageMs <= 10 * 60 * 1000
+  if (!withinDuplicateWindow) return false
+
+  return (
+    normalizeComparableText(latest.status) === normalizeComparableText(params.status) &&
+    normalizeComparableText(latest.reason) === normalizeComparableText(params.reason) &&
+    normalizeComparableText(latest.remarks) === normalizeComparableText(params.remarks) &&
+    normalizeComparableText(latest.attempt_no) === normalizeComparableText(params.attemptNo)
+  )
+}
+
+const getLatestNdrStatusForOrder = async (orderId: string) => {
+  const [latest] = await db
+    .select({
+      status: ndr_events.status,
+      created_at: ndr_events.created_at,
+    })
+    .from(ndr_events)
+    .where(eq(ndr_events.order_id, orderId))
+    .orderBy(sql`${ndr_events.created_at} desc, ${ndr_events.id} desc`)
+    .limit(1)
+
+  return normalizeComparableText(latest?.status)
+}
+
+const captureNdrEventFromWebhook = async (params: {
+  order: any
+  awbNumber?: string | null
+  status?: string | null
+  reason?: string | null
+  remarks?: string | null
+  attemptNo?: string | null
+  payload?: any
+  courierLabel: string
+  signalParts?: unknown[]
+}) => {
+  const {
+    order,
+    awbNumber,
+    status,
+    reason,
+    remarks,
+    attemptNo,
+    payload,
+    courierLabel,
+    signalParts = [],
+  } = params
+
+  const finalStatus = resolveNdrStatus(status, reason, remarks, ...signalParts)
+  const currentOrderStatus = normalizeComparableText(order.order_status)
+  const latestNdrStatus = await getLatestNdrStatusForOrder(order.id)
+  const reattemptInProgress =
+    currentOrderStatus === 'pickup_initiated' && latestNdrStatus === 'ndr_action'
+
+  if (reattemptInProgress && ['ndr', 'undelivered', 'lost'].includes(finalStatus)) {
+    console.log(`ℹ️ Skipping NDR capture while reattempt is in progress for ${courierLabel}`, {
+      order_number: order.order_number,
+      awb_number: awbNumber || order.awb_number || null,
+      status: finalStatus,
+      current_status: currentOrderStatus,
+      latest_ndr_status: latestNdrStatus,
+    })
+    return { skipped: true, status: finalStatus, reason: 'reattempt_in_progress' }
+  }
+
+  if (['ndr', 'undelivered', 'lost'].includes(currentOrderStatus)) {
+    console.log(`ℹ️ Skipping repeated NDR event for ${courierLabel}`, {
+      order_number: order.order_number,
+      awb_number: awbNumber || order.awb_number || null,
+      status: finalStatus,
+      current_status: currentOrderStatus,
+    })
+    return { skipped: true, status: finalStatus }
+  }
+  const duplicate = await shouldSkipDuplicateNdrEvent({
+    orderId: order.id,
+    status: finalStatus,
+    reason,
+    remarks,
+    attemptNo,
+  })
+
+  if (duplicate) {
+    console.log(`ℹ️ Skipping duplicate NDR event for ${courierLabel}`, {
+      order_number: order.order_number,
+      awb_number: awbNumber || order.awb_number || null,
+      status: finalStatus,
+    })
+    return { skipped: true, status: finalStatus }
+  }
+
+  await recordNdrEvent({
+    orderId: order.id,
+    userId: order.user_id,
+    awbNumber: awbNumber || order.awb_number || undefined,
+    status: finalStatus,
+    reason: reason || null,
+    remarks: remarks || null,
+    attemptNo: attemptNo || null,
+    payload,
+  })
+
+  await createNotificationService({
+    targetRole: 'user',
+    userId: order.user_id,
+    title: `Delivery attempt issue (${courierLabel})`,
+    message: `Order ${order.order_number} marked as ${finalStatus}.`,
+  })
+  await createNotificationService({
+    targetRole: 'admin',
+    title: `NDR captured (${courierLabel})`,
+    message: `User ${order.user_id} order ${order.order_number} status ${finalStatus}`,
+  })
+
+  return { skipped: false, status: finalStatus }
+}
+
+// Helper function to generate invoice for an order
+const generateInvoiceForOrderWebhook = async (
+  order: any,
+  tx: any,
+): Promise<
+  | {
+      key: string
+      invoiceNumber: string
+      invoiceDate: string
+      invoiceAmount: number
+    }
+  | null
+> => {
+  try {
+    // Check if invoice already exists
+    if (order.invoice_link) {
+      console.log(`ℹ️ Invoice already exists for order ${order.order_number}`)
+      return order.invoice_link
+    }
+
+    const [prefs] = await tx
+      .select()
+      .from(invoicePreferences)
+      .where(eq(invoicePreferences.userId, order.user_id))
+
+    const [user] = await tx
+      .select({
+        companyName: sql<string>`(${userProfiles.companyInfo} ->> 'businessName')`,
+        brandName: sql<string>`(${userProfiles.companyInfo} ->> 'brandName')`,
+        companyGST: sql<string>`(${userProfiles.companyInfo} ->> 'companyGst')`,
+        supportEmail: sql<string>`(${userProfiles.companyInfo} ->> 'companyEmail')`,
+        supportPhone: sql<string>`(${userProfiles.companyInfo} ->> 'companyContactNumber')`,
+        companyLogo: sql<string>`(${userProfiles.companyInfo} ->> 'companyLogoUrl')`,
+        companyAddress: sql<string>`(${userProfiles.companyInfo} ->> 'companyAddress')`,
+        companyState: sql<string>`(${userProfiles.companyInfo} ->> 'state')`,
+        panNumber: sql<string>`(${userProfiles.companyInfo} ->> 'panNumber')`,
+      })
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, order.user_id))
+
+    const { logoBuffer, signatureBuffer } = await loadInvoiceAssets(
+      {
+        companyLogoKey: user?.companyLogo,
+        includeSignature: prefs?.includeSignature,
+        signatureFile: prefs?.signatureFile,
+      },
+      order.order_number || String(order.id),
+    )
+
+    const invoiceNumber = await resolveInvoiceNumber({
+      userId: order.user_id,
+      existingInvoiceNumber: (order as any)?.invoice_number,
+      prefix: prefs?.prefix ?? undefined,
+      suffix: prefs?.suffix ?? undefined,
+      tx,
+    })
+
+    const invoiceDateDisplay = dayjs().format('DD MMM YYYY')
+    const invoiceDateStored = dayjs().format('YYYY-MM-DD')
+
+    const invoiceAmount =
+      Number(order.order_amount ?? 0) +
+      Number(order.shipping_charges ?? 0) + // Already includes other_charges
+      Number(order.gift_wrap ?? 0) +
+      Number(order.transaction_fee ?? 0) -
+      (Number(order.discount ?? 0) + Number(order.prepaid_amount ?? 0))
+
+    const pickupDetails = normalizePickupDetails(order.pickup_details)
+    const pickupPincode = pickupDetails?.pincode
+
+    const serviceType =
+      order.service_type ||
+      (order as any).serviceType ||
+      order.integration_type ||
+      order.courier_partner ||
+      ''
+    const pickupAddress = formatPickupAddress(pickupDetails)
+    const sellerAddress = pickupAddress || user?.companyAddress || ''
+    const sellerStateCode = pickupDetails?.state || user?.companyState || ''
+    const sellerName =
+      pickupDetails?.warehouse_name || user?.companyName || user?.brandName || 'Seller'
+    const brandName =
+      user?.brandName ||
+      user?.companyName ||
+      pickupDetails?.warehouse_name ||
+      ''
+    const gstNumber = user?.companyGST || ''
+    const panNumber = user?.panNumber || ''
+    const supportPhone = pickupDetails?.phone || user?.supportPhone || ''
+    const supportEmail = user?.supportEmail || prefs?.supportEmail || ''
+
+    const invoiceBuffer = await generateInvoicePDF({
+      invoiceNumber,
+      invoiceDate: invoiceDateDisplay,
+      invoiceAmount,
+      buyerName: order.buyer_name,
+      buyerPhone: order.buyer_phone,
+      buyerEmail: order.buyer_email ?? '',
+      buyerAddress: order.address,
+      buyerCity: order.city,
+      buyerState: order.state,
+      buyerPincode: order.pincode,
+      products: order.products as any,
+      shippingCharges: Number(order.shipping_charges ?? 0),
+      giftWrap: Number(order.gift_wrap) ?? 0,
+      transactionFee: Number(order.transaction_fee) ?? 0,
+      discount: Number(order.discount) ?? 0,
+      prepaidAmount: Number(order.prepaid_amount) ?? 0,
+      courierName: order.courier_partner ?? '',
+      courierId: order.courier_id?.toString() ?? '',
+      logoBuffer,
+      orderType: order?.order_type as 'prepaid' | 'cod',
+      courierCod: order?.order_type === 'cod' ? Number(order?.cod_charges ?? 0) : 0,
+      signatureBuffer,
+      companyName: sellerName,
+      supportEmail,
+      supportPhone,
+      companyGST: gstNumber,
+      sellerName,
+      brandName,
+      sellerAddress,
+      sellerStateCode,
+      gstNumber,
+      panNumber,
+      invoiceNotes: prefs?.invoiceNotes ?? '',
+      termsAndConditions: prefs?.termsAndConditions ?? '',
+      orderId: order.order_number,
+      awbNumber: order.awb_number ?? '',
+      courierPartner: order.courier_partner ?? '',
+      serviceType,
+      pickupPincode: pickupPincode ?? '',
+      deliveryPincode: order.pincode ?? '',
+      orderDate: order.order_date ?? '',
+      rtoCharges: Number((order as any).rto_charges ?? 0),
+      layout: (prefs?.template as 'classic' | 'thermal') ?? 'classic',
+    })
+
+    const { uploadUrl, key } = await presignUpload({
+      filename: `invoice-${order.id}.pdf`,
+      contentType: 'application/pdf',
+      userId: order.user_id,
+      folderKey: 'invoices',
+    })
+    const finalUploadUrl = Array.isArray(uploadUrl) ? uploadUrl[0] : uploadUrl
+    const uploadResponse = await axios.put(finalUploadUrl, invoiceBuffer, {
+      headers: { 'Content-Type': 'application/pdf' },
+      validateStatus: (status) => status >= 200 && status < 300, // Only accept 2xx status codes
+      timeout: WEBHOOK_INVOICE_UPLOAD_TIMEOUT_MS,
+    })
+
+    // Verify upload succeeded
+    if (uploadResponse.status < 200 || uploadResponse.status >= 300) {
+      throw new Error(`Invoice upload failed with status ${uploadResponse.status}`)
+    }
+
+    const finalKey = Array.isArray(key) ? key[0] : key
+
+    // Validate key is not empty and is a string
+    if (!finalKey || typeof finalKey !== 'string' || finalKey.trim().length === 0) {
+      throw new Error('Invoice key is invalid or empty after upload')
+    }
+
+    const trimmedKey = finalKey.trim()
+    console.log(
+      `✅ Invoice uploaded successfully for order ${order.order_number}: ${trimmedKey} (status: ${uploadResponse.status})`,
+    )
+
+    return {
+      key: trimmedKey,
+      invoiceNumber,
+      invoiceDate: invoiceDateStored,
+      invoiceAmount,
+    }
+  } catch (err: any) {
+    console.error(
+      `⚠️ Failed to generate invoice for order ${order.order_number}:`,
+      err?.message || err,
+    )
+    return null
+  }
+}
+
+const getStoredRtoCharge = (order: any) =>
+  Number(order.freight_charges ?? order.shipping_charges ?? 0) || 0
+
+async function resolveRtoCharge(order: any): Promise<number> {
+  const storedCharge = getStoredRtoCharge(order)
+
+  const courierId = Number(order.courier_id ?? 0)
+  const originPincode = order.pickup_details?.pincode
+  const destinationPincode = order.pincode
+  const weightG = Math.round(Number(order.weight ?? 0) * 1000)
+  const lengthCm = Number(order.length ?? 0)
+  const breadthCm = Number(order.breadth ?? 0)
+  const heightCm = Number(order.height ?? 0)
+
+  if (
+    !order.user_id ||
+    !courierId ||
+    !originPincode ||
+    !destinationPincode ||
+    weightG <= 0 ||
+    lengthCm <= 0 ||
+    breadthCm <= 0 ||
+    heightCm <= 0
+  ) {
+    return storedCharge
+  }
+
+  try {
+    const rate = await computeB2CFreightForOrder({
+      userId: order.user_id,
+      courierId,
+      serviceProvider: order.integration_type ?? null,
+      mode: order.shipping_mode ?? null,
+      selectedMaxSlabWeight: order.selected_max_slab_weight ?? null,
+      originPincode,
+      destinationPincode,
+      weightG,
+      lengthCm,
+      breadthCm,
+      heightCm,
+      isReverse: true,
+    })
+
+    const rtoRate = Number(rate.freight ?? 0) || 0
+    return rtoRate > 0 ? rtoRate : storedCharge
+  } catch (err) {
+    console.error(`⚠️ Failed to resolve RTO rate from plan table for ${order.order_number}:`, err)
+    return storedCharge
+  }
+}
+
+async function applyRtoChargeOnce(
+  tx: any,
+  order: any,
+  courierLabel: string,
+): Promise<number | null> {
+  const amount = await resolveRtoCharge(order)
+  if (amount <= 0) return null
+
+  const [existingChargedEvent] = await tx
+    .select({ id: rto_events.id })
+    .from(rto_events)
+    .where(
+      and(
+        eq(rto_events.order_id, order.id),
+        isNotNull(rto_events.rto_charges),
+        gt(rto_events.rto_charges, 0),
+      ),
+    )
+    .limit(1)
+
+  if (existingChargedEvent) {
+    return null
+  }
+
+  try {
+    const [wallet] = await tx.select().from(wallets).where(eq(wallets.userId, order.user_id))
+    if (!wallet) throw new Error(`Wallet not found for user ${order.user_id}`)
+
+    await createWalletTransaction({
+      walletId: wallet.id,
+      amount,
+      type: 'debit',
+      currency: wallet.currency ?? 'INR',
+      reason: `RTO freight - ${courierLabel} (${order.order_number})`,
+      ref: order.id,
+      meta: {
+        awb: order.awb_number,
+        order_number: order.order_number,
+        courier_partner: order.courier_partner ?? courierLabel,
+      },
+      tx: tx as any,
+    })
+  } catch (err) {
+    console.error(`⚠️ Failed RTO debit for ${courierLabel}:`, err)
+  }
+
+  return amount
+}
+
+export async function applyCancellationRefundOnce(
+  tx: any,
+  order: any,
+  source: string,
+): Promise<number> {
+  const freightCharges = Number(order.freight_charges ?? 0)
+  const otherCharges = Number(order.other_charges ?? 0)
+  const codCharges = Number(order.cod_charges ?? 0)
+
+  const [wallet] = await tx.select().from(wallets).where(eq(wallets.userId, order.user_id))
+  if (!wallet) {
+    throw new Error(`Wallet not found for user ${order.user_id}`)
+  }
+
+  const refundReason = getCancellationRefundReason(order.order_number)
+  const [existingRefund] = await tx
+    .select({ id: walletTransactions.id })
+    .from(walletTransactions)
+    .where(
+      and(
+        eq(walletTransactions.wallet_id, wallet.id),
+        eq(walletTransactions.type, 'credit'),
+        eq(walletTransactions.reason, refundReason),
+      ),
+    )
+    .limit(1)
+
+  if (existingRefund) {
+    console.log(
+      `ℹ️ Cancellation refund already exists for order ${order.order_number}; skipping duplicate refund`,
+    )
+    return 0
+  }
+
+  const debitTransactions = await tx
+    .select({
+      amount: walletTransactions.amount,
+      reason: walletTransactions.reason,
+      meta: walletTransactions.meta,
+    })
+    .from(walletTransactions)
+    .where(
+      and(
+        eq(walletTransactions.wallet_id, wallet.id),
+        eq(walletTransactions.type, 'debit'),
+        eq(walletTransactions.ref, order.id),
+      ),
+    )
+
+  const originalWalletDebit = debitTransactions
+    .filter((transaction: any) =>
+      ORIGINAL_WALLET_DEBIT_REASONS.includes(String(transaction.reason ?? '')),
+    )
+    .reduce((sum: number, transaction: any) => sum + Number(transaction.amount ?? 0), 0)
+
+  const fallbackRefundAmount =
+    order.order_type === 'prepaid'
+      ? Number(order.order_amount ?? 0) + freightCharges + otherCharges
+      : freightCharges + otherCharges + codCharges
+  const refundAmount = await getOrderRefundOutstanding(
+    tx,
+    wallet.id,
+    order.id,
+    order.order_number,
+    fallbackRefundAmount,
+  )
+
+  if (refundAmount <= 0) {
+    console.warn(`⚠️ No refundable amount resolved for cancelled order ${order.order_number}`, {
+      source,
+      order_type: order.order_type,
+      order_amount: Number(order.order_amount ?? 0),
+      freight_charges: freightCharges,
+      other_charges: otherCharges,
+      cod_charges: codCharges,
+      original_wallet_debit: originalWalletDebit,
+      debit_transactions_found: debitTransactions.length,
+    })
+    return 0
+  }
+
+  console.log(`💰 Refunding ₹${refundAmount} for cancelled order ${order.order_number}`, {
+    source,
+    order_type: order.order_type,
+    order_amount: order.order_type === 'prepaid' ? Number(order.order_amount ?? 0) : 0,
+    freight_charges: freightCharges,
+    other_charges: otherCharges,
+    cod_charges: order.order_type === 'cod' ? codCharges : 0,
+    original_wallet_debit: originalWalletDebit,
+    total_refund: refundAmount,
+  })
+
+  await createWalletTransaction({
+    walletId: wallet.id,
+    amount: refundAmount,
+    type: 'credit',
+    ref: order.id,
+    reason: refundReason,
+    currency: wallet.currency ?? 'INR',
+    meta: {
+      source,
+      order_id: order.id,
+      order_number: order.order_number,
+      order_type: order.order_type,
+      freight_charges: freightCharges,
+      other_charges: otherCharges,
+      cod_charges: order.order_type === 'cod' ? codCharges : 0,
+    },
+    tx: tx as any,
+  })
+
+  console.log(`✅ Wallet refunded ₹${refundAmount} for ${order.user_id}`)
+  return refundAmount
+}
+
+// Ekart webhook: supports track_updated, shipment_created, shipment_recreated
+export async function processEkartWebhookV2(payload: any, tx = db) {
+  const statusRaw = payload?.status || payload?.track_updated?.status || payload?.status_text
+  const awb =
+    payload?.wbn || payload?.id || payload?.tracking_id || payload?.track_updated?.wbn || null
+  const orderRef = payload?.orderNumber || payload?.order_number || payload?.order_id || null
+
+  const normalized = (statusRaw || '').toString().toLowerCase()
+  const statusMap: Record<string, string> = {
+    'order placed': 'booked',
+    'pickup scheduled': 'pickup_scheduled',
+    'in transit': 'in_transit',
+    'out for delivery': 'out_for_delivery',
+    delivered: 'delivered',
+    'return to origin': 'rto_initiated',
+    'rto initiated': 'rto_initiated',
+    'rto in transit': 'rto_in_transit',
+    'rto delivered': 'rto_delivered',
+    'delivery attempted': 'ndr',
+    ndr: 'ndr',
+    'manifest generated': 'pickup_initiated',
+  }
+
+  let mapped = statusMap[normalized] || normalized || 'unknown'
+  if (mapped === 'pickup_scheduled') mapped = 'pickup_initiated'
+  if (mapped === 'unknown' && normalized.includes('delivery')) mapped = 'out_for_delivery'
+  if (mapped === 'unknown' && normalized.includes('attempt')) mapped = 'ndr'
+  if (mapped === 'unknown' && normalized.includes('rto')) mapped = 'rto_initiated'
+
+  // find order by awb then order_number
+  let order
+  if (awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.awb_number, awb))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.order_number, orderRef))
+  }
+
+  if (!order) {
+    console.warn(`⚠️ Ekart webhook: order not found for AWB ${awb} or ref ${orderRef}`)
+    return { success: false, reason: 'order_not_found' }
+  }
+
+  const update: any = {
+    order_status: mapped,
+    provider_last_status: String(statusRaw || mapped || '').trim().slice(0, 80) || null,
+    delivery_message: String(statusRaw || mapped || '').trim().slice(0, 100) || null,
+    updated_at: new Date(),
+  }
+  if (mapped === 'booked') {
+    update.pickup_status = 'pending'
+  } else if (
+    [
+      'pickup_initiated',
+      'in_transit',
+      'out_for_delivery',
+      'delivered',
+      'ndr',
+      'rto_initiated',
+      'rto_in_transit',
+      'rto_delivered',
+    ].includes(mapped)
+  ) {
+    update.pickup_status = 'pickup_initiated'
+  }
+
+  const prevStatus = order.order_status || ''
+  await tx.update(b2c_orders).set(update).where(eq(b2c_orders.id, order.id))
+    await syncShopifyStatusForLocalOrder({ ...order, ...update }, tx).catch((err) => {
+      console.warn('⚠️ Failed Shopify status sync for Ekart webhook:', err)
+    })
+    await syncWooCommerceTrackingNoteForLocalOrder({ ...order, ...update }, tx, {
+      source: 'ekart_webhook',
+    }).catch((err) => {
+      console.warn('Failed WooCommerce tracking note sync for Ekart webhook:', err)
+    })
+
+  // emit tracking webhook
+  await sendWebhookEvent(order.user_id, 'tracking.updated', {
+    awb_number: awb || order.awb_number,
+    order_id: order.id,
+    order_number: order.order_number,
+    status: mapped,
+    raw_status: statusRaw,
+    courier_partner: order.courier_partner,
+  })
+
+  if (mapped === 'ndr' || hasNdrSignal(statusRaw, payload?.status_text, payload?.remarks)) {
+    try {
+      await captureNdrEventFromWebhook({
+        order,
+        awbNumber: order.awb_number || awb || undefined,
+        status: mapped,
+        reason: payload?.remarks || payload?.status_text || statusRaw || null,
+        remarks: payload?.event || payload?.status || null,
+        attemptNo:
+          payload?.attempt_no?.toString?.() ||
+          payload?.attempted_count?.toString?.() ||
+          payload?.attemptCount?.toString?.() ||
+          null,
+        payload,
+        courierLabel: 'Ekart',
+        signalParts: [statusRaw, payload?.status_text, payload?.remarks],
+      })
+    } catch (err) {
+      console.error('❌ Failed to record NDR event (Ekart V2):', err)
+    }
+  }
+
+  return { success: true }
+}
+
+export async function processDelhiveryWebhook(payload: any, tx = db) {
+  const shipment = payload?.Shipment || payload?.shipment || payload || {}
+  const statusInfo =
+    shipment?.Status ||
+    shipment?.status_detail ||
+    shipment?.statusDetails ||
+    payload?.Status ||
+    payload?.status_detail ||
+    payload?.statusDetails ||
+    {}
+
+  const waybill = pickWebhookText(
+    shipment?.AWB,
+    shipment?.Waybill,
+    shipment?.awb,
+    shipment?.waybill,
+    shipment?.wbn,
+    shipment?.awb_number,
+    payload?.AWB,
+    payload?.Waybill,
+    payload?.awb,
+    payload?.waybill,
+    payload?.wbn,
+    payload?.awb_number,
+  )
+  const referenceNo =
+    pickWebhookText(
+      shipment?.ReferenceNo,
+      shipment?.ReferenceNumber,
+      shipment?.reference_no,
+      shipment?.order,
+      shipment?.order_number,
+      shipment?.orderNumber,
+      payload?.ReferenceNo,
+      payload?.ReferenceNumber,
+      payload?.reference_no,
+      payload?.order_number,
+      payload?.orderNumber,
+      payload?.order,
+    ) || null
+  const status = pickWebhookText(
+    statusInfo?.Status,
+    statusInfo?.status,
+    statusInfo?.ScanStatus,
+    shipment?.current_status,
+    shipment?.status,
+    payload?.current_status,
+    payload?.status,
+    payload?.event,
+  )
+  const status_type = pickWebhookText(
+    statusInfo?.StatusType,
+    statusInfo?.status_type,
+    statusInfo?.ScanType,
+    payload?.StatusType,
+    payload?.status_type,
+    payload?.scan_type,
+  )
+  const location = pickWebhookText(
+    statusInfo?.StatusLocation,
+    statusInfo?.StatusLocationName,
+    statusInfo?.ScanLocation,
+    statusInfo?.location,
+    payload?.location,
+  )
+  const instructions = pickWebhookText(
+    statusInfo?.Instructions,
+    statusInfo?.instructions,
+    statusInfo?.StatusAction,
+    statusInfo?.Remarks,
+    shipment?.Instructions,
+    shipment?.Remarks,
+    payload?.instructions,
+    payload?.remarks,
+    payload?.message,
+  )
+  const statusCode = pickWebhookText(
+    statusInfo?.StatusCode,
+    statusInfo?.status_code,
+    statusInfo?.NSLCode,
+    statusInfo?.nsl_code,
+    shipment?.StatusCode,
+    shipment?.status_code,
+    shipment?.NSLCode,
+    shipment?.nsl_code,
+    payload?.StatusCode,
+    payload?.status_code,
+    payload?.NSLCode,
+    payload?.nsl_code,
+  )
+
+  if (!waybill) return { success: false, reason: 'missing_awb' }
+
+  let [order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.awb_number, waybill))
+  if (!order && referenceNo) {
+    ;[order] = await tx
+      .select()
+      .from(b2c_orders)
+      .where(eq(b2c_orders.order_number, String(referenceNo)))
+  }
+  if (!order) {
+    console.warn(`⚠️ No local order found for AWB ${waybill}`)
+    return { success: false, reason: 'order_not_found' }
+  }
+
+  // 🔹 Map Delhivery → internal status
+  // Reference: Delhivery Webhook Documentation
+  // Forward Shipment: UD (Manifested, Not Picked, In Transit, Pending, Dispatched) → DL (Delivered)
+  // Return Shipment: RT (In Transit, Pending, Dispatched) → DL (RTO)
+  // Reverse Shipment: PP (Open, Scheduled, Dispatched) → PU (In Transit, Pending, Dispatched) → DL (DTO)
+  const mapStatus = (
+    type?: string,
+    s?: string,
+    instructionText?: string,
+    statusCodeText?: string,
+  ): string => {
+    const t = type?.toUpperCase()
+    const st = s?.toLowerCase() || ''
+    const instruction = instructionText?.toLowerCase() || ''
+    const combined = `${st} ${instruction}`.trim()
+    const hasNdrStatusSignal =
+      hasNdrSignal(st, t, instruction, statusCodeText) ||
+      hasDelhiveryNdrStatusCode(statusCodeText)
+
+    // Delhivery sometimes reports refusal / reattempt cases as text that still
+    // contains "order cancelled". Those are delivery exceptions, not terminal
+    // shipment cancellations, so let the NDR classifier win first.
+    if (
+      hasNdrStatusSignal &&
+      !instruction.includes('seller cancelled') &&
+      !instruction.includes('seller canceled') &&
+      !instruction.includes('shipment has been cancelled') &&
+      !instruction.includes('shipment has been canceled')
+    ) {
+      return 'ndr'
+    }
+
+    if (
+      combined.includes('cancelled') ||
+      combined.includes('canceled') ||
+      instruction.includes('seller cancelled') ||
+      instruction.includes('seller canceled') ||
+      instruction.includes('shipment has been cancelled') ||
+      instruction.includes('shipment has been canceled')
+    ) {
+      return 'cancelled'
+    }
+
+    // Some Delhivery events arrive as simple status-only payloads without StatusType.
+    if (st === 'booked' || st === 'booking confirmed' || st === 'manifest created') {
+      return 'booked'
+    }
+    if (st === 'manifested') return 'shipment_created'
+    if (st === 'not picked' || st === 'pickup scheduled' || st === 'pickup requested') {
+      return 'pickup_initiated'
+    }
+    if (st === 'in transit') return 'in_transit'
+    if (st === 'pending') return 'in_transit'
+    if (st === 'dispatched' || st === 'out for delivery') return 'out_for_delivery'
+    if (st === 'delivered') return 'delivered'
+    if (st === 'rto') return 'rto_delivered'
+    if (st === 'dto') return 'delivered'
+
+    // Forward Shipment Statuses (UD)
+    if (t === 'UD') {
+      if (st === 'manifested') return 'shipment_created'
+      if (st === 'not picked') return 'pickup_initiated'
+      if (st === 'in transit') return 'in_transit'
+      if (st === 'pending') return 'in_transit' // Reached destination city, not yet dispatched
+      if (st === 'dispatched') return 'out_for_delivery'
+    }
+
+    // Delivery Statuses (DL)
+    if (t === 'DL') {
+      if (st === 'delivered') return 'delivered' // Forward shipment delivered
+      if (st === 'dto') return 'delivered' // Reverse shipment accepted (DTO = Delivered To Origin)
+      if (st === 'rto') return 'rto_delivered' // Return shipment delivered to origin
+    }
+
+    // Return Shipment Statuses (RT)
+    if (t === 'RT') {
+      if (st === 'in transit') return 'rto_in_transit' // Forward shipment converted to return, in transit
+      if (st === 'pending') return 'rto' // Reached DC nearest to origin
+      if (st === 'dispatched') return 'rto_in_transit' // Dispatched for delivery to origin
+    }
+
+    // NDR handling for Delhivery
+    if (t === 'ND') {
+      return 'ndr'
+    }
+
+    // Reverse Shipment - Pickup Request Statuses (PP)
+    if (t === 'PP') {
+      if (st === 'open') return 'pickup_initiated' // Pickup request created
+      if (st === 'scheduled') return 'pickup_initiated' // Pickup request scheduled
+      if (st === 'dispatched') return 'out_for_delivery' // FE out in field to collect package
+    }
+
+    // Reverse Shipment - Pickup In Transit Statuses (PU)
+    if (t === 'PU') {
+      if (st === 'in transit') return 'in_transit' // In transit to RPC from DC after physical pickup
+      if (st === 'pending') return 'in_transit' // Reached RPC but not yet dispatched
+      if (st === 'dispatched') return 'out_for_delivery' // Dispatched for delivery to client from RPC
+    }
+
+    // Cancellation Statuses (CN)
+    if (t === 'CN') {
+      if (st === 'canceled' || st === 'cancelled') return 'cancelled' // Canceled before pickup
+      if (st === 'closed') return 'cancelled' // Canceled and request closed
+      return 'cancelled' // Default for any CN status
+    }
+
+    return 'in_transit' // Default fallback
+  }
+
+  let internalStatus = mapStatus(status_type, status, instructions, statusCode)
+  const latestNdrStatus = await getLatestNdrStatusForOrder(order.id)
+  const reattemptInProgress =
+    normalizeComparableText(order.order_status) === 'pickup_initiated' &&
+    latestNdrStatus === 'ndr_action'
+
+  // Map any pending_pickup status to pickup_initiated
+  if (internalStatus === 'pending_pickup') {
+    internalStatus = 'pickup_initiated'
+  }
+
+  if (
+    reattemptInProgress &&
+    ['ndr', 'undelivered', 'lost'].includes(normalizeComparableText(internalStatus))
+  ) {
+    internalStatus = 'pickup_initiated'
+  }
+
+  console.log(
+    `📦 Delhivery Webhook: ${waybill} → ${status} (${status_type}${
+      statusCode ? `/${statusCode}` : ''
+    }) → ${internalStatus}`,
+  )
+
+  const currentStatus = (order.order_status || '').toLowerCase()
+  const currentManifestError = String(order.manifest_error || '').trim()
+  const hasExistingAwb = String(order.awb_number || '').trim().length > 0
+  const manifestReference = String(order.manifest || '').trim()
+  const hasLocalManifest =
+    manifestReference.length > 0 &&
+    (/^https?:\/\//i.test(manifestReference) ||
+      manifestReference.includes('/') ||
+      manifestReference.toLowerCase().includes('manifest') ||
+      manifestReference.toLowerCase().endsWith('.pdf'))
+  if (
+    currentStatus === 'cancelled' &&
+    internalStatus !== 'cancelled' &&
+    internalStatus !== 'rto' &&
+    internalStatus !== 'rto_in_transit' &&
+    internalStatus !== 'rto_delivered'
+  ) {
+    console.log(
+      `⏭️ Ignoring Delhivery webhook status regression for cancelled order ${order.order_number}: ${status} (${status_type}) would map to ${internalStatus}`,
+    )
+    return {
+      success: true,
+      ignored: true,
+      reason: 'cancelled_order_status_regression',
+    }
+  }
+
+  if (
+    currentStatus === 'manifest_failed' &&
+    currentManifestError &&
+    !hasExistingAwb &&
+    (internalStatus === 'booked' || internalStatus === 'pickup_initiated')
+  ) {
+    console.log(
+      `⏭️ Ignoring Delhivery webhook status regression for manifest_failed order ${order.order_number}: ${status} (${status_type}) would map to ${internalStatus}`,
+    )
+    return {
+      success: true,
+      ignored: true,
+      reason: 'manifest_failed_status_regression',
+    }
+  }
+
+  const shouldHoldPreManifestStatus =
+    !hasLocalManifest &&
+    ['booked', 'shipment_created'].includes(currentStatus || 'booked') &&
+    ['shipment_created', 'pickup_initiated'].includes(internalStatus)
+
+  if (shouldHoldPreManifestStatus) {
+    console.log(
+      `Holding Delhivery pre-manifest status for order ${order.order_number}: provider ${status} (${status_type}) mapped to ${internalStatus}, local remains ${
+        currentStatus || 'booked'
+      }`,
+    )
+  }
+
+  await tx.transaction(async (innerTx) => {
+    // 1️⃣ Update base order status
+    const nextOrderStatus = shouldHoldPreManifestStatus ? currentStatus || 'booked' : internalStatus
+    const updateData: any = {
+      order_status: nextOrderStatus,
+      delivery_location: location || null,
+      delivery_message: instructions || null,
+      provider_last_status: status || internalStatus,
+      updated_at: new Date(),
+    }
+
+    if (
+      !shouldHoldPreManifestStatus &&
+      (internalStatus === 'pickup_initiated' || internalStatus === 'booked')
+    ) {
+      updateData.manifest_error = null
+      updateData.pickup_error = null
+      updateData.pickup_status = internalStatus
+    }
+
+    if (!order.awb_number && waybill) {
+      updateData.awb_number = String(waybill)
+    }
+
+    // 🔹 Capture courier cost if available from Delhivery webhook (for revenue calculation)
+    // Check various possible field names from Delhivery webhook
+    if (
+      shipment?.Charge !== undefined ||
+      shipment?.Amount !== undefined ||
+      shipment?.BillingAmount !== undefined ||
+      shipment?.TotalCharge !== undefined ||
+      shipment?.FreightCharges !== undefined ||
+      shipment?.cost !== undefined
+    ) {
+      const courierCost =
+        shipment?.Charge ||
+        shipment?.Amount ||
+        shipment?.BillingAmount ||
+        shipment?.TotalCharge ||
+        shipment?.FreightCharges ||
+        shipment?.cost
+      if (courierCost !== null && courierCost !== undefined) {
+        updateData.courier_cost = Number(courierCost)
+        console.log(
+          `💰 Captured Delhivery courier cost ₹${courierCost} for order ${order.order_number}`,
+        )
+      }
+    }
+
+    // 🔹 Capture weight data from Delhivery webhook if available
+    const scans = shipment?.Scans || shipment?.scans || payload?.Scans || payload?.scans
+    const firstScan = Array.isArray(scans)
+      ? scans[0]?.ScanDetail || scans[0]?.scan_detail || scans[0]
+      : scans?.ScanDetail || scans?.scan_detail || scans
+    const scannedWeight = pickWebhookText(
+      firstScan?.ScannedWeight,
+      firstScan?.scanned_weight,
+      shipment?.ScannedWeight,
+      shipment?.scanned_weight,
+      payload?.ScannedWeight,
+      payload?.scanned_weight,
+    )
+    const chargedWeight = pickWebhookText(
+      shipment?.ChargedWeight,
+      shipment?.charged_weight,
+      shipment?.ChargeableWeight,
+      shipment?.chargeable_weight,
+      payload?.ChargedWeight,
+      payload?.charged_weight,
+      payload?.ChargeableWeight,
+      payload?.chargeable_weight,
+      scannedWeight,
+    )
+    const volumetricWeight = pickWebhookText(
+      shipment?.VolumetricWeight,
+      shipment?.volumetric_weight,
+      payload?.VolumetricWeight,
+      payload?.volumetric_weight,
+    )
+    const chargedWeightGrams = normalizeWebhookWeightGrams(chargedWeight)
+    const volumetricWeightGrams = normalizeWebhookWeightGrams(volumetricWeight)
+    const scannedWeightGrams = normalizeWebhookWeightGrams(scannedWeight)
+
+    if (chargedWeightGrams || volumetricWeightGrams || scannedWeightGrams) {
+      if (chargedWeightGrams) updateData.charged_weight = chargedWeightGrams
+      if (volumetricWeightGrams) updateData.volumetric_weight = volumetricWeightGrams
+      if (scannedWeightGrams && !updateData.actual_weight)
+        updateData.actual_weight = scannedWeightGrams
+
+      // Check for weight discrepancy
+      const finalChargedWeight = chargedWeightGrams
+      const declaredWeight = normalizeWebhookWeightGrams(order.weight) || Number(order.weight)
+
+      if (
+        finalChargedWeight &&
+        declaredWeight &&
+        Math.abs(finalChargedWeight - declaredWeight) > 10
+      ) {
+        updateData.weight_discrepancy = true
+
+        // Create weight discrepancy record
+        try {
+          await createWeightDiscrepancy({
+            orderType: 'b2c',
+            orderId: order.id,
+            userId: order.user_id,
+            orderNumber: order.order_number,
+            awbNumber: order.awb_number || undefined,
+            courierPartner: 'Delhivery',
+            declaredWeight,
+            actualWeight: scannedWeightGrams || undefined,
+            volumetricWeight: volumetricWeightGrams || undefined,
+            chargedWeight: finalChargedWeight,
+            declaredDimensions: {
+              length: Number(order.length || 0),
+              breadth: Number(order.breadth || 0),
+              height: Number(order.height || 0),
+            },
+            originalShippingCharge: Number(order.shipping_charges || 0),
+            courierRemarks: shipment?.Status?.Instructions,
+          })
+          console.log(
+            `⚖️ Weight discrepancy detected for order ${order.order_number}: ${declaredWeight}g → ${finalChargedWeight}g`,
+          )
+        } catch (err) {
+          console.error(`❌ Failed to create weight discrepancy record:`, err)
+        }
+      }
+    }
+
+    await innerTx.update(b2c_orders).set(updateData).where(eq(b2c_orders.id, order.id))
+    await syncShopifyStatusForLocalOrder({ ...order, ...updateData }, innerTx).catch((err) => {
+      console.warn('⚠️ Failed Shopify status sync for Delhivery webhook:', err)
+    })
+    await syncWooCommerceTrackingNoteForLocalOrder({ ...order, ...updateData }, innerTx, {
+      source: 'delhivery_webhook',
+    }).catch((err) => {
+      console.warn('Failed WooCommerce tracking note sync for Delhivery webhook:', err)
+    })
+    // 🔔 NDR capture for Delhivery
+    const statusLower = (internalStatus || '').toLowerCase()
+    const isNdr =
+      ['ndr', 'undelivered'].includes(statusLower) ||
+      hasNdrSignal(statusLower, status, status_type, instructions, statusCode) ||
+      hasDelhiveryNdrStatusCode(statusCode)
+    if (isNdr) {
+      try {
+        await captureNdrEventFromWebhook({
+          order,
+          awbNumber: order.awb_number || undefined,
+          status: statusLower,
+          reason: pickWebhookText(statusInfo?.Instructions, instructions, statusCode) || null,
+          remarks: pickWebhookText(statusInfo?.Status, status, statusCode) || null,
+          attemptNo:
+            pickWebhookText(
+              shipment?.AttemptedCount,
+              shipment?.attempted_count,
+              statusInfo?.AttemptedCount,
+              statusInfo?.attempted_count,
+              payload?.AttemptedCount,
+              payload?.attempted_count,
+            ) || null,
+          payload,
+          courierLabel: 'Delhivery',
+          signalParts: [status, status_type, instructions, statusCode],
+        })
+      } catch (e) {
+        console.error('❌ Failed to record NDR event (Delhivery):', e)
+      }
+    }
+
+    // 🔔 RTO capture for Delhivery
+    const isRto = ['rto', 'rto_in_transit', 'rto_delivered'].includes(statusLower)
+    if (isRto) {
+      try {
+        const rtoCharge = await applyRtoChargeOnce(innerTx, order, 'Delhivery')
+        await recordRtoEvent({
+          orderId: order.id,
+          userId: order.user_id,
+          awbNumber: order.awb_number || undefined,
+          status: statusLower,
+          reason: shipment?.Status?.Instructions || null,
+          remarks: shipment?.Status?.Status || null,
+          rtoCharges: rtoCharge,
+          payload,
+        })
+        await createNotificationService({
+          targetRole: 'user',
+          userId: order.user_id,
+          title: 'RTO update (Delhivery)',
+          message: `Order ${order.order_number} status updated: ${statusLower}.`,
+        })
+        await createNotificationService({
+          targetRole: 'admin',
+          title: 'RTO event (Delhivery)',
+          message: `User ${order.user_id} order ${order.order_number} ${statusLower}`,
+        })
+      } catch (e) {
+        console.error('❌ Failed to record RTO event (Delhivery):', e)
+      }
+    }
+
+    // 2️⃣ Delivered → Create COD remittance (if COD order)
+    if (internalStatus === 'delivered' && order.order_type === 'cod') {
+      try {
+        console.log(`💰 Creating COD remittance for Delhivery order ${order.order_number}`)
+
+        const { remittance, created } = await createCodRemittance({
+          orderId: order.id,
+          orderType: 'b2c',
+          userId: order.user_id,
+          orderNumber: order.order_number,
+          awbNumber: order.awb_number || undefined,
+          courierPartner: order.courier_partner || 'Delhivery',
+          codAmount: Number(order.order_amount || 0),
+          codCharges: Number(order.cod_charges || 0),
+          freightCharges: Number(order.freight_charges ?? order.shipping_charges ?? 0),
+          collectedAt: new Date(),
+        })
+
+        if (created) {
+          await createNotificationService({
+            targetRole: 'admin',
+            title: 'COD remittance created',
+            message: `Order ${order.order_number} (${order.awb_number || 'no AWB'}) created pending COD remittance of ₹${Number(
+              remittance.remittableAmount || 0,
+            ).toFixed(2)}.`,
+          })
+        }
+
+        console.log(`✅ COD remittance created for Delhivery order ${order.order_number}`)
+      } catch (err) {
+        console.error(`❌ Failed to create COD remittance for order ${order.order_number}:`, err)
+      }
+    }
+
+    // 3️⃣ Cancelled → Refund wallet
+    if (internalStatus === 'cancelled') {
+      await applyCancellationRefundOnce(innerTx, order, 'delhivery_webhook')
+    }
+  })
+
+  try {
+    await logTrackingEvent({
+      orderId: order.id,
+      userId: order.user_id,
+      awbNumber: waybill || order.awb_number || undefined,
+      courier: 'Delhivery',
+      statusCode: shouldHoldPreManifestStatus ? currentStatus || 'booked' : internalStatus,
+      statusText: status,
+      location,
+      raw: payload,
+    })
+  } catch (e) {
+    console.error('Failed to log tracking event (Delhivery):', e)
+  }
+
+  return { success: true }
+}
+
+/**
+ * Process Delhivery Document Push Webhook (POD, Sorter Image, QC Image)
+ * According to Delhivery documentation, document push webhooks are separate from scan push webhooks
+ */
+export async function processDelhiveryDocumentWebhook(
+  payload: any,
+  documentType: string | null,
+  tx = db,
+) {
+  const shipment = payload?.Shipment || payload
+  const waybill = pickWebhookText(
+    shipment?.AWB,
+    shipment?.Waybill,
+    shipment?.awb,
+    shipment?.waybill,
+    shipment?.wbn,
+    shipment?.awb_number,
+    payload?.AWB,
+    payload?.Waybill,
+    payload?.awb,
+    payload?.waybill,
+    payload?.wbn,
+    payload?.awb_number,
+  )
+
+  if (!waybill) {
+    return { success: false, reason: 'missing_awb' }
+  }
+
+  const [order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.awb_number, waybill))
+  if (!order) {
+    console.warn(`⚠️ No local order found for AWB ${waybill} (document webhook)`)
+    return { success: false, reason: 'order_not_found' }
+  }
+
+  // Extract document URLs based on document type
+  let documentUrl: string | null = null
+  const docType = (documentType || '').toLowerCase()
+
+  if (docType === 'pod' || docType === 'poddocument') {
+    documentUrl =
+      shipment?.PODDocument ||
+      payload?.PODDocument ||
+      shipment?.POD?.DocumentURL ||
+      payload?.POD?.DocumentURL ||
+      shipment?.DocumentURL ||
+      payload?.DocumentURL
+  } else if (docType === 'sorterimage' || docType === 'sorter') {
+    documentUrl =
+      shipment?.SorterImage ||
+      payload?.SorterImage ||
+      shipment?.Sorter?.ImageURL ||
+      payload?.Sorter?.ImageURL ||
+      shipment?.ImageURL ||
+      payload?.ImageURL
+  } else if (docType === 'qcimage' || docType === 'qc') {
+    documentUrl =
+      shipment?.QCImage ||
+      payload?.QCImage ||
+      shipment?.QC?.ImageURL ||
+      payload?.QC?.ImageURL ||
+      shipment?.ImageURL ||
+      payload?.ImageURL
+  } else {
+    // Generic document URL extraction
+    documentUrl =
+      shipment?.DocumentURL ||
+      payload?.DocumentURL ||
+      shipment?.ImageURL ||
+      payload?.ImageURL ||
+      shipment?.URL ||
+      payload?.URL
+  }
+
+  if (!documentUrl) {
+    console.warn(`⚠️ No document URL found in Delhivery document webhook for AWB ${waybill}`)
+    return { success: false, reason: 'missing_document_url' }
+  }
+
+  console.log(
+    `📄 Processing Delhivery ${
+      documentType || 'document'
+    } webhook for AWB ${waybill}, URL: ${documentUrl}`,
+  )
+
+  try {
+    await tx.transaction(async (innerTx) => {
+      // Store document URL in order metadata or delivery_message field
+      // Note: You may want to add a dedicated field for POD/document URLs in the schema
+      const updateData: any = {
+        updated_at: new Date(),
+      }
+
+      // Store in delivery_message if it's POD, otherwise append to existing message
+      if (docType === 'pod' || docType === 'poddocument') {
+        const existingMessage = order.delivery_message || ''
+        updateData.delivery_message = existingMessage
+          ? `${existingMessage}\nPOD Document: ${documentUrl}`
+          : `POD Document: ${documentUrl}`
+      }
+
+      // Log the document for tracking
+      await logTrackingEvent({
+        orderId: order.id,
+        userId: order.user_id,
+        awbNumber: order.awb_number,
+        courier: 'Delhivery',
+        statusCode: 'document_received',
+        statusText: `${documentType || 'Document'} received`,
+        location: null,
+        raw: {
+          documentType,
+          documentUrl,
+          payload,
+        },
+      })
+
+      await innerTx.update(b2c_orders).set(updateData).where(eq(b2c_orders.id, order.id))
+
+      // Create notification for document received
+      await createNotificationService({
+        targetRole: 'user',
+        userId: order.user_id,
+        title: `${documentType || 'Document'} received (Delhivery)`,
+        message: `Order ${order.order_number} - ${
+          documentType || 'Document'
+        } document is now available.`,
+      })
+
+      // Also notify admins so POD/document events are visible in admin notification center.
+      await createNotificationService({
+        targetRole: 'admin',
+        title: `${documentType || 'Document'} received (Delhivery)`,
+        message: `Order ${order.order_number} (${order.awb_number || waybill}) - ${
+          documentType || 'Document'
+        } document received.`,
+      })
+
+      console.log(
+        `✅ Delhivery ${
+          documentType || 'document'
+        } webhook processed successfully for AWB ${waybill}`,
+      )
+    })
+
+    return { success: true }
+  } catch (error: any) {
+    console.error(
+      `❌ Failed to process Delhivery document webhook for AWB ${waybill}:`,
+      error?.message || error,
+    )
+    return { success: false, reason: 'processing_error' }
+  }
+}
+
+// =========================
+// Ekart Webhook Processing
+// =========================
+const mapEkartStatus = (...parts: unknown[]): string => {
+  const s = normalizeWebhookText(...parts)
+  if (!s) return 'in_transit'
+  if (s.includes('cancel')) return 'cancelled'
+  if (s.includes('rto delivered') || s.includes('return delivered')) return 'rto_delivered'
+  if (s.includes('rto') || s.includes('return to origin') || s.includes('return in transit')) {
+    return 'rto_in_transit'
+  }
+  if (
+    s.includes('ndr') ||
+    s.includes('undelivered') ||
+    s.includes('not delivered') ||
+    s.includes('delivery attempted') ||
+    s.includes('attempt failed')
+  ) {
+    return 'ndr'
+  }
+  if (s.includes('delivered')) return 'delivered'
+  if (s.includes('out for delivery') || s.includes('ofd')) return 'out_for_delivery'
+  if (s.includes('order placed') || s.includes('booked') || s.includes('created')) {
+    return 'booked'
+  }
+  if (
+    s.includes('consignment manifested') ||
+    s.includes('manifest') ||
+    s.includes('pickup scheduled') ||
+    s.includes('pickup requested') ||
+    s.includes('pickup')
+  ) {
+    return 'pickup_initiated'
+  }
+  if (s.includes('transit') || s.includes('dispatched') || s.includes('shipped')) return 'in_transit'
+  return 'in_transit'
+}
+
+const preserveEkartStatusTransition = (currentStatus: unknown, nextStatus: string) => {
+  const current = normalizeComparableText(currentStatus).replace(/\s+/g, '_')
+  const next = normalizeComparableText(nextStatus).replace(/\s+/g, '_')
+  if (!current) return next || 'in_transit'
+
+  if (
+    ['cancelled', 'delivered', 'rto_delivered'].includes(current) &&
+    !['cancelled', 'delivered', 'rto_delivered'].includes(next)
+  ) {
+    return current
+  }
+
+  if (current.startsWith('rto') && !next.startsWith('rto') && next !== 'cancelled') {
+    return current
+  }
+
+  const rank: Record<string, number> = {
+    pending: 0,
+    booked: 1,
+    shipment_created: 2,
+    pickup_initiated: 3,
+    in_transit: 4,
+    out_for_delivery: 5,
+    delivered: 6,
+  }
+
+  if (
+    current === 'pickup_initiated' &&
+    ['pending', 'booked', 'shipment_created'].includes(next)
+  ) {
+    return next
+  }
+
+  if (rank[current] !== undefined && rank[next] !== undefined && rank[next] < rank[current]) {
+    return current
+  }
+
+  return next || current || 'in_transit'
+}
+
+const ekartWebhookEventForStatus = (status: string) => {
+  if (status === 'delivered') return 'order.delivered'
+  if (status === 'cancelled') return 'order.cancelled'
+  if (['ndr', 'undelivered', 'lost'].includes(status)) return 'order.failed'
+  if (status.startsWith('rto')) return 'order.rto'
+  if (['pickup_initiated', 'in_transit', 'out_for_delivery'].includes(status)) return 'order.shipped'
+  return 'order.updated'
+}
+
+const collectEkartValuesByKeys = (
+  node: any,
+  keys: Set<string>,
+  seen = new WeakSet<object>(),
+): any[] => {
+  if (!node || typeof node !== 'object') return []
+  if (seen.has(node)) return []
+  seen.add(node)
+
+  const values: any[] = []
+  for (const [key, value] of Object.entries(node)) {
+    const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, '')
+    if (keys.has(normalizedKey)) values.push(value)
+    if (value && typeof value === 'object') {
+      values.push(...collectEkartValuesByKeys(value, keys, seen))
+    }
+  }
+
+  return values
+}
+
+const pickFirstEkartWeight = (...values: unknown[]) => {
+  for (const value of values) {
+    const parsed = normalizeWebhookWeightGrams(value)
+    if (parsed !== null) return parsed
+  }
+  return null
+}
+
+const extractEkartWeightSnapshot = (payload: any) => {
+  const chargedWeight = pickFirstEkartWeight(
+    ...collectEkartValuesByKeys(
+      payload,
+      new Set([
+        'chargedweight',
+        'chargeableweight',
+        'billingweight',
+        'billedweight',
+        'finalweight',
+      ]),
+    ),
+  )
+  const actualWeight = pickFirstEkartWeight(
+    ...collectEkartValuesByKeys(
+      payload,
+      new Set([
+        'actualweight',
+        'deadweight',
+        'physicalweight',
+        'scannedweight',
+        'pickupweight',
+      ]),
+    ),
+  )
+  const volumetricWeight = pickFirstEkartWeight(
+    ...collectEkartValuesByKeys(
+      payload,
+      new Set(['volumetricweight', 'volweight', 'volumeweight']),
+    ),
+  )
+  const remarks = collectEkartValuesByKeys(
+    payload,
+    new Set(['weightremarks', 'weightremark', 'weightmessage', 'weightcomment']),
+  )
+    .map((value) => String(value || '').trim())
+    .find(Boolean)
+
+  return {
+    chargedWeight,
+    actualWeight,
+    volumetricWeight,
+    remarks: remarks || undefined,
+  }
+}
+
+const unwrapXpressbeesPayload = (payload: any) => {
+  if (payload?.__provider === 'xpressbees' && payload?.body) {
+    return payload.body
+  }
+  if (Array.isArray(payload?.data) && payload.data.length > 0) {
+    return payload.data[0]
+  }
+  if (payload?.data && typeof payload.data === 'object' && !Array.isArray(payload.data)) {
+    return payload.data
+  }
+  return payload
+}
+
+const mapXpressbeesStatus = (status: string): string => {
+  const s = (status || '').toLowerCase().trim()
+  if (!s) return 'in_transit'
+  if (s.includes('cancel')) return 'cancelled'
+  if (s.includes('ndr') || s.includes('undelivered') || s.includes('attempt')) return 'ndr'
+  if (s.includes('rto') && s.includes('deliver')) return 'rto_delivered'
+  if (s.includes('rto')) return 'rto_in_transit'
+  if (s.includes('out for delivery') || s.includes('ofd')) return 'out_for_delivery'
+  if (s.includes('deliver')) return 'delivered'
+  if (
+    s.includes('pickup scheduled') ||
+    s.includes('pickup requested') ||
+    s.includes('pickup assigned') ||
+    s.includes('assigned for pickup') ||
+    s.includes('out for pickup') ||
+    s.includes('pickup booked') ||
+    s.includes('manifest') ||
+    s.includes('picked') ||
+    ['drc', 'pnd', 'pck', 'pku', 'pkd', 'pickup', 'manifested'].includes(s)
+  ) return 'pickup_initiated'
+  if (s.includes('booked') || s.includes('created') || s.includes('order placed')) return 'booked'
+  if (s.includes('transit') || s.includes('dispatched')) return 'in_transit'
+  return 'in_transit'
+}
+
+const isXpressbeesPickupWaitingSignal = (...parts: unknown[]) => {
+  const text = normalizeWebhookText(...parts)
+  if (!text) return false
+
+  return [
+    'waiting for pickup',
+    'still waiting for pickup',
+    'shipment waiting for pickup',
+    'shipment still waiting for pickup',
+    'pickup not done',
+    'pickup pending',
+    'awaiting pickup',
+    'pending pickup',
+    'not picked',
+    'not picked up',
+    'pickup not completed',
+  ].some((marker) => text.includes(marker))
+}
+
+const isXpressbeesPickupProgressStatus = (status: string) =>
+  [
+    'pickup_initiated',
+    'in_transit',
+    'out_for_delivery',
+    'delivered',
+    'ndr',
+    'rto',
+    'rto_in_transit',
+    'rto_delivered',
+  ].includes(String(status || '').trim().toLowerCase())
+
+const preserveXpressbeesStatusTransition = (currentStatus: unknown, mappedStatus: string) => {
+  const current = normalizeComparableText(currentStatus).replace(/\s+/g, '_')
+  const mapped = normalizeComparableText(mappedStatus).replace(/\s+/g, '_')
+  if (!mapped) return current || 'in_transit'
+
+  if (
+    ['cancelled', 'delivered', 'rto_delivered'].includes(current) &&
+    !['cancelled', 'delivered', 'rto_delivered'].includes(mapped)
+  ) {
+    return current
+  }
+
+  if (current.startsWith('rto') && !mapped.startsWith('rto') && mapped !== 'cancelled') {
+    return current
+  }
+
+  const rank: Record<string, number> = {
+    pending: 0,
+    booked: 1,
+    shipment_created: 2,
+    pickup_initiated: 3,
+    in_transit: 4,
+    out_for_delivery: 5,
+    delivered: 6,
+  }
+
+  if (
+    current === 'pickup_initiated' &&
+    ['pending', 'booked', 'shipment_created'].includes(mapped)
+  ) {
+    return mapped
+  }
+
+  if (rank[current] !== undefined && rank[mapped] !== undefined && rank[mapped] < rank[current]) {
+    return current
+  }
+
+  return mapped
+}
+
+const xpressbeesWebhookEventForStatus = (status: string) => {
+  if (status === 'delivered') return 'order.delivered'
+  if (status === 'cancelled') return 'order.cancelled'
+  if (['ndr', 'undelivered', 'lost'].includes(status)) return 'order.failed'
+  if (status.startsWith('rto')) return 'order.rto'
+  if (['pickup_initiated', 'in_transit', 'out_for_delivery'].includes(status)) return 'order.shipped'
+  return 'order.updated'
+}
+
+export async function processEkartWebhook(payload: any, tx = db) {
+  const event = payload?.track_updated || payload?.track || payload?.data || payload || {}
+  const awb = pickWebhookText(
+    event?.tracking_id,
+    event?.trackingId,
+    event?.awb,
+    event?.waybill,
+    event?.wbn,
+    event?.id,
+    event?.barcodes?.wbn,
+    payload?.tracking_id,
+    payload?.trackingId,
+    payload?.awb,
+    payload?.waybill,
+    payload?.wbn,
+    payload?.id,
+    payload?.barcodes?.wbn,
+  )
+  const orderRef = pickWebhookText(
+    event?.orderNumber,
+    event?.order_number,
+    event?.order_id,
+    event?.shipment_id,
+    event?.client_order_id,
+    event?.barcodes?.order,
+    payload?.orderNumber,
+    payload?.order_number,
+    payload?.order_id,
+    payload?.shipment_id,
+    payload?.client_order_id,
+    payload?.barcodes?.order,
+  )
+  const statusRaw = pickWebhookText(
+    event?.current_status,
+    event?.status,
+    event?.event,
+    event?.status_text,
+    payload?.current_status,
+    payload?.status,
+    payload?.event,
+    payload?.status_text,
+  )
+  const remarks = pickWebhookText(
+    event?.desc,
+    event?.description,
+    event?.remarks,
+    event?.remark,
+    event?.message,
+    payload?.desc,
+    payload?.description,
+    payload?.remarks,
+    payload?.remark,
+    payload?.message,
+  )
+  const location =
+    pickWebhookText(
+      event?.current_location,
+      event?.location,
+      event?.scan_location,
+      event?.last_location,
+      payload?.current_location,
+      payload?.location,
+      payload?.scan_location,
+      payload?.last_location,
+    ) || null
+
+  if (!awb && !orderRef) return { success: false, reason: 'missing_awb' }
+
+  let order: any
+  if (awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.awb_number, awb))
+  }
+  if (!order && awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.shipment_id, awb))
+  }
+  if (!order && awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.provider_reference, awb))
+  }
+  if (!order && awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.provider_request_id, awb))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.order_number, orderRef))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.order_id, orderRef))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.shipment_id, orderRef))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.provider_reference, orderRef))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.provider_request_id, orderRef))
+  }
+
+  if (!order) {
+    console.warn(`No local order found for Ekart AWB ${awb || 'N/A'} ref ${orderRef || 'N/A'}`)
+    return { success: false, reason: 'order_not_found' }
+  }
+
+  const mappedStatus = mapEkartStatus(statusRaw, remarks, event?.ndrStatus, event?.ndrActions)
+  const internalStatus = preserveEkartStatusTransition(order.order_status, mappedStatus)
+  const previousStatus = normalizeComparableText(order.order_status).replace(/\s+/g, '_')
+  const statusLower = internalStatus.toLowerCase()
+  const statusText = statusRaw || remarks || internalStatus
+  const ekartWeight = extractEkartWeightSnapshot(payload)
+  const ekartProof = extractWeightProofFromWebhook(payload, 'ekart')
+  const updateData: any = {
+    order_status: internalStatus,
+    delivery_location: location,
+    delivery_message: remarks || statusRaw || null,
+    provider_last_status: String(statusRaw || remarks || internalStatus || '').trim().slice(0, 80) || null,
+    updated_at: new Date(),
+  }
+
+  if (internalStatus === 'booked') {
+    updateData.pickup_status = 'pending'
+    updateData.pickup_error = null
+  } else if (internalStatus === 'pickup_initiated') {
+    updateData.pickup_status = 'pickup_initiated'
+    updateData.pickup_error = null
+    updateData.manifest_error = null
+  }
+
+  if (payload?.courier_cost !== undefined) updateData.courier_cost = Number(payload.courier_cost)
+  if (ekartWeight.chargedWeight !== null) updateData.charged_weight = ekartWeight.chargedWeight
+  if (ekartWeight.volumetricWeight !== null) updateData.volumetric_weight = ekartWeight.volumetricWeight
+  if (ekartWeight.actualWeight !== null) updateData.actual_weight = ekartWeight.actualWeight
+
+  const declaredWeight = normalizeWebhookWeightGrams(order.weight) || Number(order.weight || 0)
+  if (
+    ekartWeight.chargedWeight !== null &&
+    declaredWeight > 0 &&
+    Math.abs(ekartWeight.chargedWeight - declaredWeight) > 10
+  ) {
+    updateData.weight_discrepancy = true
+
+    try {
+      await createWeightDiscrepancy({
+        orderType: 'b2c',
+        orderId: order.id,
+        userId: order.user_id,
+        orderNumber: order.order_number,
+        awbNumber: order.awb_number || awb || undefined,
+        courierPartner: 'Ekart Logistics',
+        declaredWeight,
+        actualWeight: ekartWeight.actualWeight || undefined,
+        volumetricWeight: ekartWeight.volumetricWeight || undefined,
+        chargedWeight: ekartWeight.chargedWeight,
+        declaredDimensions: {
+          length: Number(order.length || 0),
+          breadth: Number(order.breadth || 0),
+          height: Number(order.height || 0),
+        },
+        originalShippingCharge: Number(order.freight_charges ?? order.shipping_charges ?? 0),
+        courierRemarks: ekartWeight.remarks || remarks || statusText || undefined,
+        courierWeightSlipUrl: ekartProof.weightSlipUrl,
+        courierWeightProofImages: ekartProof.weightImages,
+        weighingMetadata: ekartProof.metadata as any,
+      })
+    } catch (err) {
+      console.error('Failed to create Ekart weight discrepancy:', err)
+    }
+  }
+
+  await tx.transaction(async (innerTx) => {
+    await innerTx.update(b2c_orders).set(updateData).where(eq(b2c_orders.id, order.id))
+    await syncShopifyStatusForLocalOrder({ ...order, ...updateData }, innerTx).catch((err) => {
+      console.warn('Failed Shopify status sync for Ekart webhook:', err)
+    })
+
+    await syncWooCommerceTrackingNoteForLocalOrder({ ...order, ...updateData }, innerTx, {
+      source: 'ekart_webhook',
+    }).catch((err) => {
+      console.warn('Failed WooCommerce tracking note sync for Ekart webhook:', err)
+    })
+
+    try {
+      await logTrackingEvent({
+        orderId: order.id,
+        userId: order.user_id,
+        awbNumber: order.awb_number || awb,
+        courier: 'Ekart Logistics',
+        statusCode: statusRaw || internalStatus,
+        statusText,
+        location,
+        raw: payload,
+      })
+    } catch (err: any) {
+      console.error('Failed to log Ekart tracking event:', err)
+    }
+
+    if (internalStatus === 'pickup_initiated') {
+      try {
+        const [freshOrder] = await innerTx
+          .select()
+          .from(b2c_orders)
+          .where(eq(b2c_orders.id, order.id))
+
+        if (!freshOrder) {
+          console.warn(`Order ${order.order_number} not found during Ekart webhook transaction`)
+          return
+        }
+
+        let invoiceKey = freshOrder.invoice_link
+        let invoiceNumberToStore = freshOrder.invoice_number
+        let invoiceDateToStore = freshOrder.invoice_date
+        let invoiceAmountToStore = freshOrder.invoice_amount
+
+        if (!invoiceKey) {
+          try {
+            const invoiceResult = await generateInvoiceForOrderWebhook(freshOrder, innerTx)
+            if (invoiceResult) {
+              invoiceKey = invoiceResult.key
+              invoiceNumberToStore = invoiceResult.invoiceNumber
+              invoiceDateToStore = invoiceResult.invoiceDate
+              invoiceAmountToStore = invoiceResult.invoiceAmount
+            }
+          } catch (invoiceErr: any) {
+            console.error(
+              `Failed to generate invoice for Ekart order ${order.order_number}:`,
+              invoiceErr?.message || invoiceErr,
+            )
+          }
+        }
+
+        await innerTx
+          .update(b2c_orders)
+          .set({
+            invoice_link: invoiceKey ?? undefined,
+            invoice_number: invoiceNumberToStore ?? undefined,
+            invoice_date: invoiceDateToStore ?? undefined,
+            invoice_amount: invoiceAmountToStore ?? undefined,
+            updated_at: new Date(),
+          })
+          .where(eq(b2c_orders.id, order.id))
+      } catch (err: any) {
+        console.error(`Ekart invoice flow error for ${order.order_number}:`, err)
+      }
+    }
+  })
+
+  await sendWebhookEvent(order.user_id, 'tracking.updated', {
+    awb_number: order.awb_number || awb,
+    order_id: order.id,
+    order_number: order.order_number,
+    status: internalStatus,
+    raw_status: statusRaw,
+    courier_partner: order.courier_partner || 'Ekart Logistics',
+    provider_reference: order.provider_reference || awb || null,
+    provider_request_id: order.provider_request_id || awb || null,
+    location,
+    remarks: remarks || statusText || null,
+    source: 'ekart_webhook',
+  }).catch((err) => {
+    console.error('Failed to send Ekart tracking.updated webhook:', err)
+  })
+
+  if (internalStatus !== previousStatus) {
+    await sendWebhookEvent(order.user_id, ekartWebhookEventForStatus(internalStatus) as any, {
+      order_id: order.id,
+      order_number: order.order_number,
+      awb_number: order.awb_number || awb,
+      status: internalStatus,
+      raw_status: statusRaw,
+      courier_partner: order.courier_partner || 'Ekart Logistics',
+      provider_reference: order.provider_reference || awb || null,
+      provider_request_id: order.provider_request_id || awb || null,
+      location,
+      remarks: remarks || statusText || null,
+      order_type: 'b2c',
+      source: 'ekart_webhook',
+    }).catch((err) => {
+      console.error('Failed to send Ekart status webhook:', err)
+    })
+  }
+
+  if (
+    ['ndr', 'undelivered'].includes(statusLower) ||
+    hasNdrSignal(statusRaw, remarks, location, event?.ndrStatus, event?.ndrActions)
+  ) {
+    try {
+      await captureNdrEventFromWebhook({
+        order,
+        awbNumber: order.awb_number || awb || undefined,
+        status: statusLower,
+        reason: remarks || pickWebhookText(event?.ndrStatus, payload?.ndrStatus) || null,
+        remarks: statusText || null,
+        attemptNo: pickWebhookText(
+          event?.attempts,
+          event?.attempt_no,
+          event?.attempted_count,
+          event?.attemptCount,
+          payload?.attempts,
+          payload?.attempt_no,
+          payload?.attempted_count,
+          payload?.attemptCount,
+        ) || null,
+        payload,
+        courierLabel: 'Ekart',
+        signalParts: [statusRaw, remarks, location, event?.ndrStatus, event?.ndrActions],
+      })
+    } catch (err) {
+      console.error('Failed to record NDR event (Ekart):', err)
+    }
+  }
+
+  if (statusLower.startsWith('rto') && internalStatus !== previousStatus) {
+    try {
+      const rtoCharge = await applyRtoChargeOnce(tx, order, 'Ekart')
+      await recordRtoEvent({
+        orderId: order.id,
+        userId: order.user_id,
+        awbNumber: order.awb_number || awb || undefined,
+        status: statusLower,
+        reason: remarks || null,
+        rtoCharges: rtoCharge,
+        payload,
+      })
+      await createNotificationService({
+        targetRole: 'user',
+        userId: order.user_id,
+        title: 'RTO update (Ekart)',
+        message: `Order ${order.order_number} status ${statusLower}.`,
+      })
+      await createNotificationService({
+        targetRole: 'admin',
+        title: 'RTO event (Ekart)',
+        message: `User ${order.user_id} order ${order.order_number} ${statusLower}`,
+      })
+    } catch (err) {
+      console.error('Failed to record RTO event (Ekart):', err)
+    }
+  }
+
+  if (internalStatus === 'delivered' && order.order_type === 'cod') {
+    try {
+      const { remittance, created } = await createCodRemittance({
+        orderId: order.id,
+        orderType: 'b2c',
+        userId: order.user_id,
+        orderNumber: order.order_number,
+        awbNumber: order.awb_number || awb || undefined,
+        courierPartner: 'Ekart Logistics',
+        codAmount: Number(order.order_amount ?? 0),
+        codCharges: Number(order.cod_charges ?? 0),
+        freightCharges: Number(order.freight_charges ?? order.shipping_charges ?? 0),
+        collectedAt: new Date(),
+      })
+
+      if (created) {
+        await createNotificationService({
+          targetRole: 'admin',
+          title: 'COD remittance created',
+          message: `Order ${order.order_number} (${order.awb_number || 'no AWB'}) created pending COD remittance of INR ${Number(
+            remittance.remittableAmount || 0,
+          ).toFixed(2)}.`,
+        })
+      }
+    } catch (err) {
+      console.error(`Failed to create COD remittance for Ekart order ${order.order_number}:`, err)
+    }
+  }
+
+  return { success: true }
+}
+
+export async function processXpressbeesWebhook(payload: any, tx = db) {
+  const event = unwrapXpressbeesPayload(payload)
+  const awb = pickWebhookText(
+    event?.awb_number ||
+    event?.awb ||
+    event?.waybill ||
+    event?.tracking_id ||
+    event?.trackingId ||
+    event?.AWBNumber ||
+    event?.AWBNo ||
+    event?.AirWayBillNO ||
+    event?.AirWayBillNo ||
+    event?.ShippingID ||
+    event?.shipment?.awb_number ||
+    event?.shipment?.awb,
+  )
+  const orderRef = pickWebhookText(
+    event?.order_number ||
+    event?.order_id ||
+    event?.reference_number ||
+    event?.shipment_id ||
+    event?.OrderNo ||
+    event?.SubOrderNo ||
+    event?.client_order_id ||
+    event?.shipment?.order_number ||
+    event?.shipment?.order_id,
+  )
+  const statusRaw = pickWebhookText(
+    event?.current_status ||
+    event?.shipment_status ||
+    event?.status ||
+    event?.event ||
+    event?.event_name ||
+    event?.scan_status ||
+    event?.ShipmentStatus ||
+    event?.CurrentStatus ||
+    event?.Status ||
+    event?.status_code ||
+    event?.Process,
+  )
+  const remarks = pickWebhookText(
+    event?.courier_remarks ||
+    event?.remarks ||
+    event?.remark ||
+    event?.message ||
+    event?.description ||
+    event?.Description ||
+    event?.ReturnMessage,
+  )
+  const location = pickWebhookText(
+    event?.current_location ||
+    event?.location ||
+    event?.scan_location ||
+    event?.hub_name ||
+    event?.HubLocation ||
+    event?.city ||
+    event?.City,
+  ) || null
+
+  if (!awb && !orderRef) return { success: false, reason: 'missing_awb' }
+
+  let order
+  if (awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.awb_number, String(awb)))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx
+      .select()
+      .from(b2c_orders)
+      .where(eq(b2c_orders.order_number, String(orderRef)))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.order_id, String(orderRef)))
+  }
+  if (!order && awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.shipment_id, String(awb)))
+  }
+  if (!order && awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.provider_reference, String(awb)))
+  }
+  if (!order && awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.provider_request_id, String(awb)))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.shipment_id, String(orderRef)))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.provider_reference, String(orderRef)))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.provider_request_id, String(orderRef)))
+  }
+
+  if (!order) {
+    console.warn(`⚠️ No local order found for Xpressbees AWB ${awb || 'N/A'} ref ${orderRef || 'N/A'}`)
+    return { success: false, reason: 'order_not_found' }
+  }
+
+  const mappedStatus = mapXpressbeesStatus(statusRaw || remarks)
+  const internalStatus = preserveXpressbeesStatusTransition(order.order_status, mappedStatus)
+  const previousStatus = normalizeComparableText(order.order_status).replace(/\s+/g, '_')
+  const statusLower = internalStatus.toLowerCase()
+  const statusText = statusRaw || remarks || internalStatus
+  const pickupWaitingSignal = isXpressbeesPickupWaitingSignal(statusRaw, remarks, event)
+  const latestNdrStatus = await getLatestNdrStatusForOrder(order.id)
+  const reattemptInProgress =
+    previousStatus === 'pickup_initiated' && latestNdrStatus === 'ndr_action'
+  let effectiveStatus =
+    reattemptInProgress && ['ndr', 'undelivered', 'lost'].includes(statusLower)
+      ? 'pickup_initiated'
+      : internalStatus
+
+  if (pickupWaitingSignal) {
+    effectiveStatus = 'pickup_initiated'
+  }
+
+  const updateData: any = {
+    order_status: effectiveStatus,
+    delivery_location: location,
+    delivery_message: remarks || null,
+    provider_last_status: String(statusRaw || remarks || internalStatus || '').slice(0, 80),
+    updated_at: new Date(),
+  }
+
+  if (effectiveStatus === 'booked') {
+    updateData.pickup_status = 'pending'
+    updateData.pickup_error = null
+  } else if (isXpressbeesPickupProgressStatus(effectiveStatus)) {
+    updateData.pickup_status = 'pickup_initiated'
+    updateData.pickup_error = null
+    updateData.manifest_error = null
+  }
+
+  if (effectiveStatus === 'cancelled') {
+    updateData.pickup_status = 'cancelled'
+    updateData.pickup_error = null
+  }
+
+  if (event?.courier_cost !== undefined) updateData.courier_cost = Number(event.courier_cost)
+  if (event?.freight_charges !== undefined && updateData.courier_cost === undefined) {
+    updateData.courier_cost = Number(event.freight_charges)
+  }
+  if (event?.charged_weight !== undefined) updateData.charged_weight = Number(event.charged_weight)
+  if (event?.chargeable_weight !== undefined && updateData.charged_weight === undefined) {
+    updateData.charged_weight = Number(event.chargeable_weight)
+  }
+  if (event?.volumetric_weight !== undefined) {
+    updateData.volumetric_weight = Number(event.volumetric_weight)
+  }
+  if (event?.actual_weight !== undefined) updateData.actual_weight = Number(event.actual_weight)
+  if (event?.label) updateData.label = String(event.label)
+  if (event?.manifest) updateData.manifest = String(event.manifest)
+
+  await tx.transaction(async (innerTx) => {
+    await innerTx.update(b2c_orders).set(updateData).where(eq(b2c_orders.id, order.id))
+    await syncShopifyStatusForLocalOrder({ ...order, ...updateData }, innerTx).catch((err) => {
+      console.warn('⚠️ Failed Shopify status sync for Xpressbees webhook:', err)
+    })
+    await syncWooCommerceTrackingNoteForLocalOrder({ ...order, ...updateData }, innerTx, {
+      source: 'xpressbees_webhook',
+    }).catch((err) => {
+      console.warn('Failed WooCommerce tracking note sync for Xpressbees webhook:', err)
+    })
+
+    try {
+      await logTrackingEvent({
+        orderId: order.id,
+        userId: order.user_id,
+        awbNumber: order.awb_number,
+        courier: 'Xpressbees',
+        statusCode: internalStatus,
+        statusText,
+        location,
+        raw: payload,
+      })
+    } catch (err: any) {
+      console.error('❌ Failed to log Xpressbees tracking event:', err)
+    }
+
+    if (internalStatus === 'booked' || internalStatus === 'pickup_initiated') {
+      try {
+        const [freshOrder] = await innerTx
+          .select()
+          .from(b2c_orders)
+          .where(eq(b2c_orders.id, order.id))
+
+        if (!freshOrder) return
+
+        let invoiceKey = freshOrder.invoice_link
+        let invoiceNumberToStore = freshOrder.invoice_number
+        let invoiceDateToStore = freshOrder.invoice_date
+        let invoiceAmountToStore = freshOrder.invoice_amount
+
+        if (!invoiceKey) {
+          const invoiceResult = await generateInvoiceForOrderWebhook(freshOrder, innerTx)
+          if (invoiceResult) {
+            invoiceKey = invoiceResult.key
+            invoiceNumberToStore = invoiceResult.invoiceNumber
+            invoiceDateToStore = invoiceResult.invoiceDate
+            invoiceAmountToStore = invoiceResult.invoiceAmount
+          }
+        }
+
+        await innerTx
+          .update(b2c_orders)
+          .set({
+            invoice_link: invoiceKey ?? undefined,
+            invoice_number: invoiceNumberToStore ?? undefined,
+            invoice_date: invoiceDateToStore ?? undefined,
+            invoice_amount: invoiceAmountToStore ?? undefined,
+            updated_at: new Date(),
+          })
+          .where(eq(b2c_orders.id, order.id))
+      } catch (err: any) {
+        console.error(`❌ Xpressbees invoice flow error for ${order.order_number}:`, err)
+      }
+    }
+  })
+
+  await sendWebhookEvent(order.user_id, 'tracking.updated', {
+    awb_number: order.awb_number || awb,
+    order_id: order.id,
+    order_number: order.order_number,
+    status: internalStatus,
+    raw_status: statusRaw,
+    courier_partner: order.courier_partner || 'Xpressbees',
+    provider_reference: order.provider_reference || awb || null,
+    provider_request_id: order.provider_request_id || awb || null,
+    location,
+    remarks: remarks || statusText || null,
+    source: 'xpressbees_webhook',
+  }).catch((err) => {
+    console.error('Failed to send Xpressbees tracking.updated webhook:', err)
+  })
+
+  if (internalStatus !== previousStatus) {
+    await sendWebhookEvent(order.user_id, xpressbeesWebhookEventForStatus(internalStatus) as any, {
+      order_id: order.id,
+      order_number: order.order_number,
+      awb_number: order.awb_number || awb,
+      status: internalStatus,
+      raw_status: statusRaw,
+      courier_partner: order.courier_partner || 'Xpressbees',
+      provider_reference: order.provider_reference || awb || null,
+      provider_request_id: order.provider_request_id || awb || null,
+      location,
+      remarks: remarks || statusText || null,
+      order_type: 'b2c',
+      source: 'xpressbees_webhook',
+    }).catch((err) => {
+      console.error('Failed to send Xpressbees status webhook:', err)
+    })
+  }
+
+  if (
+    ['ndr', 'undelivered'].includes(statusLower) ||
+    hasNdrSignal(statusRaw, remarks, statusText, location)
+  ) {
+    try {
+      await captureNdrEventFromWebhook({
+        order,
+        awbNumber: order.awb_number || undefined,
+        status: statusLower,
+        reason: remarks || null,
+        remarks: statusText || null,
+        payload,
+        courierLabel: 'Xpressbees',
+        signalParts: [statusRaw, remarks, statusText, location],
+      })
+    } catch (err) {
+      console.error('❌ Failed to record NDR event (Xpressbees):', err)
+    }
+  }
+
+  if (statusLower.includes('rto')) {
+    try {
+      const rtoCharge = await applyRtoChargeOnce(tx, order, 'Xpressbees')
+      await recordRtoEvent({
+        orderId: order.id,
+        userId: order.user_id,
+        awbNumber: order.awb_number || undefined,
+        status: statusLower,
+        reason: remarks || null,
+        remarks: statusText || null,
+        rtoCharges: rtoCharge,
+        payload,
+      })
+      await createNotificationService({
+        targetRole: 'user',
+        userId: order.user_id,
+        title: 'RTO update (Xpressbees)',
+        message: `Order ${order.order_number} status ${statusLower}.`,
+      })
+      await createNotificationService({
+        targetRole: 'admin',
+        title: 'RTO event (Xpressbees)',
+        message: `User ${order.user_id} order ${order.order_number} ${statusLower}`,
+      })
+    } catch (err) {
+      console.error('❌ Failed to record RTO event (Xpressbees):', err)
+    }
+  }
+
+  if (internalStatus === 'delivered' && order.order_type === 'cod') {
+    try {
+      const { remittance, created } = await createCodRemittance({
+        orderId: order.id,
+        orderType: 'b2c',
+        userId: order.user_id,
+        orderNumber: order.order_number,
+        awbNumber: order.awb_number || undefined,
+        courierPartner: 'Xpressbees',
+        codAmount: Number(order.order_amount ?? 0),
+        codCharges: Number(order.cod_charges ?? 0),
+        freightCharges: Number(order.freight_charges ?? order.shipping_charges ?? 0),
+        collectedAt: new Date(),
+      })
+
+      if (created) {
+        await createNotificationService({
+          targetRole: 'admin',
+          title: 'COD remittance created',
+          message: `Order ${order.order_number} (${order.awb_number || 'no AWB'}) created pending COD remittance of ₹${Number(
+            remittance.remittableAmount || 0,
+          ).toFixed(2)}.`,
+        })
+      }
+    } catch (err) {
+      console.error(
+        `❌ Failed to create COD remittance for Xpressbees order ${order.order_number}:`,
+        err,
+      )
+    }
+  }
+
+  if (internalStatus === 'cancelled') {
+    await applyCancellationRefundOnce(tx, order, 'xpressbees_webhook')
+  }
+
+  return { success: true }
+}
+
+const isAmazonWebhookObject = (value: unknown): value is Record<string, any> =>
+  Boolean(value && typeof value === 'object' && !Array.isArray(value))
+
+const amazonWebhookText = (value: unknown) => {
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return String(value).trim()
+  }
+  return ''
+}
+
+const pickAmazonWebhookText = (...values: unknown[]) =>
+  values.map(amazonWebhookText).find(Boolean) || ''
+
+const truncateAmazonWebhookText = (value: unknown, maxLength: number) => {
+  const text = amazonWebhookText(value)
+  return text.length > maxLength ? text.slice(0, maxLength) : text
+}
+
+const unwrapAmazonShippingWebhookPayload = (payload: any) => {
+  if (Array.isArray(payload)) return payload[0] || {}
+  if (payload?.__provider === 'amazon' && isAmazonWebhookObject(payload.body)) {
+    return payload.body
+  }
+  if (isAmazonWebhookObject(payload?.payload)) return payload.payload
+  if (isAmazonWebhookObject(payload?.data)) return payload.data
+  if (isAmazonWebhookObject(payload?.notification?.payload)) return payload.notification.payload
+  return payload || {}
+}
+
+const resolveAmazonWebhookDetails = (event: any) => {
+  if (isAmazonWebhookObject(event?.trackingEvent)) return event.trackingEvent
+  if (isAmazonWebhookObject(event?.trackingDetails)) return event.trackingDetails
+  if (isAmazonWebhookObject(event?.statusDetails)) return event.statusDetails
+  if (isAmazonWebhookObject(event?.latestEvent)) return event.latestEvent
+  if (isAmazonWebhookObject(event?.event)) return event.event
+  return {}
+}
+
+const resolveAmazonWebhookLocation = (...values: unknown[]) => {
+  for (const value of values) {
+    const direct = amazonWebhookText(value)
+    if (direct) return direct
+
+    if (!isAmazonWebhookObject(value)) continue
+    const location = [
+      value.city,
+      value.stateOrRegion,
+      value.state,
+      value.postalCode,
+      value.countryCode,
+    ]
+      .map(amazonWebhookText)
+      .filter(Boolean)
+      .join(', ')
+    if (location) return location
+  }
+
+  return ''
+}
+
+const mapAmazonShippingWebhookStatus = (statusRaw: unknown, eventCode?: unknown) => {
+  const normalized = normalizeWebhookText(statusRaw, eventCode)
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+  if (!normalized) return 'in_transit'
+  if (normalized.includes('cancel')) return 'cancelled'
+  if (
+    (normalized.includes('delivered') || normalized.includes('delivery complete')) &&
+    (normalized.includes('return') || normalized.includes('rto'))
+  ) {
+    return 'rto_delivered'
+  }
+  if (normalized.includes('return') || normalized.includes('rto')) return 'rto_in_transit'
+  if (normalized.includes('lost')) return 'lost'
+  if (
+    normalized.includes('undeliver') ||
+    normalized.includes('delivery attempted') ||
+    normalized.includes('attempted') ||
+    normalized.includes('rejected') ||
+    normalized.includes('refused') ||
+    normalized.includes('failed')
+  ) {
+    return 'ndr'
+  }
+  if (normalized.includes('out for delivery') || normalized.includes('ofd')) {
+    return 'out_for_delivery'
+  }
+  if (normalized.includes('delivered')) return 'delivered'
+  if (
+    normalized.includes('pickup') ||
+    normalized.includes('shipment created') ||
+    normalized.includes('label created') ||
+    normalized.includes('pre transit') ||
+    normalized.includes('manifest')
+  ) {
+    return 'pickup_initiated'
+  }
+  if (
+    normalized.includes('transit') ||
+    normalized.includes('arrived') ||
+    normalized.includes('departed') ||
+    normalized.includes('received') ||
+    normalized.includes('scanned')
+  ) {
+    return 'in_transit'
+  }
+
+  return 'in_transit'
+}
+
+const amazonWebhookEventForStatus = (status: string) => {
+  if (status === 'delivered') return 'order.delivered'
+  if (status === 'cancelled') return 'order.cancelled'
+  if (['ndr', 'undelivered', 'lost'].includes(status)) return 'order.failed'
+  if (status.startsWith('rto')) return 'order.rto'
+  if (['pickup_initiated', 'in_transit', 'out_for_delivery'].includes(status)) return 'order.shipped'
+  return 'order.updated'
+}
+
+const findAmazonOrderByIdentifier = async (identifier: string, tx: any) => {
+  const value = amazonWebhookText(identifier)
+  if (!value) return { order: null, orderType: 'b2c' as 'b2c' | 'b2b' }
+
+  const [b2c] = await tx
+    .select()
+    .from(b2c_orders)
+    .where(
+      or(
+        eq(b2c_orders.awb_number, value),
+        eq(b2c_orders.provider_reference, value),
+        eq(b2c_orders.provider_request_id, value),
+        eq(b2c_orders.shipment_id, value),
+      )!,
+    )
+    .limit(1)
+
+  if (b2c) return { order: b2c, orderType: 'b2c' as const }
+
+  const [b2b] = await tx
+    .select()
+    .from(b2b_orders)
+    .where(
+      or(
+        eq(b2b_orders.awb_number, value),
+        eq(b2b_orders.provider_reference, value),
+        eq(b2b_orders.provider_request_id, value),
+        eq(b2b_orders.shipment_id, value),
+      )!,
+    )
+    .limit(1)
+
+  if (b2b) return { order: b2b, orderType: 'b2b' as const }
+  return { order: null, orderType: 'b2c' as 'b2c' | 'b2b' }
+}
+
+const findAmazonOrderByReference = async (reference: string, tx: any) => {
+  const value = amazonWebhookText(reference)
+  if (!value) return { order: null, orderType: 'b2c' as 'b2c' | 'b2b' }
+
+  const [b2c] = await tx
+    .select()
+    .from(b2c_orders)
+    .where(or(eq(b2c_orders.order_number, value), eq(b2c_orders.order_id, value))!)
+    .limit(1)
+
+  if (b2c) return { order: b2c, orderType: 'b2c' as const }
+
+  const [b2b] = await tx
+    .select()
+    .from(b2b_orders)
+    .where(or(eq(b2b_orders.order_number, value), eq(b2b_orders.order_id, value))!)
+    .limit(1)
+
+  if (b2b) return { order: b2b, orderType: 'b2b' as const }
+  return { order: null, orderType: 'b2c' as 'b2c' | 'b2b' }
+}
+
+export const getAmazonShippingWebhookSummary = (payload: any) => {
+  const event = unwrapAmazonShippingWebhookPayload(payload)
+  const details = resolveAmazonWebhookDetails(event)
+  const trackingId = pickAmazonWebhookText(
+    event?.trackingId,
+    event?.tracking_id,
+    event?.trackingNumber,
+    event?.containerTrackingId,
+    event?.packageTrackingId,
+    event?.awb,
+    event?.awb_number,
+    details?.trackingId,
+    details?.tracking_id,
+    details?.trackingNumber,
+  )
+  const shipmentId = pickAmazonWebhookText(
+    event?.shipmentId,
+    event?.shipment_id,
+    event?.shipmentIdentifier,
+    event?.shipmentIdentifierId,
+    details?.shipmentId,
+    details?.shipment_id,
+  )
+  const orderRef = pickAmazonWebhookText(
+    event?.orderNumber,
+    event?.order_number,
+    event?.orderId,
+    event?.order_id,
+    event?.clientReferenceId,
+    event?.packageClientReferenceId,
+    details?.orderNumber,
+    details?.order_number,
+    details?.clientReferenceId,
+    details?.packageClientReferenceId,
+  )
+  const status = pickAmazonWebhookText(
+    event?.status,
+    event?.statusCode,
+    event?.statusDescription,
+    event?.trackingStatus,
+    event?.latestStatus,
+    details?.status,
+    details?.statusCode,
+    details?.statusDescription,
+  )
+  const eventCode = pickAmazonWebhookText(
+    event?.eventCode,
+    event?.eventType,
+    event?.code,
+    details?.eventCode,
+    details?.eventType,
+    details?.code,
+  )
+  const eventTime = pickAmazonWebhookText(
+    event?.eventTime,
+    event?.eventDate,
+    event?.timestamp,
+    event?.eventTimestamp,
+    event?.updatedAt,
+    details?.eventTime,
+    details?.eventDate,
+    details?.timestamp,
+  )
+  const location = resolveAmazonWebhookLocation(
+    event?.location,
+    event?.eventLocation,
+    event?.currentLocation,
+    details?.location,
+    details?.eventLocation,
+    details?.currentLocation,
+  )
+  const remarks = pickAmazonWebhookText(
+    event?.eventDescription,
+    event?.statusDescription,
+    event?.message,
+    event?.description,
+    details?.eventDescription,
+    details?.statusDescription,
+    details?.message,
+    details?.description,
+  )
+
+  return {
+    event,
+    trackingId,
+    shipmentId,
+    orderRef,
+    status,
+    eventCode,
+    eventTime,
+    location,
+    remarks,
+    shippingPartyAccountId: pickAmazonWebhookText(
+      event?.shippingPartyAccountId,
+      event?.shipping_party_account_id,
+      details?.shippingPartyAccountId,
+      details?.shipping_party_account_id,
+    ),
+  }
+}
+
+export async function processAmazonShippingTrackingWebhook(payload: any, tx = db) {
+  const summary = getAmazonShippingWebhookSummary(payload)
+  const { trackingId, shipmentId, orderRef, status, eventCode, eventTime, location, remarks } =
+    summary
+
+  if (!trackingId && !shipmentId && !orderRef) {
+    return { success: false, reason: 'missing_awb' }
+  }
+
+  let resolved = { order: null as any, orderType: 'b2c' as 'b2c' | 'b2b' }
+  for (const identifier of [trackingId, shipmentId]) {
+    if (!identifier) continue
+    resolved = await findAmazonOrderByIdentifier(identifier, tx)
+    if (resolved.order) break
+  }
+  if (!resolved.order && orderRef) {
+    resolved = await findAmazonOrderByReference(orderRef, tx)
+  }
+
+  const order = resolved.order
+  const orderType = resolved.orderType
+  const primaryTrackingId = trackingId || shipmentId || orderRef
+  if (!order) {
+    console.warn(
+      `Amazon Shipping webhook: order not found for tracking ${trackingId || 'N/A'} shipment ${
+        shipmentId || 'N/A'
+      } ref ${orderRef || 'N/A'}`,
+    )
+    return { success: false, reason: 'order_not_found' }
+  }
+
+  const internalStatus = mapAmazonShippingWebhookStatus(status, eventCode)
+  const previousStatus = String(order.order_status || '').trim().toLowerCase()
+  const providerMeta =
+    isAmazonWebhookObject(order.provider_meta) ? { ...order.provider_meta } : {}
+
+  const updateData: any = {
+    order_status: internalStatus,
+    delivery_location: truncateAmazonWebhookText(location, 100) || null,
+    delivery_message: truncateAmazonWebhookText(remarks || status, 100) || null,
+    provider_last_status: truncateAmazonWebhookText(status || eventCode || internalStatus, 80) || null,
+    provider_meta: {
+      ...providerMeta,
+      amazon_tracking_webhook: payload,
+      amazon_last_event_time: eventTime || null,
+      amazon_shipping_party_account_id: summary.shippingPartyAccountId || null,
+    },
+    updated_at: new Date(),
+  }
+
+  if (orderType === 'b2c' && internalStatus === 'pickup_initiated') {
+    updateData.pickup_status = 'pickup_initiated'
+    updateData.pickup_error = null
+    updateData.manifest_error = null
+  }
+
+  await tx.transaction(async (innerTx: any) => {
+    if (orderType === 'b2b') {
+      await innerTx.update(b2b_orders).set(updateData).where(eq(b2b_orders.id, order.id))
+    } else {
+      await innerTx.update(b2c_orders).set(updateData).where(eq(b2c_orders.id, order.id))
+      await syncShopifyStatusForLocalOrder({ ...order, ...updateData }, innerTx).catch((err) => {
+        console.warn('Failed Shopify status sync for Amazon Shipping webhook:', err)
+      })
+      await syncWooCommerceTrackingNoteForLocalOrder({ ...order, ...updateData }, innerTx, {
+        source: 'amazon_shipping_webhook',
+      }).catch((err) => {
+        console.warn('Failed WooCommerce tracking note sync for Amazon Shipping webhook:', err)
+      })
+
+      try {
+        await logTrackingEvent({
+          orderId: order.id,
+          userId: order.user_id,
+          awbNumber: order.awb_number || primaryTrackingId,
+          courier: 'Amazon Shipping',
+          statusCode: truncateAmazonWebhookText(eventCode || status || internalStatus, 80),
+          statusText: truncateAmazonWebhookText(status || remarks || internalStatus, 200),
+          location: truncateAmazonWebhookText(location, 120) || null,
+          raw: payload,
+        })
+      } catch (err: any) {
+        console.error('Failed to log Amazon Shipping tracking event:', err)
+      }
+    }
+  })
+
+  await sendWebhookEvent(order.user_id, 'tracking.updated', {
+    awb_number: order.awb_number || primaryTrackingId,
+    order_id: order.id,
+    order_number: order.order_number,
+    status: internalStatus,
+    raw_status: status || eventCode,
+    courier_partner: order.courier_partner || 'Amazon Shipping',
+    provider_reference: order.provider_reference || shipmentId || primaryTrackingId || null,
+    provider_request_id: order.provider_request_id || null,
+    location: location || null,
+    remarks: remarks || null,
+    event_time: eventTime || null,
+    shipping_party_account_id: summary.shippingPartyAccountId || null,
+  }).catch((err) => {
+    console.error('Failed to send Amazon Shipping tracking.updated webhook:', err)
+  })
+
+  if (internalStatus !== previousStatus) {
+    await sendWebhookEvent(order.user_id, amazonWebhookEventForStatus(internalStatus) as any, {
+      order_id: order.id,
+      order_number: order.order_number,
+      awb_number: order.awb_number || primaryTrackingId,
+      status: internalStatus,
+      raw_status: status || eventCode,
+      courier_partner: order.courier_partner || 'Amazon Shipping',
+      provider_reference: order.provider_reference || shipmentId || primaryTrackingId || null,
+      provider_request_id: order.provider_request_id || null,
+      location: location || null,
+      remarks: remarks || null,
+      order_type: orderType,
+    }).catch((err) => {
+      console.error('Failed to send Amazon Shipping status webhook:', err)
+    })
+  }
+
+  if (orderType === 'b2c') {
+    if (
+      ['ndr', 'undelivered'].includes(internalStatus) ||
+      hasNdrSignal(status, eventCode, remarks, location)
+    ) {
+      try {
+        await captureNdrEventFromWebhook({
+          order,
+          awbNumber: order.awb_number || primaryTrackingId,
+          status: internalStatus,
+          reason: remarks || status || null,
+          remarks: eventCode || status || null,
+          payload,
+          courierLabel: 'Amazon Shipping',
+          signalParts: [status, eventCode, remarks, location],
+        })
+      } catch (err) {
+        console.error('Failed to record NDR event (Amazon Shipping):', err)
+      }
+    }
+
+    if (internalStatus.startsWith('rto') && internalStatus !== previousStatus) {
+      try {
+        const rtoCharge = await applyRtoChargeOnce(tx, order, 'Amazon Shipping')
+        await recordRtoEvent({
+          orderId: order.id,
+          userId: order.user_id,
+          awbNumber: order.awb_number || primaryTrackingId,
+          status: internalStatus,
+          reason: remarks || status || null,
+          remarks: eventCode || status || null,
+          rtoCharges: rtoCharge,
+          payload,
+        })
+        await createNotificationService({
+          targetRole: 'user',
+          userId: order.user_id,
+          title: 'RTO update (Amazon Shipping)',
+          message: `Order ${order.order_number} status ${internalStatus}.`,
+        })
+        await createNotificationService({
+          targetRole: 'admin',
+          title: 'RTO event (Amazon Shipping)',
+          message: `User ${order.user_id} order ${order.order_number} ${internalStatus}`,
+        })
+      } catch (err) {
+        console.error('Failed to record RTO event (Amazon Shipping):', err)
+      }
+    }
+
+    if (internalStatus === 'delivered' && order.order_type === 'cod') {
+      try {
+        const { remittance, created } = await createCodRemittance({
+          orderId: order.id,
+          orderType: 'b2c',
+          userId: order.user_id,
+          orderNumber: order.order_number,
+          awbNumber: order.awb_number || primaryTrackingId,
+          courierPartner: 'Amazon Shipping',
+          codAmount: Number(order.order_amount ?? 0),
+          codCharges: Number(order.cod_charges ?? 0),
+          freightCharges: Number(order.freight_charges ?? order.shipping_charges ?? 0),
+          collectedAt: eventTime ? new Date(eventTime) : new Date(),
+        })
+
+        if (created) {
+          await createNotificationService({
+            targetRole: 'admin',
+            title: 'COD remittance created',
+            message: `Order ${order.order_number} (${order.awb_number || 'no AWB'}) created pending COD remittance of ${Number(
+              remittance.remittableAmount || 0,
+            ).toFixed(2)}.`,
+          })
+        }
+      } catch (err) {
+        console.error(
+          `Failed to create COD remittance for Amazon Shipping order ${order.order_number}:`,
+          err,
+        )
+      }
+    }
+
+    if (internalStatus === 'cancelled') {
+      await applyCancellationRefundOnce(tx, order, 'amazon_shipping_webhook')
+    }
+  }
+
+  return { success: true, orderType }
+}
+
+const mapShadowfaxWebhookStatus = (statusRaw: unknown, requestId?: string | null) => {
+  const normalized = String(statusRaw || '').trim().toLowerCase()
+  const reverseLike = String(requestId || '').toUpperCase().startsWith('R')
+
+  const mapping: Record<string, string> = {
+    new: 'booked',
+    assigned_for_seller_pickup: 'pickup_initiated',
+    assigned_for_pickup: 'pickup_initiated',
+    ofp: 'pickup_initiated',
+    picked: 'pickup_initiated',
+    received_from_client_warehouse: 'pickup_initiated',
+    recd_at_rev_hub: 'in_transit',
+    item_manifested: 'in_transit',
+    recd_at_fwd_dc: 'in_transit',
+    recd_at_fwd_hub: 'in_transit',
+    assigned_for_delivery: 'out_for_delivery',
+    ofd: 'out_for_delivery',
+    delivered: 'delivered',
+    cid: 'ndr',
+    seller_initiated_delay: 'ndr',
+    seller_not_contactable: 'ndr',
+    nc: 'ndr',
+    na: 'ndr',
+    on_hold: 'ndr',
+    pickup_on_hold: 'ndr',
+    pickup_not_attempted: 'ndr',
+    cancelled_by_customer: 'cancelled',
+    cancelled_by_seller: 'cancelled',
+    rts: reverseLike ? 'in_transit' : 'rto',
+    rto: 'rto',
+    rts_in_process: 'rto_in_transit',
+    rts_ofd: 'rto_in_transit',
+    in_transit_return: 'rto_in_transit',
+    rts_d: 'rto_delivered',
+    rto_d: 'rto_delivered',
+    rts_nd: 'rto',
+    lost: 'lost',
+    item_misrouted: 'in_transit',
+    pincode_updated: 'in_transit',
+    returned_to_client: 'rto_delivered',
+  }
+
+  return mapping[normalized] || (reverseLike ? 'in_transit' : 'in_transit')
+}
+
+const shadowfaxWebhookEventForStatus = (status: string) => {
+  if (status === 'delivered') return 'order.delivered'
+  if (status === 'cancelled') return 'order.cancelled'
+  if (['ndr', 'undelivered', 'lost'].includes(status)) return 'order.failed'
+  if (status.startsWith('rto')) return 'order.rto'
+  if (['pickup_initiated', 'in_transit', 'out_for_delivery'].includes(status)) return 'order.shipped'
+  return 'order.updated'
+}
+
+const parseShadowfaxNumeric = (value: unknown): number | undefined => {
+  if (value === null || value === undefined || value === '') return undefined
+  if (typeof value === 'number') return Number.isFinite(value) ? value : undefined
+
+  const match = String(value).replace(/,/g, '').match(/-?\d+(\.\d+)?/)
+  if (!match) return undefined
+
+  const parsed = Number(match[0])
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+const collectShadowfaxValuesByKeys = (
+  node: any,
+  keys: Set<string>,
+  seen = new WeakSet<object>(),
+): any[] => {
+  if (!node || typeof node !== 'object') return []
+  if (seen.has(node)) return []
+  seen.add(node)
+
+  if (Array.isArray(node)) {
+    return node.flatMap((item) => collectShadowfaxValuesByKeys(item, keys, seen))
+  }
+
+  const values: any[] = []
+  for (const [key, value] of Object.entries(node)) {
+    if (keys.has(key.toLowerCase())) {
+      values.push(value)
+    }
+    if (value && typeof value === 'object') {
+      values.push(...collectShadowfaxValuesByKeys(value, keys, seen))
+    }
+  }
+
+  return values
+}
+
+const pickFirstShadowfaxNumber = (...values: unknown[]) => {
+  for (const value of values) {
+    const parsed = parseShadowfaxNumeric(value)
+    if (parsed !== undefined) return parsed
+  }
+  return undefined
+}
+
+const extractShadowfaxWeightSnapshot = (payload: any) => {
+  const chargedWeight = pickFirstShadowfaxNumber(
+    ...collectShadowfaxValuesByKeys(
+      payload,
+      new Set([
+        'charged_weight',
+        'chargeable_weight',
+        'chargedweight',
+        'chargeableweight',
+        'billing_weight',
+        'billed_weight',
+      ]),
+    ),
+  )
+  const actualWeight = pickFirstShadowfaxNumber(
+    ...collectShadowfaxValuesByKeys(
+      payload,
+      new Set(['actual_weight', 'dead_weight', 'pickup_weight', 'physical_weight', 'scanned_weight']),
+    ),
+  )
+  const volumetricWeight = pickFirstShadowfaxNumber(
+    ...collectShadowfaxValuesByKeys(
+      payload,
+      new Set(['volumetric_weight', 'vol_weight', 'volumetricweight']),
+    ),
+  )
+  const remarks = collectShadowfaxValuesByKeys(
+    payload,
+    new Set(['weight_remarks', 'weight_remark', 'weight_message', 'weight_comment']),
+  )
+    .map((value) => String(value || '').trim())
+    .find(Boolean)
+
+  return {
+    chargedWeight,
+    actualWeight,
+    volumetricWeight,
+    remarks: remarks || undefined,
+  }
+}
+
+export async function processShadowfaxWebhook(payload: any, tx = db) {
+  const event = payload || {}
+  const awb =
+    event?.awb_number ||
+    event?.client_request_id ||
+    event?.request_id ||
+    event?.order_id ||
+    null
+  const orderRef = event?.order_id || event?.client_order_id || null
+  const statusRaw = event?.event || event?.status || event?.current_status || ''
+  const location = event?.current_location || event?.location || null
+  const remarks = event?.comments || event?.message || null
+
+  console.log('🔄 processShadowfaxWebhook:start', {
+    awb: awb || null,
+    orderRef: orderRef || null,
+    statusRaw: String(statusRaw || ''),
+    eventTimestamp:
+      event?.shadowfax_event_timestamp ||
+      event?.event_timestamp ||
+      event?.event_time ||
+      event?.timestamp ||
+      null,
+    payloadKeys: Object.keys(event || {}),
+  })
+
+  if (!awb && !orderRef) return { success: false, reason: 'missing_awb' }
+
+  let order: any
+  let orderType: 'b2c' | 'b2b' = 'b2c'
+  if (awb) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.awb_number, String(awb)))
+  }
+  if (!order && awb) {
+    ;[order] = await tx
+      .select()
+      .from(b2c_orders)
+      .where(eq(b2c_orders.provider_reference, String(awb)))
+  }
+  if (!order && awb) {
+    ;[order] = await tx
+      .select()
+      .from(b2c_orders)
+      .where(eq(b2c_orders.provider_request_id, String(awb)))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx
+      .select()
+      .from(b2c_orders)
+      .where(eq(b2c_orders.order_number, String(orderRef)))
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2c_orders).where(eq(b2c_orders.order_id, String(orderRef)))
+  }
+  if (!order && awb) {
+    ;[order] = await tx
+      .select()
+      .from(b2b_orders)
+      .where(eq(b2b_orders.awb_number, String(awb)))
+    if (order) orderType = 'b2b'
+  }
+  if (!order && awb) {
+    ;[order] = await tx
+      .select()
+      .from(b2b_orders)
+      .where(eq(b2b_orders.provider_reference, String(awb)))
+    if (order) orderType = 'b2b'
+  }
+  if (!order && awb) {
+    ;[order] = await tx
+      .select()
+      .from(b2b_orders)
+      .where(eq(b2b_orders.provider_request_id, String(awb)))
+    if (order) orderType = 'b2b'
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx
+      .select()
+      .from(b2b_orders)
+      .where(eq(b2b_orders.order_number, String(orderRef)))
+    if (order) orderType = 'b2b'
+  }
+  if (!order && orderRef) {
+    ;[order] = await tx.select().from(b2b_orders).where(eq(b2b_orders.order_id, String(orderRef)))
+    if (order) orderType = 'b2b'
+  }
+
+  if (!order) {
+    console.warn(`⚠️ No local order found for Shadowfax AWB ${awb || 'N/A'} ref ${orderRef || 'N/A'}`)
+    return { success: false, reason: 'order_not_found' }
+  }
+
+  const internalStatus = mapShadowfaxWebhookStatus(statusRaw, awb)
+  const shadowfaxWeight = extractShadowfaxWeightSnapshot(payload)
+  const shadowfaxProof = extractWeightProofFromWebhook(payload, 'shadowfax')
+  const existingProviderMeta =
+    order?.provider_meta && typeof order.provider_meta === 'object' && !Array.isArray(order.provider_meta)
+      ? order.provider_meta
+      : {}
+  const updateData: any = {
+    order_status: internalStatus,
+    delivery_location: location,
+    delivery_message: remarks || null,
+    provider_last_status: String(statusRaw || internalStatus || '').trim() || null,
+    provider_meta: {
+      ...existingProviderMeta,
+      shadowfax_tracking_webhook: payload,
+    },
+    updated_at: new Date(),
+  }
+
+  if (internalStatus === 'pickup_initiated') {
+    updateData.pickup_status = 'pickup_initiated'
+    updateData.pickup_error = null
+    updateData.manifest_error = null
+  }
+
+  if (shadowfaxWeight.chargedWeight !== undefined) {
+    updateData.charged_weight = shadowfaxWeight.chargedWeight
+  }
+  if (shadowfaxWeight.actualWeight !== undefined) {
+    updateData.actual_weight = shadowfaxWeight.actualWeight
+  }
+  if (shadowfaxWeight.volumetricWeight !== undefined) {
+    updateData.volumetric_weight = shadowfaxWeight.volumetricWeight
+  }
+
+  const declaredWeight = Number(order.weight || 0)
+  console.log('🔄 processShadowfaxWebhook:resolved-order', {
+    orderType,
+    orderId: order.id,
+    orderNumber: order.order_number,
+    awb: order.awb_number || awb || null,
+    previousStatus: String(order.order_status || ''),
+    internalStatus,
+    declaredWeight,
+    providerReference: order.provider_reference || null,
+    providerRequestId: order.provider_request_id || null,
+  })
+
+  console.log('⚖️ Shadowfax webhook weight snapshot', {
+    orderNumber: order.order_number,
+    awb: order.awb_number || awb || null,
+    declaredWeight,
+    actualWeight: shadowfaxWeight.actualWeight ?? null,
+    volumetricWeight: shadowfaxWeight.volumetricWeight ?? null,
+    chargedWeight: shadowfaxWeight.chargedWeight ?? null,
+    proofUrl: shadowfaxProof.weightSlipUrl || null,
+    proofImagesCount: Array.isArray(shadowfaxProof.weightImages)
+      ? shadowfaxProof.weightImages.length
+      : 0,
+  })
+
+  if (
+    shadowfaxWeight.chargedWeight !== undefined &&
+    declaredWeight > 0 &&
+    Math.abs(shadowfaxWeight.chargedWeight - declaredWeight) > 0.01
+  ) {
+    updateData.weight_discrepancy = true
+
+    try {
+      await createWeightDiscrepancy({
+        orderType,
+        orderId: order.id,
+        userId: order.user_id,
+        orderNumber: order.order_number,
+        awbNumber: order.awb_number || String(awb || '') || undefined,
+        courierPartner: 'Shadowfax',
+        declaredWeight,
+        actualWeight: shadowfaxWeight.actualWeight,
+        volumetricWeight: shadowfaxWeight.volumetricWeight,
+        chargedWeight: shadowfaxWeight.chargedWeight,
+        declaredDimensions: {
+          length: Number(order.length || 0),
+          breadth: Number(order.breadth || 0),
+          height: Number(order.height || 0),
+        },
+        originalShippingCharge: Number(order.shipping_charges || order.freight_charges || 0),
+        courierRemarks: shadowfaxWeight.remarks || remarks || null,
+        courierWeightSlipUrl: shadowfaxProof.weightSlipUrl,
+        courierWeightProofImages: shadowfaxProof.weightImages,
+        weighingMetadata: shadowfaxProof.metadata as any,
+      })
+      console.log(
+        `⚖️ Shadowfax weight discrepancy detected for ${orderType} order ${order.order_number}: ${declaredWeight} -> ${shadowfaxWeight.chargedWeight}`,
+      )
+    } catch (err) {
+      console.error('❌ Failed to create Shadowfax weight discrepancy:', err)
+    }
+  }
+
+  console.log('🔄 processShadowfaxWebhook:updateData', {
+    orderNumber: order.order_number,
+    awb: order.awb_number || awb || null,
+    orderType,
+    updateData,
+  })
+
+  const previousStatus = String(order.order_status || '').trim().toLowerCase()
+
+  await tx.transaction(async (innerTx) => {
+    if (orderType === 'b2b') {
+      await innerTx.update(b2b_orders).set(updateData).where(eq(b2b_orders.id, order.id))
+    } else {
+      await innerTx.update(b2c_orders).set(updateData).where(eq(b2c_orders.id, order.id))
+      await syncShopifyStatusForLocalOrder({ ...order, ...updateData }, innerTx).catch((err) => {
+        console.warn('⚠️ Failed Shopify status sync for Shadowfax webhook:', err)
+      })
+      await syncWooCommerceTrackingNoteForLocalOrder({ ...order, ...updateData }, innerTx, {
+        source: 'shadowfax_webhook',
+      }).catch((err) => {
+        console.warn('Failed WooCommerce tracking note sync for Shadowfax webhook:', err)
+      })
+
+      try {
+        await logTrackingEvent({
+          orderId: order.id,
+          userId: order.user_id,
+          awbNumber: order.awb_number || String(awb || ''),
+          courier: 'Shadowfax',
+          statusCode: String(statusRaw || internalStatus),
+          statusText: String(event?.status || statusRaw || internalStatus),
+          location,
+          raw: payload,
+        })
+      } catch (err: any) {
+        console.error('❌ Failed to log Shadowfax tracking event:', err)
+      }
+    }
+  })
+
+  await sendWebhookEvent(order.user_id, 'tracking.updated', {
+    awb_number: order.awb_number || String(awb || ''),
+    order_id: order.id,
+    order_number: order.order_number,
+    status: internalStatus,
+    raw_status: statusRaw,
+    courier_partner: order.courier_partner || 'Shadowfax',
+    provider_reference: order.provider_reference || awb || null,
+    provider_request_id: order.provider_request_id || awb || null,
+    location,
+    remarks,
+  }).catch((err) => {
+    console.error('❌ Failed to send Shadowfax tracking.updated webhook:', err)
+  })
+
+  const shouldEmitGenericStatusWebhook = !(
+    orderType === 'b2c' && internalStatus.startsWith('rto')
+  )
+
+  if (internalStatus !== previousStatus && shouldEmitGenericStatusWebhook) {
+    await sendWebhookEvent(order.user_id, shadowfaxWebhookEventForStatus(internalStatus) as any, {
+      order_id: order.id,
+      order_number: order.order_number,
+      awb_number: order.awb_number || String(awb || ''),
+      status: internalStatus,
+      raw_status: statusRaw,
+      courier_partner: order.courier_partner || 'Shadowfax',
+      provider_reference: order.provider_reference || awb || null,
+      provider_request_id: order.provider_request_id || awb || null,
+      location,
+      remarks,
+      order_type: orderType,
+    }).catch((err) => {
+      console.error('❌ Failed to send Shadowfax status webhook:', err)
+    })
+  }
+
+  if (orderType === 'b2c') {
+    if (
+      ['ndr', 'undelivered'].includes(internalStatus) ||
+      hasNdrSignal(statusRaw, remarks, event?.status, location)
+    ) {
+      try {
+        await captureNdrEventFromWebhook({
+          order,
+          awbNumber: order.awb_number || String(awb || ''),
+          status: internalStatus,
+          reason: remarks || null,
+          remarks: String(event?.status || statusRaw || internalStatus),
+          payload,
+          courierLabel: 'Shadowfax',
+          signalParts: [statusRaw, remarks, event?.status, location],
+        })
+      } catch (err) {
+        console.error('❌ Failed to capture Shadowfax NDR event:', err)
+      }
+    }
+
+    if (internalStatus.startsWith('rto') && internalStatus !== previousStatus) {
+      try {
+        const rtoCharge = await applyRtoChargeOnce(tx, order, 'Shadowfax')
+        await recordRtoEvent({
+          orderId: order.id,
+          userId: order.user_id,
+          awbNumber: order.awb_number || String(awb || ''),
+          status: internalStatus,
+          reason: remarks || null,
+          remarks: String(event?.status || statusRaw || internalStatus),
+          rtoCharges: rtoCharge,
+          payload,
+        })
+        await createNotificationService({
+          targetRole: 'user',
+          userId: order.user_id,
+          title: 'RTO update (Shadowfax)',
+          message: `Order ${order.order_number} status ${internalStatus}.`,
+        })
+        await createNotificationService({
+          targetRole: 'admin',
+          title: 'RTO event (Shadowfax)',
+          message: `User ${order.user_id} order ${order.order_number} ${internalStatus}`,
+        })
+      } catch (err) {
+        console.error('❌ Failed to capture Shadowfax RTO event:', err)
+      }
+    }
+
+    if (internalStatus === 'delivered' && order.order_type === 'cod') {
+      try {
+        const { remittance, created } = await createCodRemittance({
+          orderId: order.id,
+          orderType: 'b2c',
+          userId: order.user_id,
+          orderNumber: order.order_number,
+          awbNumber: order.awb_number || String(awb || ''),
+          courierPartner: 'Shadowfax',
+          codAmount: Number(order.order_amount ?? 0),
+          codCharges: Number(order.cod_charges ?? 0),
+          freightCharges: Number(order.freight_charges ?? order.shipping_charges ?? 0),
+          collectedAt: new Date(),
+        })
+
+        if (created) {
+          await createNotificationService({
+            targetRole: 'admin',
+            title: 'COD remittance created',
+            message: `Order ${order.order_number} (${order.awb_number || 'no AWB'}) created pending COD remittance of INR ${Number(
+              remittance.remittableAmount || 0,
+            ).toFixed(2)}.`,
+          })
+        }
+      } catch (err) {
+        console.error(`Failed to create COD remittance for Shadowfax order ${order.order_number}:`, err)
+      }
+    }
+  }
+
+  console.log('✅ processShadowfaxWebhook:done', {
+    orderType,
+    orderId: order.id,
+    orderNumber: order.order_number,
+    awb: order.awb_number || awb || null,
+    finalStatus: internalStatus,
+  })
+  return { success: true, orderType }
+}

@@ -1,11 +1,14 @@
 {
-  "name": "admin",
+  "name": "kourier-boyz-admin-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev:logistics": "npm --prefix logistics run start",
+    "build:marketplace": "tsc -b && vite build",
+    "build:logistics": "npm --prefix logistics run build",
+    "build": "npm run build:marketplace && npm run build:logistics && node scripts/assemble-build.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

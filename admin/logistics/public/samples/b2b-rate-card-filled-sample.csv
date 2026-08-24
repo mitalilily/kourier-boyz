@@ -1,0 +1,6 @@
+origin_zone_code,destination_zone_code,rate_per_kg
+N1,N2,18.50
+N2,S1,24.75
+S1,N1,21.00
+N1,S1,23.25
+S1,N2,22.10

@@ -48,7 +48,7 @@ const TrackingModal = ({ open, onClose, orderId, shipment }: TrackingModalProps)
   const [error, setError] = useState<string | null>(null)
 
   // Compute AWB from shipment prop (always get fresh value)
-  const getAwb = () => shipment.shippingMeta?.awb || shipment.courierCart?.awb_number
+  const getAwb = () => shipment.shippingMeta?.awb || shipment.kourierBoyzLogistics?.awb_number
   const awb = getAwb()
   const courier = shipment.shippingMeta?.courier || 'Unknown'
   const platformStatus = shipment.status

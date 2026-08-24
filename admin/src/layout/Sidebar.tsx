@@ -65,6 +65,11 @@ const Sidebar = () => {
         icon: <DashboardOutlined />,
         label: 'Dashboard',
       },
+      {
+        key: '/logistics/',
+        icon: <TruckOutlined />,
+        label: 'Logistics Admin',
+      },
       { type: 'divider' },
 
       // 2. Order Lifecycle
@@ -366,6 +371,11 @@ const Sidebar = () => {
           icon: <DashboardOutlined />,
           label: 'Dashboard',
         },
+        {
+          key: '/logistics/',
+          icon: <TruckOutlined />,
+          label: 'Logistics Admin',
+        },
       ]
     }
 
@@ -373,7 +383,7 @@ const Sidebar = () => {
       .map((item) => {
         if (!item || item.type === 'divider') return item
 
-        if (item.key === 'logout') return item
+        if (item.key === 'logout' || item.key === '/logistics/') return item
 
         if ('children' in item && item.children) {
           const filteredChildren = item.children.filter(
@@ -450,6 +460,11 @@ const Sidebar = () => {
   }, [location.pathname])
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === '/logistics/') {
+      window.location.assign('/logistics/')
+      return
+    }
+
     if (key === 'logout') {
       logout()
       window.location.href = '/login'
@@ -551,10 +566,18 @@ const Sidebar = () => {
         style={{ flexShrink: 0 }}
       >
         {collapsed ? (
-          <img src="/logo.png" alt="Kourier Boyz" className="h-8 w-auto object-contain" />
+          <img
+            src="/brand/kourier-boyz-logo-nav-cropped.png"
+            alt="Kourier Boyz"
+            className="h-10 w-auto object-contain"
+          />
         ) : (
           <div className="flex items-center space-x-2">
-            <img src="/logo.png" alt="Kourier Boyz" className="h-8 w-auto object-contain" />
+            <img
+              src="/brand/kourier-boyz-logo-nav-cropped.png"
+              alt="Kourier Boyz"
+              className="h-10 w-auto object-contain"
+            />
             <div className="flex flex-col">
               <span className="font-bold text-xl text-white tracking-tight">Kourier Boyz</span>
               <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">

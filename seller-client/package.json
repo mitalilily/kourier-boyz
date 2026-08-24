@@ -1,0 +1,15 @@
+{
+  "name": "kourier-boyz-seller-client",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev:logistics": "npm run dev --prefix apps/logistics",
+    "dev:marketplace": "npm run dev --prefix apps/marketplace",
+    "build:logistics": "npm run build --prefix apps/logistics",
+    "build:marketplace": "npm run build --prefix apps/marketplace",
+    "build": "npm run build:logistics && npm run build:marketplace && node scripts/assemble-build.mjs",
+    "test": "npm run test --prefix apps/logistics",
+    "lint:logistics": "npm run lint --prefix apps/logistics",
+    "lint:marketplace": "npm run lint --prefix apps/marketplace"
+  }
+}

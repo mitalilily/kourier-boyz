@@ -343,7 +343,7 @@ const AdminOrderDetail = () => {
   }
 
   const hasShippingDetails = (shipment: AdminSellerShipment) => {
-    return !!(shipment.shippingMeta?.awb || shipment.courierCart?.awb_number)
+    return !!(shipment.shippingMeta?.awb || shipment.kourierBoyzLogistics?.awb_number)
   }
 
   const canCancelOrder = useCallback((order: AdminOrder): boolean => {
@@ -359,13 +359,13 @@ const AdminOrderDetail = () => {
       return false
     }
 
-    // If any seller shipment already has an AWB (either in shippingMeta or courierCart),
+    // If any seller shipment already has an AWB (either in shippingMeta or kourierBoyzLogistics),
     // treat the order as non‑cancellable
     if (order.sellerShipments && order.sellerShipments.length > 0) {
       const hasAwb = order.sellerShipments.some((shipment) => {
         const awbFromMeta = shipment?.shippingMeta?.awb
-        const awbFromCourierCart = shipment?.courierCart?.awb_number
-        return Boolean(awbFromMeta || awbFromCourierCart)
+        const awbFromKourierBoyzLogistics = shipment?.kourierBoyzLogistics?.awb_number
+        return Boolean(awbFromMeta || awbFromKourierBoyzLogistics)
       })
 
       if (hasAwb) {
@@ -1133,20 +1133,20 @@ const AdminOrderDetail = () => {
                     </Tag>
                   </Descriptions.Item>
                   <Descriptions.Item label="AWB">
-                    {shipment.shippingMeta?.awb || shipment.courierCart?.awb_number || 'NA'}
+                    {shipment.shippingMeta?.awb || shipment.kourierBoyzLogistics?.awb_number || 'NA'}
                   </Descriptions.Item>
                   <Descriptions.Item label="Courier">
                     {shipment.shippingMeta?.courier || 'NA'}
                   </Descriptions.Item>
-                  {shipment.courierCart?.rate && (
+                  {shipment.kourierBoyzLogistics?.rate && (
                     <Descriptions.Item label="Shipping Charge">
-                      ₹{shipment.courierCart.rate.toFixed(2)}
+                      ₹{shipment.kourierBoyzLogistics.rate.toFixed(2)}
                     </Descriptions.Item>
                   )}
                   {(shipment.shippingMeta?.tracking_link ||
-                    shipment.courierCart?.tracking_link ||
+                    shipment.kourierBoyzLogistics?.tracking_link ||
                     shipment.shippingMeta?.awb ||
-                    shipment.courierCart?.awb_number ||
+                    shipment.kourierBoyzLogistics?.awb_number ||
                     shipment.shareableTrackingLink) && (
                     <Descriptions.Item label="Tracking">
                       <Space direction="vertical" size="small" style={{ width: '100%' }}>
@@ -1185,11 +1185,11 @@ const AdminOrderDetail = () => {
                           </div>
                         )}
                         {(shipment.shippingMeta?.tracking_link ||
-                          shipment.courierCart?.tracking_link) && (
+                          shipment.kourierBoyzLogistics?.tracking_link) && (
                           <a
                             href={
                               shipment.shippingMeta?.tracking_link ||
-                              shipment.courierCart?.tracking_link
+                              shipment.kourierBoyzLogistics?.tracking_link
                             }
                             target="_blank"
                             rel="noopener noreferrer"

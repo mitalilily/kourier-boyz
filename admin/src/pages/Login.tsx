@@ -1,4 +1,11 @@
-import { LockOutlined, MailOutlined, SafetyOutlined } from '@ant-design/icons'
+import {
+  BarChartOutlined,
+  LockOutlined,
+  MailOutlined,
+  SafetyOutlined,
+  ShopOutlined,
+  TruckOutlined,
+} from '@ant-design/icons'
 import { Button, Card, Form, Input, message, Typography } from 'antd'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -21,9 +28,6 @@ const Login = () => {
 
   const onFinish = (values: { email: string; password: string }) => {
     loginMutation.mutate(values, {
-      onSuccess: () => {
-        // Navigation will happen automatically via useEffect
-      },
       onError: (err: unknown) => {
         const axiosError = err as { response?: { data?: { error?: string } } }
         message.error(axiosError.response?.data?.error || 'Login failed')
@@ -32,146 +36,143 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 relative overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-white rounded-full mix-blend-overlay animate-[float_6s_ease-in-out_infinite]"></div>
-          <div className="absolute top-40 right-20 w-96 h-96 bg-white rounded-full mix-blend-overlay animate-[float_8s_ease-in-out_infinite_2s]"></div>
-          <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-white rounded-full mix-blend-overlay animate-[float_7s_ease-in-out_infinite_4s]"></div>
-        </div>
+    <main className="min-h-screen flex bg-[#f5f6f4]">
+      <section className="hidden lg:flex lg:w-[52%] relative overflow-hidden bg-[#202321] text-white">
+        <div
+          className="absolute inset-0 opacity-70"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(207,211,209,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(207,211,209,0.08) 1px, transparent 1px), repeating-linear-gradient(135deg, transparent 0 52px, rgba(223,183,67,0.08) 52px 54px)',
+            backgroundSize: '44px 44px, 44px 44px, 120px 120px',
+          }}
+        />
+        <div className="absolute inset-y-0 right-0 w-1 bg-[#d8b24a]" />
 
-        {/* Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center w-full p-12 text-white">
-          <div className="max-w-md text-center space-y-8">
-            <div>
-              <img
-                src="/logo-shaded.png"
-                alt="Kourier Boyz"
-                className="h-20 w-auto object-contain mb-4 mx-auto"
-                style={{
-                  aspectRatio: 'auto',
-                  maxWidth: '100%',
-                  height: 'auto',
-                  objectFit: 'contain',
-                  transform: 'none',
-                }}
-              />
-              <p className="text-xl text-white/90 tracking-wide">Admin Dashboard</p>
+        <div className="relative z-10 flex w-full items-center justify-center px-14 py-12">
+          <div className="w-full max-w-xl">
+            <img
+              src="/brand/kourier-boyz-logo-nav-cropped.png"
+              alt="Kourier Boyz"
+              className="w-full max-w-[500px] object-contain"
+            />
+
+            <div className="mt-14 max-w-lg">
+              <p className="text-sm font-semibold uppercase text-[#dfb743]">
+                Unified operations
+              </p>
+              <h1 className="mt-3 text-4xl font-bold leading-tight text-white">
+                Every order, seller and shipment in one command center.
+              </h1>
+              <p className="mt-5 max-w-md text-base leading-7 text-[#ced2d0]">
+                Manage marketplace growth and courier performance with one secure Kourier Boyz
+                workspace.
+              </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 mt-12">
-              {[
-                { icon: '📊', text: 'Analytics' },
-                { icon: '📦', text: 'Orders' },
-                { icon: '👥', text: 'Users' },
-                { icon: '🏪', text: 'Products' },
-              ].map((feature, index) => (
-                <div
-                  key={index}
-                  className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/15 hover:scale-105 transition-all duration-300 cursor-default"
-                >
-                  <div className="text-3xl mb-2">{feature.icon}</div>
-                  <div className="text-sm font-medium">{feature.text}</div>
-                </div>
-              ))}
+            <div className="mt-12 grid grid-cols-3 border-y border-white/15">
+              <div className="py-5 pr-4">
+                <ShopOutlined className="text-xl text-[#dfb743]" />
+                <p className="mt-2 text-sm font-medium text-white">Marketplace</p>
+              </div>
+              <div className="border-x border-white/15 px-5 py-5">
+                <TruckOutlined className="text-xl text-[#dfb743]" />
+                <p className="mt-2 text-sm font-medium text-white">Logistics</p>
+              </div>
+              <div className="py-5 pl-5">
+                <BarChartOutlined className="text-xl text-[#dfb743]" />
+                <p className="mt-2 text-sm font-medium text-white">Performance</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 p-6">
+      <section
+        className="flex w-full items-center justify-center p-6 lg:w-[48%]"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 1px 1px, rgba(85,93,97,0.14) 1px, transparent 0)',
+          backgroundSize: '24px 24px',
+        }}
+      >
         <div className="w-full max-w-md">
-          {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-8">
+          <div className="mb-8 text-center lg:hidden">
             <img
-              src="/logo.png"
+              src="/brand/kourier-boyz-logo-nav-cropped.png"
               alt="Kourier Boyz"
-              className="h-16 w-auto object-contain mx-auto mb-4"
-              style={{
-                aspectRatio: 'auto',
-                maxWidth: '100%',
-                height: 'auto',
-                objectFit: 'contain',
-                transform: 'none',
-              }}
+              className="mx-auto w-full max-w-[330px] object-contain"
             />
           </div>
 
           <Card
-            className="shadow-xl border-0 rounded-2xl overflow-hidden"
+            className="overflow-hidden rounded-lg border border-[#d9dcda] shadow-[0_24px_70px_rgba(32,35,33,0.12)]"
             styles={{ body: { padding: '2.5rem' } }}
           >
-            {/* Header */}
-            <div className="text-center mb-8">
-              <Title level={2} className="!mb-2 !text-3xl !font-bold">
-                Welcome Back
+            <div className="mb-8">
+              <Text className="text-sm font-semibold uppercase !text-[#9b7119]">
+                Administration
+              </Text>
+              <Title level={2} className="!mb-2 !mt-2 !text-3xl !font-bold !text-[#202321]">
+                Welcome back
               </Title>
-              <Text className="text-gray-500 text-base">
-                Sign in to access your admin dashboard
+              <Text className="text-base !text-[#626966]">
+                Sign in with your authorized admin account.
               </Text>
             </div>
 
-            {/* Form */}
             <Form form={form} layout="vertical" onFinish={onFinish} size="large">
               <Form.Item
                 name="email"
+                label="Email address"
                 rules={[
                   { required: true, message: 'Please enter your email' },
                   { type: 'email', message: 'Please enter a valid email' },
                 ]}
               >
                 <Input
-                  prefix={<MailOutlined className="text-gray-400" />}
-                  placeholder="Email address"
-                  className="h-12 rounded-lg"
+                  prefix={<MailOutlined className="text-[#7f8783]" />}
+                  placeholder="admin@kourierboyz.com"
+                  className="h-12 rounded-md border-[#ced2d0]"
                 />
               </Form.Item>
 
               <Form.Item
                 name="password"
+                label="Password"
                 rules={[{ required: true, message: 'Please enter your password' }]}
               >
                 <Input.Password
-                  prefix={<LockOutlined className="text-gray-400" />}
-                  placeholder="Password"
-                  className="h-12 rounded-lg"
+                  prefix={<LockOutlined className="text-[#7f8783]" />}
+                  placeholder="Enter your password"
+                  className="h-12 rounded-md border-[#ced2d0]"
                 />
               </Form.Item>
 
-              <Form.Item className="!mb-0">
+              <Form.Item className="!mb-0 !mt-7">
                 <Button
                   type="primary"
                   htmlType="submit"
                   block
                   loading={loginMutation.isPending}
-                  className="h-12 text-base font-semibold rounded-lg bg-blue-600 border-0 hover:bg-blue-700 transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
+                  className="h-12 rounded-md border-0 !bg-[#b78115] text-base font-semibold !text-white shadow-[0_10px_28px_rgba(183,129,21,0.22)] transition-all duration-300 hover:!-translate-y-0.5 hover:!bg-[#8f650f]"
                 >
-                  {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
+                  {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
                 </Button>
               </Form.Item>
             </Form>
 
-            {/* Footer */}
-            <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-center gap-2 text-gray-500">
-              <SafetyOutlined />
-              <Text type="secondary" className="text-sm">
-                Secure admin access only
-              </Text>
+            <div className="mt-8 flex items-center justify-center gap-2 border-t border-[#e4e7e5] pt-6">
+              <SafetyOutlined className="text-[#8f650f]" />
+              <Text className="text-sm !text-[#626966]">Secure admin access</Text>
             </div>
           </Card>
 
-          {/* Additional Info */}
-          <div className="mt-6 text-center">
-            <Text type="secondary" className="text-xs">
-              © 2025 KOURIER_BOYZ. All rights reserved.
-            </Text>
-          </div>
+          <p className="mt-6 text-center text-xs text-[#7f8783]">
+            &copy; {new Date().getFullYear()} Kourier Boyz. All rights reserved.
+          </p>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }
 

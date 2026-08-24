@@ -1,0 +1,79 @@
+[
+  {
+    "code": "N1",
+    "name": "North One",
+    "description": "Delhi, Uttar Pradesh, Haryana, and Rajasthan coverage zone",
+    "states": ["Delhi", "Uttar Pradesh", "Haryana", "Rajasthan"]
+  },
+  {
+    "code": "N2",
+    "name": "North Two",
+    "description": "Chandigarh, Punjab, Himachal Pradesh, Uttarakhand, Jammu and Kashmir, and Ladakh coverage zone",
+    "states": [
+      "Chandigarh",
+      "Punjab",
+      "Himachal Pradesh",
+      "Uttarakhand",
+      "Jammu and Kashmir",
+      "Ladakh"
+    ]
+  },
+  {
+    "code": "E",
+    "name": "East",
+    "description": "West Bengal, Odisha, Bihar, and Jharkhand coverage zone",
+    "states": ["West Bengal", "Odisha", "Bihar", "Jharkhand"]
+  },
+  {
+    "code": "NE",
+    "name": "North East",
+    "description": "North East and Sikkim coverage zone",
+    "states": [
+      "Assam",
+      "Meghalaya",
+      "Tripura",
+      "Arunachal Pradesh",
+      "Mizoram",
+      "Manipur",
+      "Nagaland",
+      "Sikkim",
+      "Andaman and Nicobar Islands"
+    ]
+  },
+  {
+    "code": "W1",
+    "name": "West One",
+    "description": "Gujarat and Dadra and Nagar Haveli and Daman and Diu coverage zone",
+    "states": ["Gujarat", "Dadra and Nagar Haveli and Daman and Diu"]
+  },
+  {
+    "code": "W2",
+    "name": "West Two",
+    "description": "Maharashtra and Goa coverage zone",
+    "states": ["Maharashtra", "Goa"]
+  },
+  {
+    "code": "S1",
+    "name": "South One",
+    "description": "Andhra Pradesh, Telangana, Karnataka, Tamil Nadu, and Puducherry coverage zone",
+    "states": [
+      "Andhra Pradesh",
+      "Telangana",
+      "Karnataka",
+      "Tamil Nadu",
+      "Puducherry"
+    ]
+  },
+  {
+    "code": "S2",
+    "name": "South Two",
+    "description": "Kerala coverage zone",
+    "states": ["Kerala"]
+  },
+  {
+    "code": "Central",
+    "name": "Central",
+    "description": "Madhya Pradesh and Chhattisgarh coverage zone",
+    "states": ["Madhya Pradesh", "Chhattisgarh"]
+  }
+]

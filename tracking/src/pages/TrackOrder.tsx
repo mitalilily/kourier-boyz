@@ -53,7 +53,7 @@ interface TrackingData {
     courier?: string
     trackingEvents: TrackingEvent[]
   }
-  courierCart: {
+  kourierBoyzLogistics: {
     awb_number: string
     order_number: string
     status: string
@@ -150,14 +150,14 @@ const TrackOrder = () => {
   if (trackingData) {
     // Add provider events first
     if (
-      trackingData.courierCart?.tracking_events &&
-      Array.isArray(trackingData.courierCart.tracking_events)
+      trackingData.kourierBoyzLogistics?.tracking_events &&
+      Array.isArray(trackingData.kourierBoyzLogistics.tracking_events)
     ) {
       console.log(
         '[TrackOrder] Provider events found:',
-        trackingData.courierCart.tracking_events.length,
+        trackingData.kourierBoyzLogistics.tracking_events.length,
       )
-      trackingData.courierCart.tracking_events.forEach((event: any) => {
+      trackingData.kourierBoyzLogistics.tracking_events.forEach((event: any) => {
         const processedEvent = {
           source: 'courier' as const,
           status: event.status_code || event.status || 'unknown',
@@ -170,8 +170,8 @@ const TrackOrder = () => {
       })
     } else {
       console.log('[TrackOrder] No provider tracking_events found', {
-        hasCourierCart: !!trackingData.courierCart,
-        trackingEvents: trackingData.courierCart?.tracking_events,
+        hasKourierBoyzLogistics: !!trackingData.kourierBoyzLogistics,
+        trackingEvents: trackingData.kourierBoyzLogistics?.tracking_events,
       })
     }
 
@@ -303,11 +303,11 @@ const TrackOrder = () => {
                   <div className="info-value">{trackingData.shipment.courier}</div>
                 </div>
               )}
-              {trackingData.courierCart?.estimated_delivery && (
+              {trackingData.kourierBoyzLogistics?.estimated_delivery && (
                 <div className="info-card">
                   <div className="info-label">Estimated Delivery</div>
                   <div className="info-value">
-                    {dayjs(trackingData.courierCart.estimated_delivery).format('DD MMM YYYY')}
+                    {dayjs(trackingData.kourierBoyzLogistics.estimated_delivery).format('DD MMM YYYY')}
                   </div>
                 </div>
               )}
@@ -409,14 +409,14 @@ const TrackOrder = () => {
             )}
 
             {/* Current Location */}
-            {trackingData.courierCart?.current_location && (
+            {trackingData.kourierBoyzLogistics?.current_location && (
               <div className="location-section">
                 <div className="section-header">
                   <h2 className="section-title">Current Location</h2>
                   <p className="section-subtitle">Last known location of your package</p>
                 </div>
                 <div className="location-card">
-                  <div className="location-value">{trackingData.courierCart.current_location}</div>
+                  <div className="location-value">{trackingData.kourierBoyzLogistics.current_location}</div>
                 </div>
               </div>
             )}

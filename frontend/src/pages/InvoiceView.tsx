@@ -62,7 +62,7 @@ type OrderWithSeller = Order & {
         country?: string
       }
     }
-    courierCart?: {
+    kourierBoyzLogistics?: {
       pickup_address?: {
         warehouseName?: string
         addressLine1: string
@@ -393,7 +393,7 @@ const InvoiceView = () => {
   const seller = orderWithSeller.sellerShipments?.[0]?.seller || orderWithSeller.seller
   const warehouseAddress =
     orderWithSeller.sellerShipments?.[0]?.shippingMeta?.pickup_address ||
-    orderWithSeller.sellerShipments?.[0]?.courierCart?.pickup_address ||
+    orderWithSeller.sellerShipments?.[0]?.kourierBoyzLogistics?.pickup_address ||
     null
 
   const invoiceDate = order.invoice.generated_at
