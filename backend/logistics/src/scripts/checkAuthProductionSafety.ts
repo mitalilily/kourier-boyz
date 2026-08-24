@@ -54,7 +54,7 @@ const phoneFormSource = fs.readFileSync(
 assert.doesNotMatch(authControllerSource, /console\.(?:log|info|warn|error)\([^\n]*demo otp/i)
 assert.doesNotMatch(otpFormSource, /console\.(?:log|info|warn|error)\([^\n]*demo otp/i)
 assert.doesNotMatch(phoneFormSource, /console\.(?:log|info|warn|error)\([^\n]*demo otp/i)
-assert.match(authControllerSource, /DEMO_AUTH_SHOW_OTP \?\? 'true'/)
+assert.match(authControllerSource, /const demoOtpEnabled = true/)
 assert.match(authControllerSource, /demoOtpEnabled && user && user\.role !== 'customer'/)
 assert.match(otpFormSource, /Demo access code/)
 assert.match(otpFormSource, /demoOtp/)

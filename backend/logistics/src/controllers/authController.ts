@@ -29,7 +29,6 @@ import { changeAdminPassword, loginAdmin } from '../models/services/adminAuth.se
 import { employees } from '../schema/schema'
 import { sendVerificationEmail } from '../utils/emailSender'
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt'
-import { isDemoOtpEnabled } from '../utils/demoAuth'
 
 const env = process.env.NODE_ENV || 'development'
 
@@ -39,7 +38,8 @@ dotenv.config({ path: path.resolve(__dirname, `../../.env.${env}`), override: tr
 const client = twilio(process.env.TWILIO_ACCOUNT_SID!, process.env.TWILIO_AUTH_TOKEN!)
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000
-const demoOtpEnabled = isDemoOtpEnabled(process.env.DEMO_AUTH_SHOW_OTP ?? 'true')
+// Temporary public demo: seller/customer OTP delivery stays onscreen until real auth is enabled.
+const demoOtpEnabled = true
 
 export const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString()
 

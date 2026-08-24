@@ -57,7 +57,9 @@ export default function OtpForm({ email, demoOtp: initialDemoOtp, onEditEmail }:
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    setDemoOtp(initialDemoOtp ?? null)
+    const nextDemoOtp = /^\d{6}$/.test(initialDemoOtp ?? '') ? initialDemoOtp! : null
+    setDemoOtp(nextDemoOtp)
+    setOtpDigits(nextDemoOtp ? nextDemoOtp.split('') : Array(OTP_LENGTH).fill(''))
     setResendEnabled(false)
     setSecondsLeft(OTP_RESEND_DELAY_MS / 1000)
 
@@ -144,8 +146,9 @@ export default function OtpForm({ email, demoOtp: initialDemoOtp, onEditEmail }:
 
     resendOtp(email.toLowerCase().trim(), {
       onSuccess: (response) => {
-        setOtpDigits(Array(OTP_LENGTH).fill(''))
-        setDemoOtp(response.demoOtp ?? null)
+        const nextDemoOtp = /^\d{6}$/.test(response.demoOtp ?? '') ? response.demoOtp! : null
+        setDemoOtp(nextDemoOtp)
+        setOtpDigits(nextDemoOtp ? nextDemoOtp.split('') : Array(OTP_LENGTH).fill(''))
         setError('')
         setResendEnabled(false)
         setSecondsLeft(OTP_RESEND_DELAY_MS / 1000)
