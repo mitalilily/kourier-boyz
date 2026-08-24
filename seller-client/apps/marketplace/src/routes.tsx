@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import SellerLayout from './layout/SellerLayout'
 import AgreementViewer from './pages/AgreementViewer'
@@ -40,7 +40,7 @@ import WaitingApproval from './pages/WaitingApproval'
 
 const AppRoutes = () => {
   return (
-    <BrowserRouter basename="/store">
+    <HashRouter>
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
@@ -115,7 +115,7 @@ const AppRoutes = () => {
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 

@@ -28,11 +28,6 @@ const Orders = lazy(() => import('../pages/orders/Orders'))
 const B2COrdersList = lazy(() => import('../components/orders/b2c/B2COrdersList'))
 const ReversePickups = lazy(() => import('../pages/orders/ReversePickups'))
 const B2bOrders = lazy(() => import('../pages/orders/B2bOrders'))
-const FtlOrders = lazy(() => import('../pages/orders/FtlOrders'))
-const InternationalOrders = lazy(() => import('../pages/orders/InternationalOrders'))
-const InternationalOrderCreatePage = lazy(
-  () => import('../pages/orders/InternationalOrderCreatePage'),
-)
 
 // Settings
 const Settings = lazy(() => import('../pages/settings/Settings'))
@@ -77,7 +72,6 @@ const RateCard = lazy(() => import('../pages/tools/RateCard'))
 const RateCalculator = lazy(() =>
   import('../pages/tools/RateCalculator').then((m) => ({ default: m.RateCalculator })),
 )
-const InternationalRateCalculator = lazy(() => import('../pages/tools/InternationalRateCalculator'))
 const OrderTrackingForm = lazy(() => import('../pages/tools/OrderTrackingForm'))
 
 // Support
@@ -217,27 +211,15 @@ export default function AppRoutes() {
             />
             <Route
               path="/orders/ftl"
-              element={
-                <RequireMerchantReady>
-                  <FtlOrders />
-                </RequireMerchantReady>
-              }
+              element={<Navigate to="/orders/list" replace />}
             />
             <Route
               path="/orders/international/list"
-              element={
-                <RequireMerchantReady>
-                  <InternationalOrders />
-                </RequireMerchantReady>
-              }
+              element={<Navigate to="/orders/list" replace />}
             />
             <Route
               path="/orders/international/create"
-              element={
-                <RequireMerchantReady>
-                  <InternationalOrderCreatePage />
-                </RequireMerchantReady>
-              }
+              element={<Navigate to="/orders/create" replace />}
             />
             <Route path="/settings/invoice_preferences" element={<InvoicePreferences />} />
             <Route path="/settings/label_config" element={<LabelSettingsPage />} />
@@ -265,7 +247,10 @@ export default function AppRoutes() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/tools/rate_card" element={<RateCard />} />
             <Route path="/tools/rate_calculator" element={<RateCalculator />} />
-            <Route path="/tools/international_rate_calculator" element={<InternationalRateCalculator />} />
+            <Route
+              path="/tools/international_rate_calculator"
+              element={<Navigate to="/tools/rate_calculator" replace />}
+            />
             <Route path="/tools/order_tracking" element={<OrderTrackingForm />} />
             <Route path="/support/tickets" element={<SupportTicketsPage />} />
             <Route path="/support/tickets/:id" element={<TicketDetailsPage />} />

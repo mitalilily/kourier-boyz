@@ -13,9 +13,7 @@ export const getSellerPanelUrl = (path = '/') => {
   const origin = cleanOrigin(configuredOrigin)
   const nextPath = cleanPath(path)
 
-  if (origin.endsWith('/store')) {
-    return `${origin}${nextPath === '/' ? '/' : nextPath}`
-  }
+  const storeOrigin = origin.endsWith('/store') ? origin : `${origin}/store`
 
-  return `${origin}/store${nextPath === '/' ? '/' : nextPath}`
+  return nextPath === '/' ? `${storeOrigin}/` : `${storeOrigin}/#${nextPath}`
 }

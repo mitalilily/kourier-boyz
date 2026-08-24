@@ -15,8 +15,7 @@ export default function Layout() {
   const { user } = useAuth()
   const isAdminWorkspace =
     user.role === 'admin' || user.role === 'employee' || Boolean(user.employeeId)
-  const isOrderCreatePage =
-    location.pathname === '/orders/create' || location.pathname === '/orders/international/create'
+  const isOrderCreatePage = location.pathname === '/orders/create'
 
   const handleDrawerToggle = () => {
     setMobileOpen((prev) => !prev)
@@ -57,7 +56,7 @@ export default function Layout() {
         >
           <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ flex: 1, overflowY: 'auto' }}>
-              <Sidebar role={isAdminWorkspace ? 'admin' : 'customer'} />
+              <Sidebar role={isAdminWorkspace ? 'admin' : 'customer'} pinned />
             </Box>
           </Box>
         </Drawer>

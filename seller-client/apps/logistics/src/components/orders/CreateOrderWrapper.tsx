@@ -1,14 +1,13 @@
 import { Box, Container, Tab, Tabs, Typography } from '@mui/material'
 import { useEffect, useState, type SyntheticEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import InternationalOrderForm from '../../pages/orders/InternationalOrderForm'
 import B2BOrderForm from './b2b/B2BOrderForm'
 import B2COrderFormSteps from './b2c/B2COrderForm'
 
-type CreateOrderType = 'b2c' | 'b2b' | 'international'
+type CreateOrderType = 'b2c' | 'b2b'
 
 const getRequestedOrderType = (value: string | null): CreateOrderType =>
-  value === 'b2b' || value === 'international' ? value : 'b2c'
+  value === 'b2b' ? value : 'b2c'
 
 const CreateOrderWrapper = () => {
   const [searchParams] = useSearchParams()
@@ -84,17 +83,14 @@ const CreateOrderWrapper = () => {
             >
               <Tab label="B2C Order" value="b2c" />
               <Tab label="B2B Order" value="b2b" />
-              <Tab label="International Order" value="international" />
             </Tabs>
           </Box>
 
           <Box sx={{ height: { md: 'calc(100% - 36px)' }, minHeight: 0 }}>
             {activeTab === 'b2c' ? (
               <B2COrderFormSteps />
-            ) : activeTab === 'b2b' ? (
-              <B2BOrderForm />
             ) : (
-              <InternationalOrderForm />
+              <B2BOrderForm />
             )}
           </Box>
         </Box>

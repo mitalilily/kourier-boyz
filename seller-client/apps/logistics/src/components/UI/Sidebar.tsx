@@ -16,7 +16,6 @@ import { BiInfoCircle, BiListPlus } from 'react-icons/bi'
 import { CgTrack } from 'react-icons/cg'
 import { FaBalanceScaleLeft, FaBox } from 'react-icons/fa'
 import { FaClipboardList as FaFileAlt, FaMoneyBill, FaToolbox, FaUser } from 'react-icons/fa6'
-import { FiGlobe } from 'react-icons/fi'
 import { HiDocumentReport } from 'react-icons/hi'
 import {
   MdDashboard,
@@ -118,16 +117,6 @@ const navItems: NavItem[] = [
         icon: <MdOutlineAddBusiness size={ICON_SIZE_MD} />,
       },
       {
-        text: 'FTL Requests',
-        path: '/orders/ftl',
-        icon: <MdOutlineAddBusiness size={ICON_SIZE_MD} />,
-      },
-      {
-        text: 'International Orders',
-        path: '/orders/international/list',
-        icon: <FiGlobe size={ICON_SIZE_MD} />,
-      },
-      {
         text: 'Create Order',
         path: '/orders/create',
         icon: <BiListPlus size={ICON_SIZE_BI} />,
@@ -210,11 +199,6 @@ const navItems: NavItem[] = [
         icon: <TbReportAnalytics size={ICON_SIZE_TB} />,
       },
       {
-        text: 'International Rate',
-        path: '/tools/international_rate_calculator',
-        icon: <FiGlobe size={ICON_SIZE_MD} />,
-      },
-      {
         text: 'Track Shipment',
         path: '/tools/order_tracking',
         icon: <CgTrack size={ICON_SIZE_CG} />,
@@ -290,6 +274,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const { pathname } = useLocation()
   const [pinned, setPinned] = useState(initialPinned)
+  const [hovered, setHovered] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
   const [hoveredItemText, setHoveredItemText] = useState<string | null>(null)
   const [expandedItemText, setExpandedItemText] = useState<string | null>(null)
@@ -304,8 +289,8 @@ export default function Sidebar({
   //   onPinChange?.(newPinned)
   // }
 
-  const sidebarWidth = pinned ? SIDEBAR_EXPANDED_WIDTH : SIDEBAR_COLLAPSED_WIDTH
-  const shouldShowExpanded = pinned
+  const shouldShowExpanded = pinned || hovered
+  const sidebarWidth = shouldShowExpanded ? SIDEBAR_EXPANDED_WIDTH : SIDEBAR_COLLAPSED_WIDTH
 
   const filteredItems = useMemo(() => {
     return navItems.filter((item) => item.roles.includes(role))
@@ -323,6 +308,19 @@ export default function Sidebar({
 
   return (
     <Box
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => {
+        setHovered(false)
+        setExpandedItemText(null)
+        handlePopoverClose()
+      }}
+      onFocusCapture={() => setHovered(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setHovered(false)
+          setExpandedItemText(null)
+        }
+      }}
       sx={{
         width: sidebarWidth,
         minWidth: sidebarWidth,
@@ -401,8 +399,7 @@ export default function Sidebar({
                         // When collapsed, show popover
                         handlePopoverOpen(e as any, text)
                       } else {
-                        // When expanded, toggle the expanded item
-                        setExpandedItemText(expandedItemText === text ? null : text)
+                        setExpandedItemText(text)
                       }
                     } else {
                       // Close popover when hovering over items without children
