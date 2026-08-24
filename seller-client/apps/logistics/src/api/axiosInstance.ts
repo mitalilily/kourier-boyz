@@ -2,6 +2,7 @@
 import axios from 'axios'
 import { clearAuthTokens, getAuthTokens, setAuthTokens } from './tokenVault'
 import { buildShopifyInstallPath, isEmbeddedShopifyContext } from '../utils/shopifyEmbedded'
+import { isDemoLogisticsSession } from '../demo/demoSession'
 
 const API_BASE_URL = import.meta.env.VITE_LOGISTICS_API_URL || import.meta.env.VITE_API_URL || '/api'
 
@@ -31,6 +32,8 @@ api.interceptors.response.use(
   (res) => res,
   async (err) => {
     const original = err.config
+
+    if (isDemoLogisticsSession()) return Promise.reject(err)
 
     // Skip refresh if:
     // 1. Not a 401 error

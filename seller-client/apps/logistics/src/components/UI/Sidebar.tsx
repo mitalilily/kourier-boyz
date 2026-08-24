@@ -68,10 +68,10 @@ const ICON_SIZE_CG = 20 // css.gg
 const ICON_SIZE_HI = 20 // Heroicons
 const ICON_SIZE_RI = 18 // Remix Icon
 const BRAND_BLUE = '#B78115'
-const BRAND_SURFACE = '#FFFFFF'
+const BRAND_SURFACE = '#FFFEFB'
 const BRAND_INK = '#202321'
 const BRAND_BORDER = '#D9DCDA'
-const LOGO_WORDMARK_SRC = '/brand/kourier-boyz-logo.png'
+const LOGO_WORDMARK_SRC = '/brand/kourier-boyz-logo-transparent.png'
 const LOGO_MARK_SRC = '/brand/kourier-boyz-mark.png'
 
 const navItems: NavItem[] = [
@@ -329,10 +329,10 @@ export default function Sidebar({
         top: 0,
         display: 'flex',
         flexDirection: 'column',
-        background: BRAND_SURFACE,
+        background: 'linear-gradient(180deg, #fffef9 0%, #ffffff 46%, #f6f9fc 100%)',
         color: BRAND_INK,
         borderRight: `1px solid ${BRAND_BORDER}`,
-        boxShadow: '2px 0 8px rgba(17, 17, 19, 0.04)',
+        boxShadow: '8px 0 28px rgba(72, 55, 18, 0.08)',
         zIndex: 1200,
         overflowY: 'auto',
         overflowX: 'hidden',
@@ -348,6 +348,7 @@ export default function Sidebar({
           px: shouldShowExpanded ? 1.5 : 1,
           py: 1.5,
           borderBottom: `1px solid ${BRAND_BORDER}`,
+          background: 'linear-gradient(135deg, #222726 0%, #3b4140 68%, #715313 140%)',
           flexShrink: 0,
         }}
       >
@@ -360,6 +361,9 @@ export default function Sidebar({
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
+            border: '1px solid rgba(223,183,67,0.22)',
+            background: 'rgba(255,255,255,0.035)',
+            p: 0.45,
           }}
         >
           <Box

@@ -227,7 +227,7 @@ const ShopifyInstallPage = () => {
         <Stack spacing={2.5} alignItems="center" textAlign="center">
           <Box
             component="img"
-            src="/brand/kourier-boyz-logo.png"
+            src="/brand/kourier-boyz-logo-transparent.png"
             alt="Kourier Boyz"
             sx={{ width: 140, height: 'auto' }}
           />

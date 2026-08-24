@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchWalletBalance, fetchWalletTransactions } from '../api/wallet.api'
+import { isDemoLogisticsSession } from '../demo/demoSession'
 
 export const useWalletBalance = (enabled = true) => {
+  const demoMode = isDemoLogisticsSession()
   const query = useQuery({
     queryKey: ['walletBalance'],
     queryFn: fetchWalletBalance,
-    enabled,
+    enabled: enabled && !demoMode,
+    initialData: demoMode ? { data: { balance: 86420 } } : undefined,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5, // cache for 5 minutes
   })

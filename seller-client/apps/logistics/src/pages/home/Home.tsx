@@ -38,9 +38,15 @@ const TEXT_MUTED = '#6B7280'
 
 const CARD_STYLE = {
   borderRadius: 3,
-  bgcolor: '#ffffff',
-  border: '1px solid rgba(17, 24, 39, 0.08)',
-  boxShadow: '0 10px 28px rgba(15, 23, 42, 0.05)',
+  background: 'linear-gradient(145deg, #ffffff 0%, #fffdf5 66%, #f7fbff 100%)',
+  border: '1px solid rgba(183, 129, 21, 0.18)',
+  boxShadow: '0 12px 30px rgba(72, 55, 18, 0.09)',
+  transition: 'transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease',
+  '&:hover': {
+    transform: 'translateY(-3px)',
+    borderColor: 'rgba(183, 129, 21, 0.34)',
+    boxShadow: '0 18px 38px rgba(72, 55, 18, 0.14)',
+  },
 }
 
 const formatCurrency = (value: number) =>
@@ -279,7 +285,7 @@ const Home = () => {
           ...CARD_STYLE,
           p: { xs: 2, md: 2.5 },
           background:
-            'linear-gradient(135deg, rgba(49, 2, 118,0.05) 0%, rgba(255,255,255,0.94) 45%, rgba(254,101,2,0.05) 100%)',
+            'linear-gradient(120deg, rgba(255,246,209,0.96) 0%, rgba(255,255,255,0.98) 48%, rgba(231,242,255,0.92) 100%)',
         }}
       >
         <Stack

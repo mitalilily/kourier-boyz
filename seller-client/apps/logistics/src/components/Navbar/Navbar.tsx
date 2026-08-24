@@ -15,10 +15,9 @@ interface NavbarProps {
   onPinChange?: (pinned: boolean) => void
 }
 
-const BRAND_SURFACE = '#FFFFFF'
 const BRAND_TEXT = '#202321'
 const BRAND_PRIMARY = '#B78115'
-const LOGO_WORDMARK_SRC = '/brand/kourier-boyz-logo.png'
+const LOGO_WORDMARK_SRC = '/brand/kourier-boyz-logo-transparent.png'
 
 export default function Navbar({ handleDrawerToggle, pinned = false, onPinChange }: NavbarProps) {
   const theme = useTheme()
@@ -39,9 +38,9 @@ export default function Navbar({ handleDrawerToggle, pinned = false, onPinChange
           px: { xs: 0.5, sm: 0.8, md: 1.2, lg: 1.5 },
           py: { xs: 0.4, sm: 0.45, md: 0.5, lg: 0.6 },
           borderRadius: 0,
-          backgroundColor: alpha(BRAND_SURFACE, 0.98),
-          border: '1px solid #D9DCDA',
-          boxShadow: '0 4px 12px rgba(17, 17, 19, 0.04)',
+          background: 'linear-gradient(110deg, rgba(255,255,255,0.91), rgba(255,253,244,0.86), rgba(246,250,255,0.92))',
+          border: '1px solid rgba(183,129,21,0.18)',
+          boxShadow: '0 8px 24px rgba(72, 55, 18, 0.09)',
           minHeight: { xs: 44, sm: 46, md: 48, lg: 52 },
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
@@ -94,6 +93,10 @@ export default function Navbar({ handleDrawerToggle, pinned = false, onPinChange
                   objectFit: 'contain',
                   objectPosition: 'left center',
                   flexShrink: 0,
+                  background: 'linear-gradient(135deg, #202524, #3c4240)',
+                  border: '1px solid rgba(223,183,67,0.24)',
+                  borderRadius: 1.5,
+                  padding: '5px 8px',
                 }}
               />
             </>

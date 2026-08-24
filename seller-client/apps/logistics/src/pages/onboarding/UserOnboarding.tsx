@@ -221,7 +221,7 @@ export default function UserOnboarding() {
             >
               <Box
                 component="img"
-                src="/brand/kourier-boyz-logo.png"
+                src="/brand/kourier-boyz-logo-transparent.png"
                 alt="Kourier Boyz"
                 sx={{ width: { xs: 150, md: 176 }, height: 'auto', mb: 2.2 }}
               />

@@ -749,3 +749,35 @@ code {
 .warehouse-select.ant-select .ant-select-selection-placeholder {
   color: rgba(0, 0, 0, 0.88) !important;
 }
+
+/* High-contrast brand treatment and brighter seller surfaces */
+img[src*="/store/brand/kourier-boyz-logo-transparent.png"],
+img[src*="/store/brand/kourier-boyz-mark.png"] {
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #202524 0%, #3c4240 72%, #705315 145%);
+  border: 1px solid rgba(223, 183, 67, 0.3);
+  border-radius: 8px;
+  padding: 5px 8px;
+  box-shadow: 0 10px 24px rgba(22, 27, 25, 0.15);
+}
+
+.ant-layout,
+.ant-layout-content {
+  background:
+    radial-gradient(circle at 8% 8%, rgba(223, 183, 67, 0.15), transparent 24%),
+    radial-gradient(circle at 92% 10%, rgba(101, 142, 178, 0.12), transparent 22%),
+    linear-gradient(145deg, #fffdf7 0%, #f8fafc 50%, #f1f7ff 100%) !important;
+}
+
+.ant-card {
+  background: linear-gradient(145deg, #ffffff 0%, #fffdf5 68%, #f6faff 100%);
+  border-color: rgba(183, 129, 21, 0.2);
+  box-shadow: 0 12px 30px rgba(72, 55, 18, 0.09);
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.ant-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(183, 129, 21, 0.36);
+  box-shadow: 0 18px 38px rgba(72, 55, 18, 0.14);
+}

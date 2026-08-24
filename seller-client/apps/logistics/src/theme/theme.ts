@@ -9,7 +9,7 @@ const BRAND_ORANGE_LIGHT = '#9AA1A4'
 const BRAND_INK = '#202321'
 const BRAND_SLATE = '#4F5552'
 const BRAND_MUTED = '#6A706D'
-const BRAND_CANVAS = '#F1F2F0'
+const BRAND_CANVAS = '#F8FAFC'
 const BRAND_SURFACE = '#FFFFFF'
 const BRAND_SURFACE_ALT = '#F8F8F6'
 const BRAND_BORDER = '#D9DCDA'
@@ -86,7 +86,8 @@ const theme = createTheme({
         },
         body: {
           color: BRAND_INK,
-          background: BRAND_CANVAS,
+          background:
+            'radial-gradient(circle at 12% 8%, rgba(223,183,67,0.16), transparent 24%), linear-gradient(145deg, #fffdf7 0%, #f8fafc 52%, #eef6ff 100%)',
         },
         '#root': {
           minHeight: '100vh',
@@ -110,8 +111,15 @@ const theme = createTheme({
           overflow: 'hidden',
           borderRadius: 4,
           backgroundColor: alpha(BRAND_SURFACE, 0.98),
-          border: `1px solid ${BRAND_BORDER}`,
-          boxShadow: '0 8px 22px rgba(17, 17, 19, 0.06)',
+          backgroundImage: 'linear-gradient(145deg, rgba(255,255,255,1), rgba(255,252,240,0.72))',
+          border: `1px solid ${alpha(BRAND_BLUE, 0.2)}`,
+          boxShadow: '0 12px 30px rgba(72, 55, 18, 0.09)',
+          transition: 'transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease',
+          '&:hover': {
+            transform: 'translateY(-3px)',
+            borderColor: alpha(BRAND_BLUE, 0.34),
+            boxShadow: '0 18px 38px rgba(72, 55, 18, 0.14)',
+          },
         },
       },
     },
@@ -226,11 +234,11 @@ const theme = createTheme({
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: alpha(BRAND_SURFACE, 0.96),
+          backgroundColor: alpha(BRAND_SURFACE, 0.82),
           color: BRAND_INK,
           border: `1px solid ${alpha(BRAND_INK, 0.06)}`,
           backdropFilter: 'blur(16px)',
-          boxShadow: '0 12px 32px rgba(20, 20, 20, 0.06)',
+          boxShadow: '0 10px 30px rgba(72, 55, 18, 0.10)',
         },
       },
     },

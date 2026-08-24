@@ -10,6 +10,8 @@ import {
 } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 import { FiMail, FiUser } from 'react-icons/fi'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/auth/AuthContext'
 import { useRequestOtp } from '../../hooks/useOTP'
 import { TERMS_AND_CONDITIONS } from '../../utils/constants'
 import CustomIconLoadingButton from '../UI/button/CustomLoadingButton'
@@ -72,6 +74,8 @@ const authInputSx = {
 }
 
 export default function PhoneForm() {
+  const navigate = useNavigate()
+  const { startDemo } = useAuth()
   const activeEmail = sessionStorage.getItem('activeEmail')
   const [step, setStep] = useState<number>(0)
   const [preferredLoginMethod, setPreferredLoginMethod] = useState<'phone' | 'password'>('phone')
@@ -207,7 +211,7 @@ export default function PhoneForm() {
                 Demo seller
               </Typography>
               <Typography sx={{ color: '#626966', fontSize: '0.76rem' }}>
-                {DEMO_SELLER_EMAIL}
+                {DEMO_SELLER_EMAIL} · onboarding complete
               </Typography>
             </Box>
             <Button
@@ -215,8 +219,8 @@ export default function PhoneForm() {
               size="small"
               startIcon={<FiUser size={14} />}
               onClick={() => {
-                setEmail(DEMO_SELLER_EMAIL)
-                setDemoOtp(null)
+                startDemo()
+                navigate('/home', { replace: true })
               }}
               sx={{
                 color: BRAND_BLUE,
@@ -227,7 +231,7 @@ export default function PhoneForm() {
               }}
               variant="outlined"
             >
-              Use demo seller
+              Enter demo console
             </Button>
           </Box>
 

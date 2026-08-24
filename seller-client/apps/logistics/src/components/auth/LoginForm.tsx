@@ -52,9 +52,9 @@ export default function LoginForm() {
         >
           <Box
             component="img"
-            src="/brand/kourier-boyz-logo.png"
+            src="/brand/kourier-boyz-logo-transparent.png"
             alt="Kourier Boyz"
-            sx={{ width: { lg: 240, xl: 280 }, height: 'auto', objectFit: 'contain' }}
+            sx={{ width: { lg: 240, xl: 280 }, height: 'auto', objectFit: 'contain', p: 1, borderRadius: 2, background: 'linear-gradient(135deg, #202524, #3c4240)', border: '1px solid rgba(223,183,67,0.28)', boxShadow: '0 14px 34px rgba(17,17,19,0.18)' }}
           />
 
           <Box sx={{ maxWidth: 520, mb: { lg: 12, xl: 16 } }}>
@@ -124,7 +124,7 @@ export default function LoginForm() {
         <Box sx={{ width: '100%', maxWidth: 430, minWidth: 0 }}>
           <Box
             component="img"
-            src="/brand/kourier-boyz-logo.png"
+            src="/brand/kourier-boyz-logo-transparent.png"
             alt="Kourier Boyz"
             sx={{
               display: { xs: 'block', lg: 'none' },
@@ -132,6 +132,11 @@ export default function LoginForm() {
               height: 'auto',
               objectFit: 'contain',
               mb: 5,
+              p: 1,
+              borderRadius: 2,
+              background: 'linear-gradient(135deg, #202524, #3c4240)',
+              border: '1px solid rgba(223,183,67,0.28)',
+              boxShadow: '0 12px 28px rgba(17,17,19,0.14)',
             }}
           />
           <Typography

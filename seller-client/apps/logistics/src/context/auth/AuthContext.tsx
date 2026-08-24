@@ -18,6 +18,11 @@ import {
 import { useUserProfile } from '../../hooks/User/useUserProfile'
 import type { IUserProfileDB } from '../../types/user.types'
 import { emptyUserProfile } from '../../utils/utility'
+import {
+  DEMO_LOGISTICS_SESSION_KEY,
+  DEMO_LOGISTICS_USER,
+  isDemoLogisticsSession,
+} from '../../demo/demoSession'
 import { buildShopifyInstallPath, isEmbeddedShopifyContext } from '../../utils/shopifyEmbedded'
 
 /* ---------- context shape ---------- */
@@ -27,7 +32,9 @@ interface AuthCtx {
   user: IUserProfileDB
   loading: boolean
   isAuthenticated: boolean
+  isDemo: boolean
   setTokens: (access: string, refresh: string) => void
+  startDemo: () => void
   clearTokens: () => void
   logout: () => Promise<void>
   refetchUser: () => void
@@ -48,10 +55,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const { accessToken, refreshToken } = getAuthTokens()
-    return Boolean(accessToken && refreshToken)
+    return isDemoLogisticsSession() || Boolean(accessToken && refreshToken)
   })
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(initiallyAuthenticated)
+  const [isDemo, setIsDemo] = useState(isDemoLogisticsSession)
   const [authCheckTimedOut, setAuthCheckTimedOut] = useState(false)
   const [walletBalance, setWalletBalance] = useState<number | null>(null)
   const [userId, setUserId] = useState('')
@@ -61,7 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isFetching: userFetching,
     isError: userProfileError,
     refetch: refetchUser,
-  } = useUserProfile(isAuthenticated)
+  } = useUserProfile(isAuthenticated, isDemo)
 
   useEffect(() => {
     if (!isAuthenticated || user?.id || userProfileError) {
@@ -87,6 +95,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [user])
 
   const setTokens = (access: string, refresh: string) => {
+    localStorage.removeItem(DEMO_LOGISTICS_SESSION_KEY)
+    setIsDemo(false)
     setAuthTokens(access, refresh)
     setIsAuthenticated(true)
     refetchUser()
@@ -94,6 +104,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const clearTokens = () => {
     clearAuthTokens()
+    localStorage.removeItem(DEMO_LOGISTICS_SESSION_KEY)
+    setIsDemo(false)
     setIsAuthenticated(false)
     queryClient.removeQueries({ queryKey: ['userInfo'] })
     queryClient.removeQueries({ queryKey: ['userProfile'] })
@@ -102,7 +114,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await logoutApi()
+      if (!isDemo) await logoutApi()
     } catch (e) {
       console.error('Logout error ignored:', e)
     }
@@ -110,6 +122,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = isEmbeddedShopifyContext()
       ? buildShopifyInstallPath('/channels/connected')
       : '/login'
+  }
+
+  const startDemo = () => {
+    clearAuthTokens()
+    localStorage.setItem(DEMO_LOGISTICS_SESSION_KEY, '1')
+    queryClient.setQueryData(['userProfile'], DEMO_LOGISTICS_USER)
+    setWalletBalance(86420)
+    setIsDemo(true)
+    setIsAuthenticated(true)
   }
 
   const value: AuthCtx = {
@@ -121,8 +142,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       !userProfileError &&
       !authCheckTimedOut,
     isAuthenticated,
+    isDemo,
     setUserId,
     setTokens,
+    startDemo,
     clearTokens,
     userId,
     logout,

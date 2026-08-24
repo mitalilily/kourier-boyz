@@ -468,21 +468,21 @@ export default function TrackingPage() {
           px: 2.5,
           py: 2,
           borderRadius: 2,
-          bgcolor: '#FFFFFF',
+          background: 'linear-gradient(145deg, #202524, #3c4240)',
           display: 'flex',
           alignItems: 'center',
           flexDirection: 'column',
           zIndex: 9999,
           pointerEvents: 'none',
           boxShadow: '0 4px 20px rgba(51, 51, 105, 0.15)',
-          border: '1px solid #E0E6ED',
+          border: '1px solid rgba(223, 183, 67, 0.3)',
         }}
       >
         <Box
           component="img"
-          src="/logo/despatch-logo.jpeg"
+          src="/brand/kourier-boyz-logo-transparent.png"
           alt="Kourier Boyz Logo"
-          sx={{ width: 72, height: 'auto', mb: 0.5, borderRadius: 1.5 }}
+          sx={{ width: 150, height: 'auto', mb: 0.5, borderRadius: 1.5 }}
         />
         <Typography
           variant="caption"

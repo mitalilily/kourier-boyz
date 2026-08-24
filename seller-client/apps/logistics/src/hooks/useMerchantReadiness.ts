@@ -38,10 +38,10 @@ const hasRequiredCompanyInfo = (companyInfo: CompanyInfoLike | null | undefined)
 }
 
 export const useMerchantReadiness = () => {
-  const { user, loading: authLoading } = useAuth()
-  const { data: pickupData, isLoading: pickupLoading } = usePickupAddresses({ page: 1, limit: 1 })
-  const { data: walletData, isLoading: walletLoading } = useWalletBalance()
-  const { data: paymentOptions, isLoading: paymentOptionsLoading } = usePaymentOptions()
+  const { user, loading: authLoading, isDemo } = useAuth()
+  const { data: pickupData, isLoading: pickupLoading } = usePickupAddresses({ page: 1, limit: 1 }, !isDemo)
+  const { data: walletData, isLoading: walletLoading } = useWalletBalance(!isDemo)
+  const { data: paymentOptions, isLoading: paymentOptionsLoading } = usePaymentOptions(!isDemo)
 
   const walletBalance = Number(walletData?.data?.balance || 0)
   const requiredWalletBalance = Math.max(Number(paymentOptions?.minAccountWalletBalance || 0), 0)
@@ -113,6 +113,22 @@ export const useMerchantReadiness = () => {
   const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
   const isReady = completedCount === totalCount
   const firstIncompleteStep = checklist.find((item) => !item.done) || null
+
+  if (isDemo) {
+    return {
+      checklist: checklist.map((item) => ({ ...item, done: true })),
+      completedCount: checklist.length,
+      totalCount: checklist.length,
+      progress: 100,
+      isReady: true,
+      firstIncompleteStep: null,
+      walletBalance: 86420,
+      requiredWalletBalance: 0,
+      assignedPlanName: user.currentPlanName || 'Growth',
+      assignedPlanId: user.currentPlanId || 'kb-growth-demo',
+      isLoading: false,
+    }
+  }
 
   return {
     checklist,

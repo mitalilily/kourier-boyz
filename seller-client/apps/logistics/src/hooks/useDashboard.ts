@@ -13,6 +13,7 @@ import {
   type CourierDistribution,
   type MerchantDashboardStats,
 } from '../api/dashboard.api'
+import { DEMO_LOGISTICS_DASHBOARD, isDemoLogisticsSession } from '../demo/demoSession'
 
 export const useIncomingPickups = () => {
   return useQuery<Pickup[], Error>({
@@ -60,9 +61,12 @@ export const useCourierDistribution = () => {
 }
 
 export const useMerchantDashboardStats = (selectedDate?: string) => {
+  const demoMode = isDemoLogisticsSession()
   return useQuery<MerchantDashboardStats, Error>({
     queryKey: ['merchantDashboardStats', selectedDate || 'today'],
     queryFn: () => getMerchantDashboardStats(selectedDate),
+    enabled: !demoMode,
+    initialData: demoMode ? DEMO_LOGISTICS_DASHBOARD : undefined,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     refetchOnWindowFocus: true,
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes

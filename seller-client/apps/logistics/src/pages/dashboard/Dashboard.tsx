@@ -49,8 +49,8 @@ const widgetComponents: Record<string, React.ComponentType<any>> = {
 const BRAND_PRIMARY = '#8F650F'
 const BRAND_TEXT = '#202321'
 const TEXT_MUTED = '#6B7280'
-const CARD_BORDER = '#EEE8E4'
-const CARD_SHADOW = '0 6px 18px rgba(17, 17, 19, 0.05)'
+const CARD_BORDER = 'rgba(183, 129, 21, 0.18)'
+const CARD_SHADOW = '0 12px 30px rgba(72, 55, 18, 0.09)'
 
 export default function Dashboard() {
   const { data: stats, isLoading, error, refetch, isRefetching } = useMerchantDashboardStats()
@@ -346,7 +346,7 @@ export default function Dashboard() {
   const showGridLines = preferences?.layout?.showGridLines || false
 
   return (
-    <Box sx={{ minHeight: '100%', pb: 3, bgcolor: '#fafafa' }}>
+    <Box sx={{ minHeight: '100%', pb: 3, bgcolor: 'transparent' }}>
       {/* Header Section */}
       <Box sx={{ mb: 3 }}>
         <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', md: 'center' }} gap={2}>
@@ -448,9 +448,15 @@ export default function Dashboard() {
               sx={{
                 p: { xs: 1.5, md: 2 },
                 borderRadius: 0,
-                bgcolor: '#ffffff',
+                background: 'linear-gradient(145deg, #ffffff 0%, #fffdf5 68%, #f4f9ff 100%)',
                 border: `1px solid ${CARD_BORDER}`,
                 boxShadow: CARD_SHADOW,
+                transition: 'transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease',
+                '&:hover': {
+                  transform: 'translateY(-3px)',
+                  borderColor: alpha(BRAND_PRIMARY, 0.36),
+                  boxShadow: '0 18px 38px rgba(72, 55, 18, 0.14)',
+                },
               }}
             >
               <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.05em', mb: 0.8 }}>

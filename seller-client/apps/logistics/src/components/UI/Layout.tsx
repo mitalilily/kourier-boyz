@@ -12,7 +12,7 @@ export default function Layout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [mobileOpen, setMobileOpen] = useState(false)
   const [sidebarPinned, setSidebarPinned] = useState(false)
-  const { user } = useAuth()
+  const { user, isDemo } = useAuth()
   const isAdminWorkspace =
     user.role === 'admin' || user.role === 'employee' || Boolean(user.employeeId)
   const isOrderCreatePage = location.pathname === '/orders/create'
@@ -33,7 +33,8 @@ export default function Layout() {
       sx={{
         display: 'flex',
         minHeight: '100vh',
-        background: '#F1F2F0',
+        background:
+          'radial-gradient(circle at 8% 12%, rgba(223,183,67,0.17), transparent 24%), radial-gradient(circle at 92% 8%, rgba(79,85,82,0.10), transparent 20%), linear-gradient(145deg, #fffdf7 0%, #f8fafc 46%, #f3f7fb 100%)',
         scrollbarGutter: 'stable',
       }}
     >
@@ -84,6 +85,24 @@ export default function Layout() {
           onPinChange={setSidebarPinned}
         />
 
+        {isDemo && (
+          <Box
+            sx={{
+              px: { xs: 1.4, md: 2.2 },
+              py: 0.85,
+              color: '#43320E',
+              fontSize: '0.78rem',
+              fontWeight: 800,
+              borderBottom: '1px solid rgba(183,129,21,0.24)',
+              background:
+                'linear-gradient(90deg, rgba(255,247,214,0.98), rgba(255,255,255,0.98), rgba(235,244,255,0.98))',
+              boxShadow: '0 6px 18px rgba(113,83,19,0.06)',
+            }}
+          >
+            Demo seller workspace · approved account · onboarding complete · changes stay in this browser
+          </Box>
+        )}
+
         <Box
           component="main"
           sx={{
@@ -91,7 +110,7 @@ export default function Layout() {
             minHeight: 0,
             overflowY: 'auto',
             p: 0,
-            backgroundColor: '#F8F8F6',
+            backgroundColor: 'transparent',
           }}
         >
           <Box

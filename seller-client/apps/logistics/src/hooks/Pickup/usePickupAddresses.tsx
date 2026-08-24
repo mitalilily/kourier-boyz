@@ -11,10 +11,11 @@ import {
 import type { HydratedPickup } from '../../types/generic.types'
 
 // Fetch all pickup addresses
-export const usePickupAddresses = (filters?: PickupAddressFilters) => {
+export const usePickupAddresses = (filters?: PickupAddressFilters, enabled = true) => {
   return useQuery({
     queryKey: ['pickupAddresses', filters],
     queryFn: () => getPickupAddresses(filters),
+    enabled,
     placeholderData: (previousData) => previousData,
   })
 }
