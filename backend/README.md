@@ -19,6 +19,8 @@ npm start
 
 Render should use `/backend` as the service root, `npm run render:build` as the build command, `npm run migrate` as the pre-deploy command, and `npm start` as the start command. Railway can continue using `npm run railway:build`. The healthcheck path is `/health`.
 
+The default `npm run build` command is also deployment-safe: it installs both child service dependency trees, including TypeScript development dependencies, before compiling them.
+
 ## Existing Marketplace Data
 
 Set `SOURCE_MONGO_URI`, `SOURCE_MONGO_DATABASE`, and `DATABASE_URL`, then run the one-time import:
