@@ -11,12 +11,13 @@ The backend deploys as one Node.js service backed by one PostgreSQL database.
 
 ```bash
 npm run railway:build
+npm run render:build
 npm run migrate
 npm test
 npm start
 ```
 
-Railway should use `/backend` as the service root, `npm run railway:build` as the build command, `npm run migrate` as the pre-deploy command, and `npm start` as the start command. The healthcheck path is `/health`.
+Render should use `/backend` as the service root, `npm run render:build` as the build command, `npm run migrate` as the pre-deploy command, and `npm start` as the start command. Railway can continue using `npm run railway:build`. The healthcheck path is `/health`.
 
 ## Existing Marketplace Data
 
