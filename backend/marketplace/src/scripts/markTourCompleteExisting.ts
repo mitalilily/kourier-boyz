@@ -1,3 +1,5 @@
+import '../database/postgresMongoose'
+
 /**
  * One-time script: Mark onboarding tour as complete for existing sellers.
  * Run this once after deploying the seller onboarding tour so existing users
@@ -40,4 +42,3 @@ const run = async () => {
 }
 
 run()
-import '../database/postgresMongoose'

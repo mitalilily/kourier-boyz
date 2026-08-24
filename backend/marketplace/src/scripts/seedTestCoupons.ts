@@ -1,3 +1,4 @@
+import '../database/postgresMongoose'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import Coupon from '../models/Coupon'
@@ -181,13 +182,3 @@ const seedTestCoupons = async () => {
 }
 
 seedTestCoupons()
-
-
-
-
-
-
-
-
-
-import '../database/postgresMongoose'

@@ -1,3 +1,4 @@
+import '../database/postgresMongoose'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import AdminInvoiceSettings from '../models/AdminInvoiceSettings'
@@ -37,9 +38,9 @@ const seedInvoiceSettings = async () => {
 
     // Create default invoice settings
     const defaultSettings = await AdminInvoiceSettings.create({
-      invoicePrefix: 'TAT/INV',
-      creditNotePrefix: 'TAT/CN',
-      debitNotePrefix: 'TAT/DN',
+      invoicePrefix: 'KB/INV',
+      creditNotePrefix: 'KB/CN',
+      debitNotePrefix: 'KB/DN',
       financialYearFormat: 'YY-YY',
       sequenceStart: 1,
       resetFrequency: 'FINANCIAL_YEAR',
@@ -81,5 +82,3 @@ const seedInvoiceSettings = async () => {
 }
 
 seedInvoiceSettings()
-
-import '../database/postgresMongoose'

@@ -1,3 +1,4 @@
+import '../database/postgresMongoose'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import Coupon from '../models/Coupon'
@@ -135,13 +136,3 @@ const seedAlmostApplicableCoupons = async () => {
 
 // Run the script
 seedAlmostApplicableCoupons()
-
-
-
-
-
-
-
-
-
-import '../database/postgresMongoose'

@@ -1,3 +1,5 @@
+import '../database/postgresMongoose'
+
 /**
  * Payment Flow Testing Script
  * 
@@ -183,5 +185,3 @@ async function testPaymentFlow() {
 
 // Run the test
 testPaymentFlow()
-
-import '../database/postgresMongoose'

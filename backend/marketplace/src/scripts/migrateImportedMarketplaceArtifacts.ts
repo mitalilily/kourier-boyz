@@ -1,3 +1,4 @@
+import '../database/postgresMongoose'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import Order from '../models/Order'
@@ -138,4 +139,3 @@ migrate()
   .finally(async () => {
     await mongoose.disconnect()
   })
-import '../database/postgresMongoose'

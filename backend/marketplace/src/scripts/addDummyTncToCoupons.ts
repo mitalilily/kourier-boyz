@@ -1,3 +1,4 @@
+import '../database/postgresMongoose'
 import mongoose from 'mongoose'
 import Coupon from '../models/Coupon'
 import dotenv from 'dotenv'
@@ -76,5 +77,3 @@ const addDummyTncToCoupons = async () => {
 
 // Run the script
 addDummyTncToCoupons()
-
-import '../database/postgresMongoose'

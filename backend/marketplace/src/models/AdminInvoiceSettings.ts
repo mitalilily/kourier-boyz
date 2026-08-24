@@ -34,19 +34,19 @@ const AdminInvoiceSettingsSchema = new Schema<IAdminInvoiceSettings>(
     invoicePrefix: {
       type: String,
       required: true,
-      default: 'TAT/INV',
+      default: 'KB/INV',
       trim: true,
     },
     creditNotePrefix: {
       type: String,
       required: true,
-      default: 'TAT/CN',
+      default: 'KB/CN',
       trim: true,
     },
     debitNotePrefix: {
       type: String,
       required: true,
-      default: 'TAT/DN',
+      default: 'KB/DN',
       trim: true,
     },
     financialYearFormat: {
@@ -137,9 +137,9 @@ AdminInvoiceSettingsSchema.statics.getSingleton =
     let settings = await this.findOne()
     if (!settings) {
       settings = await this.create({
-        invoicePrefix: 'TAT',
-        creditNotePrefix: 'TATCN',
-        debitNotePrefix: 'TATDN',
+        invoicePrefix: 'KB/INV',
+        creditNotePrefix: 'KB/CN',
+        debitNotePrefix: 'KB/DN',
         financialYearFormat: 'YYYY',
         sequenceStart: 1,
         resetFrequency: 'FINANCIAL_YEAR',

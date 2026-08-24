@@ -1,3 +1,5 @@
+import '../database/postgresMongoose'
+
 /**
  * Migration Script: Re-encrypt Phone Numbers
  * 
@@ -128,5 +130,3 @@ const migratePhones = async () => {
 
 // Run migration
 migratePhones()
-
-import '../database/postgresMongoose'

@@ -1,3 +1,4 @@
+import '../database/postgresMongoose'
 import bcrypt from 'bcryptjs'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
@@ -40,4 +41,3 @@ const createAdmin = async () => {
 }
 
 createAdmin()
-import '../database/postgresMongoose'
