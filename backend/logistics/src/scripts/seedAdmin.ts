@@ -35,6 +35,7 @@ export const seedAdmin = async ({
         role,
         phoneVerified: true,
         emailVerified: !!email || existing[0].emailVerified,
+        accountVerified: true,
         updatedAt: new Date(),
       })
       .where(eq(users.id, existing[0].id))
@@ -54,6 +55,7 @@ export const seedAdmin = async ({
       role,
       phoneVerified: true,
       emailVerified: !!email,
+      accountVerified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     })
@@ -69,7 +71,13 @@ seedAdmin({
   role: 'admin',
 })
   .then((user) => {
-    console.log('Admin user created or already exists:', user)
+    console.log('Admin user created or updated:', {
+      id: user.id,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      accountVerified: user.accountVerified,
+    })
     process.exit(0)
   })
   .catch((err) => {

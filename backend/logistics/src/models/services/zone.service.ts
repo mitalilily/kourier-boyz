@@ -672,10 +672,18 @@ const remapB2BPincodesForZone = async (zoneId: string, externalClient?: any) => 
         ),
       )
 
-    for (const row of existingRows) {
-      if (!normalizedSelectedStates.has(normalizeStateName(row.state))) {
-        await tx.delete(b2bPincodes).where(eq(b2bPincodes.id, row.id))
-      }
+    const chunkSize = 750
+    const staleRowIds = existingRows
+      .filter(
+        (row: typeof b2bPincodes.$inferSelect) =>
+          !normalizedSelectedStates.has(normalizeStateName(row.state)),
+      )
+      .map((row: typeof b2bPincodes.$inferSelect) => row.id)
+
+    for (let index = 0; index < staleRowIds.length; index += chunkSize) {
+      await tx
+        .delete(b2bPincodes)
+        .where(inArray(b2bPincodes.id, staleRowIds.slice(index, index + chunkSize)))
     }
 
     if (selectedStates.length === 0) {
@@ -697,10 +705,25 @@ const remapB2BPincodesForZone = async (zoneId: string, externalClient?: any) => 
       .from(locations)
       .where(or(...stateFilters))
 
-    const allGlobalRows = await tx
-      .select()
-      .from(b2bPincodes)
-      .where(and(isNull(b2bPincodes.courier_id), isNull(b2bPincodes.service_provider)))
+    const allGlobalRows: any[] = []
+    const locationPincodes: string[] = Array.from(
+      new Set(
+        locationRows.map((location: typeof locations.$inferSelect) => location.pincode),
+      ),
+    )
+    for (let index = 0; index < locationPincodes.length; index += chunkSize) {
+      const rows = await tx
+        .select()
+        .from(b2bPincodes)
+        .where(
+          and(
+            isNull(b2bPincodes.courier_id),
+            isNull(b2bPincodes.service_provider),
+            inArray(b2bPincodes.pincode, locationPincodes.slice(index, index + chunkSize)),
+          ),
+        )
+      allGlobalRows.push(...rows)
+    }
     const existingByPincodeAndState = new Map(
       allGlobalRows.map((row: any) => [
         `${row.pincode}|${normalizeStateName(row.state)}`,
@@ -737,7 +760,6 @@ const remapB2BPincodesForZone = async (zoneId: string, externalClient?: any) => 
       }
     }
 
-    const chunkSize = 750
     for (let index = 0; index < rowIdsToMove.length; index += chunkSize) {
       await tx
         .update(b2bPincodes)

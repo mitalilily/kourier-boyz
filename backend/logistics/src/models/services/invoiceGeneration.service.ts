@@ -26,7 +26,7 @@ interface GenerateInvoiceParams {
 }
 
 const formatAmount = (value: number) => `Rs. ${Number(value || 0).toFixed(2)}`
-const BILLABLE_ORDER_STATUSES = [
+export const BILLABLE_ORDER_STATUSES = [
   'shipment_created',
   'booked',
   'pickup_initiated',
