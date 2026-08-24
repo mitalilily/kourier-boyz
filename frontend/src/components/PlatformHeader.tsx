@@ -13,22 +13,30 @@ const platformLinks = [
 const PlatformHeader = () => {
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
-  const sellerUrl = import.meta.env.VITE_SELLER_URL || '/become-a-seller'
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const sellerUrl = '/become-a-seller'
 
   useEffect(() => setMenuOpen(false), [location.pathname])
+
+  useEffect(() => {
+    const onScroll = () => setIsCollapsed(window.scrollY > 48)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const isActive = (to: string) =>
     to === '/' ? location.pathname === '/' : location.pathname === to
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 lg:px-7">
-      <div className="kb-frosted-nav mx-auto max-w-[1480px]">
-        <div className="flex min-h-[72px] items-center justify-between gap-5 px-4 sm:px-5 lg:px-6">
+      <div className={`kb-frosted-nav mx-auto ${isCollapsed ? 'is-collapsed' : 'is-expanded'}`}>
+        <div className="kb-platform-nav-inner">
           <Link to="/" className="flex shrink-0 items-center" aria-label="Kourier Boyz home">
             <img
               src="/brand/kourier-boyz-logo-nav-cropped.png"
               alt="Kourier Boyz"
-              className="h-11 w-44 object-contain sm:w-48 lg:w-52"
+              className="kb-platform-logo"
             />
           </Link>
 

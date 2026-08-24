@@ -27,17 +27,7 @@ import {
   Wallet,
 } from 'lucide-react'
 import { useMemo } from 'react'
-
-// Helper to get seller app URL
-const getSellerAppUrl = (path: string): string => {
-  // Check if there's an environment variable for seller app URL
-  const sellerBaseUrl = import.meta.env.VITE_SELLER_APP_URL
-  if (sellerBaseUrl) {
-    return `${sellerBaseUrl}${path}`
-  }
-  // Default to the dedicated seller subdomain.
-  return `https://seller.kourierboyz.com${path}`
-}
+import { getSellerPanelUrl } from '@/lib/sellerPanelUrl'
 
 const BecomeASeller = () => {
   const { isAuthenticated, user } = useAuthStore()
@@ -89,19 +79,19 @@ const BecomeASeller = () => {
   const handleStartSelling = () => {
     if (!isAuthenticated) {
       // Not logged in → redirect to seller signup
-      window.location.href = getSellerAppUrl('/register') // Seller app uses /register route
+      window.location.href = getSellerPanelUrl('/register')
     } else if (user?.role !== 'seller') {
       // Logged in but not a seller → redirect to seller signup
-      window.location.href = getSellerAppUrl('/register') // Seller app uses /register route
+      window.location.href = getSellerPanelUrl('/register')
     } else {
       // Logged in and is a seller → redirect to seller dashboard
-      window.location.href = getSellerAppUrl('/') // Seller dashboard is at root
+      window.location.href = getSellerPanelUrl('/')
     }
   }
 
   const handleSellerLogin = () => {
     // Always redirect to seller login
-    window.location.href = getSellerAppUrl('/login')
+    window.location.href = getSellerPanelUrl('/login')
   }
 
   const valueCards = [

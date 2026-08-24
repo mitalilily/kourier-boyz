@@ -1,8 +1,9 @@
 import { ArrowRight, Boxes, Check, FileText, PackagePlus, Truck, Upload, WalletCards } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { getSellerPanelUrl } from '@/lib/sellerPanelUrl'
 
 const ShipWithUs = () => {
-  const sellerUrl = import.meta.env.VITE_SELLER_URL || 'http://localhost:5175'
+  const sellerUrl = getSellerPanelUrl('/')
 
   return (
     <main className="kb-site min-h-screen bg-white pt-28 lg:pt-24">
