@@ -50,6 +50,7 @@ const navigationOnlyParents = new Set([
   '/channels',
   '/support',
 ])
+const mountedAppPrefixes = ['/store']
 
 const withoutQuery = (routePath) => routePath.replace(/\?.*$/, '')
 const matchesRoute = (reference, route) => {
@@ -68,6 +69,13 @@ const matchesRoute = (reference, route) => {
 const unresolved = routeReferences.filter(({ path: reference }) => {
   const normalizedReference = withoutQuery(reference)
   if (navigationOnlyParents.has(normalizedReference)) return false
+  if (
+    mountedAppPrefixes.some(
+      (prefix) => normalizedReference === prefix || normalizedReference.startsWith(`${prefix}/`),
+    )
+  ) {
+    return false
+  }
   return !routePaths.some((route) => matchesRoute(normalizedReference, route))
 })
 

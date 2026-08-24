@@ -3,6 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "install:apps": "npm ci --include=dev --prefix apps/logistics && npm ci --include=dev --prefix apps/marketplace",
+    "postinstall": "npm run install:apps",
     "dev:logistics": "npm run dev --prefix apps/logistics",
     "dev:marketplace": "npm run dev --prefix apps/marketplace",
     "build:logistics": "npm run build --prefix apps/logistics",
