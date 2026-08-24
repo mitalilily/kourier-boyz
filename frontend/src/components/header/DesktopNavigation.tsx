@@ -74,7 +74,7 @@ export const DesktopNavigation: React.FC<DesktopNavigationProps> = ({
         { to: '/ship', label: 'Ship', active: pathname === '/ship' },
         { to: '/track', label: 'Track', active: pathname === '/track' },
         { to: '/rates', label: 'Rates', active: pathname === '/rates' },
-        { to: '/become-a-seller', label: 'Sell', active: pathname === '/become-a-seller' },
+        { to: '/become-a-seller', label: 'Open your store', active: pathname === '/become-a-seller' },
       ]
   const isCategoriesActive = pathname.startsWith('/shop-by-category') || categoriesDropdownOpen
   const isOrdersActive = pathname === '/orders' || pathname.startsWith('/profile/orders')

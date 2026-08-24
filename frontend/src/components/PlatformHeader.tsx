@@ -54,9 +54,9 @@ const PlatformHeader = () => {
 
           <div className="hidden shrink-0 md:block">
             {sellerUrl.startsWith('http') ? (
-              <a href={sellerUrl} className="kb-platform-cta">Sell with us <ArrowRight className="h-4 w-4" /></a>
+              <a href={sellerUrl} className="kb-platform-cta">Open your store <ArrowRight className="h-4 w-4" /></a>
             ) : (
-              <Link to={sellerUrl} className="kb-platform-cta">Sell with us <ArrowRight className="h-4 w-4" /></Link>
+              <Link to={sellerUrl} className="kb-platform-cta">Open your store <ArrowRight className="h-4 w-4" /></Link>
             )}
           </div>
 
@@ -84,9 +84,9 @@ const PlatformHeader = () => {
                 </Link>
               ))}
               {sellerUrl.startsWith('http') ? (
-                <a href={sellerUrl} className="kb-platform-mobile-cta">Sell with us <ArrowRight className="h-4 w-4" /></a>
+                <a href={sellerUrl} className="kb-platform-mobile-cta">Open your store <ArrowRight className="h-4 w-4" /></a>
               ) : (
-                <Link to={sellerUrl} className="kb-platform-mobile-cta">Sell with us <ArrowRight className="h-4 w-4" /></Link>
+                <Link to={sellerUrl} className="kb-platform-mobile-cta">Open your store <ArrowRight className="h-4 w-4" /></Link>
               )}
             </nav>
           </div>

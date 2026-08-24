@@ -1,5 +1,5 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
-import { useAuthStore } from '../store/authStore'
+import { isDemoSellerSession, useAuthStore } from '../store/authStore'
 
 // Authenticated seller API
 const API = axios.create({
@@ -41,6 +41,10 @@ API.interceptors.response.use(
     const status = error?.response?.status
     const requestUrl = originalRequest.url ?? ''
     const errorCode = error?.response?.data?.code || error?.response?.data?.error
+
+    if (isDemoSellerSession()) {
+      return Promise.reject(error)
+    }
 
     // Check if account is deactivated - log out immediately
     // But don't redirect if we're already on the login page (let it handle the error)

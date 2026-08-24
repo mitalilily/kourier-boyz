@@ -29,7 +29,7 @@ const navigation = [
   {
     title: 'For sellers',
     links: [
-      ['Start selling', '/become-a-seller'],
+      ['Open your store', '/become-a-seller'],
       ['Best sellers', '/best-sellers'],
       ['Shop by category', '/shop-by-category'],
       ['Current deals', '/events/deals'],

@@ -178,7 +178,7 @@ const BecomeASeller = () => {
                 variant="primary"
                 className="text-lg px-8 py-6 h-auto font-semibold"
               >
-                Start Selling
+                Open your store
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
               <Button
@@ -567,7 +567,7 @@ const BecomeASeller = () => {
               variant="primary"
               className="text-lg px-8 py-6 h-auto font-semibold"
             >
-              Start Selling
+              Open your store
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
             <Button

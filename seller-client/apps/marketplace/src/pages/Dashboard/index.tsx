@@ -47,6 +47,7 @@ const Dashboard = () => {
   const navigate = useNavigate()
   const { message } = App.useApp()
   const user = useAuthStore((state) => state.user)
+  const isDemo = Boolean(user?.isDemo)
   const setUser = useAuthStore((state) => state.setUser)
   const [refreshing, setRefreshing] = useState(false)
   const setRunTour = useSellerTourStore((state) => state.setRunTour)
@@ -76,6 +77,18 @@ const Dashboard = () => {
     },
     staleTime: 30000, // Consider data fresh for 30 seconds
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    enabled: !isDemo,
+    initialData: isDemo
+      ? {
+          totalProducts: 148,
+          activeProducts: 126,
+          draftProducts: 22,
+          lowStockProducts: 4,
+          totalSales: 486320,
+          totalOrders: 352,
+          totalViews: 18460,
+        }
+      : undefined,
   })
 
   const handleRefreshStatus = async () => {

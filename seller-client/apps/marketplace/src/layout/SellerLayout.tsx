@@ -122,6 +122,25 @@ const SellerLayout = () => {
           <SellerOnboardingTutorial run={runTour} onComplete={handleTourComplete} />
         )}
         <HeaderBar collapsed={collapsed} setCollapsed={setCollapsed} />
+        {user?.isDemo && (
+          <div
+            style={{
+              minHeight: 36,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px 16px',
+              color: '#5f4308',
+              background: '#fbf4df',
+              borderBottom: '1px solid #ead69f',
+              fontSize: 12,
+              fontWeight: 700,
+              textAlign: 'center',
+            }}
+          >
+            Demo workspace: explore the seller tools freely. Demo changes stay in this browser.
+          </div>
+        )}
         <Content
           style={{
             margin: isMobile ? '8px' : '16px',

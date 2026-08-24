@@ -154,7 +154,7 @@ const HeaderBar = ({ collapsed, setCollapsed }: HeaderBarProps) => {
   }, [])
 
   useEffect(() => {
-    if (!user?.id) return
+    if (!user?.id || user.isDemo) return
 
     const base = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000'
     const socket = ioc(base, {

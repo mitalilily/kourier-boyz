@@ -5,9 +5,14 @@ import type { ChangePasswordData, UpdateProfileData } from './profile'
 import { changePassword, getProfile, markOnboardingTourCompleted, updateProfile } from './profile'
 
 export const useProfile = () => {
+  const user = useAuthStore((state) => state.user)
+  const isDemo = Boolean(user?.isDemo)
+
   return useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
+    enabled: !isDemo,
+    initialData: isDemo ? user : undefined,
   })
 }
 
@@ -16,6 +21,7 @@ export const useProfileSync = () => {
   const setUser = useAuthStore((state) => state.setUser)
   const logout = useAuthStore((state) => state.logout)
   const user = useAuthStore((state) => state.user)
+  const isDemo = Boolean(user?.isDemo)
 
   const query = useQuery({
     queryKey: ['profile-sync'],
@@ -24,7 +30,7 @@ export const useProfileSync = () => {
     refetchInterval: !user?.isApproved ? 30000 : false,
     // Refetch on window focus
     refetchOnWindowFocus: true,
-    enabled: !!user, // Only run if user is logged in
+    enabled: !!user && !isDemo,
   })
 
   // Update auth store when profile data changes

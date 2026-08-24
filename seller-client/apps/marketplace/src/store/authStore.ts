@@ -71,6 +71,7 @@ interface User {
 
   // Onboarding (platform tour completed/skipped - from backend)
   onboardingTourCompletedAt?: string
+  isDemo?: boolean
 
   // Store Settings (from profile)
   defaultShippingRate?: number
@@ -94,7 +95,53 @@ interface AuthState {
   user: User | null
   setAuth: (token: string, user: User) => void
   setUser: (user: User) => void
+  startDemo: () => void
   logout: () => void
+}
+
+export const DEMO_SELLER_TOKEN = 'kourier-boyz-demo-seller'
+
+export const isDemoSellerSession = () =>
+  typeof window !== 'undefined' && localStorage.getItem('seller_token') === DEMO_SELLER_TOKEN
+
+const DEMO_SELLER: User = {
+  id: 'demo-seller-001',
+  name: 'Aarav Mehta',
+  email: 'demo.seller@kourierboyz.com',
+  phone: '9876543210',
+  role: 'seller',
+  businessName: 'Northstar Living',
+  businessType: 'Proprietorship',
+  storeDescription: 'Considered home, travel, and everyday essentials.',
+  addressLine1: '21 Market Street',
+  city: 'New Delhi',
+  state: 'Delhi',
+  postalCode: '110001',
+  country: 'India',
+  isApproved: true,
+  kycSubmitted: true,
+  kycStatus: 'APPROVED',
+  isEmailVerified: true,
+  isPhoneVerified: true,
+  sellerLifecycleStatus: 'ACTIVE',
+  storeStatus: 'active',
+  onboardingTourCompletedAt: new Date().toISOString(),
+  isDemo: true,
+  defaultShippingRate: 69,
+  pickupAddresses: [
+    {
+      _id: 'demo-warehouse-001',
+      warehouseName: 'Northstar Delhi Hub',
+      addressLine1: '21 Market Street',
+      city: 'New Delhi',
+      state: 'Delhi',
+      postalCode: '110001',
+      country: 'India',
+      contactName: 'Aarav Mehta',
+      contactPhone: '9876543210',
+      isDefault: true,
+    },
+  ],
 }
 
 const getStoredToken = (): string | null => {
@@ -122,6 +169,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/
 
 const sendLogoutRequest = async (): Promise<void> => {
   if (typeof window === 'undefined') return
+  if (isDemoSellerSession()) return
   try {
     const token = localStorage.getItem('seller_token')
     await axios.post(
@@ -152,6 +200,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.setItem('seller_data', JSON.stringify(user))
     }
     set({ user })
+  },
+  startDemo: () => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('seller_token', DEMO_SELLER_TOKEN)
+      localStorage.setItem('seller_data', JSON.stringify(DEMO_SELLER))
+    }
+    set({ token: DEMO_SELLER_TOKEN, user: DEMO_SELLER })
   },
   logout: () => {
     if (typeof window !== 'undefined') {

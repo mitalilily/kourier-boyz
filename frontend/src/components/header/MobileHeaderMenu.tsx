@@ -80,7 +80,7 @@ export const MobileHeaderMenu: FC<MobileHeaderMenuProps> = ({
         { to: '/ship', label: 'Ship', Icon: Truck },
         { to: '/track', label: 'Track', Icon: Search },
         { to: '/rates', label: 'Rates', Icon: Calculator },
-        { to: '/become-a-seller', label: 'Sell', Icon: Store },
+        { to: '/become-a-seller', label: 'Open your store', Icon: Store },
       ]
 
   const renderMobileCategoryItem = (category: Category, level = 0): ReactElement => {
