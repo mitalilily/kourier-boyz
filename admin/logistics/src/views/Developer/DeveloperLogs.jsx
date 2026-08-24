@@ -156,7 +156,7 @@ export default function DeveloperLogs() {
   const filterMeta = data?.filterMeta || {}
   const textColor = useColorModeValue('gray.700', 'white')
   const mutedColor = useColorModeValue('gray.600', 'gray.300')
-  const cardBg = useColorModeValue('white', '#0F172A')
+  const cardBg = useColorModeValue('white', '#252927')
   const headerIconBg = useColorModeValue('red.500', 'red.400')
   const alertBg = useColorModeValue('red.50', 'rgba(127,29,29,0.22)')
   const alertBorder = useColorModeValue('red.100', 'red.900')
@@ -1252,7 +1252,7 @@ function DrawerPlacement({
 }
 
 function DrawerShell({ isOpen, onClose, children }) {
-  const drawerBg = useColorModeValue('white', '#0F172A')
+  const drawerBg = useColorModeValue('white', '#252927')
 
   return (
     <Box>

@@ -87,7 +87,8 @@ const SidebarContent = ({ logoText, routes, sidebarWidth }) => {
       bg={sidebarBg}
       borderRight="1px solid"
       borderColor={borderColor}
-      boxShadow="6px 0 24px rgba(49, 2, 118, 0.06)"
+      backgroundImage="repeating-linear-gradient(118deg, rgba(92, 100, 96, 0.05) 0 1px, transparent 1px 17px), linear-gradient(180deg, rgba(255,255,255,0.98), rgba(232,235,233,0.96))"
+      boxShadow="8px 0 28px rgba(41, 45, 43, 0.08)"
       position="fixed"
       left="0"
       top="0"
@@ -96,18 +97,21 @@ const SidebarContent = ({ logoText, routes, sidebarWidth }) => {
       transition="width .25s ease"
       css={{ '&::-webkit-scrollbar': { width: '4px' }, '&::-webkit-scrollbar-thumb': { background: '#B6BCBA' } }}
     >
-      <Flex h="84px" px={collapsed ? 3 : 5} align="center" borderBottom="1px solid" borderColor={borderColor}>
-        <Box
-          as="img"
-          src={collapsed ? '/logistics/brand/kourier-boyz-mark.png' : '/logistics/brand/kourier-boyz-logo.png'}
-          alt={logoText}
-          w={collapsed ? '42px' : '176px'}
-          h={collapsed ? '42px' : '70px'}
-          objectFit="contain"
-          objectPosition="left center"
-        />
+      <Flex h="104px" px={collapsed ? 3 : 5} align="center" borderBottom="1px solid" borderColor={borderColor}>
+        <Box w={collapsed ? '42px' : '190px'} h={collapsed ? '42px' : '58px'} overflow="hidden">
+          <Box
+            as="img"
+            src="/logistics/brand/kourier-boyz-logo-transparent.png"
+            alt={logoText}
+            w={collapsed ? '180px' : '190px'}
+            maxW="none"
+            h={collapsed ? '42px' : '58px'}
+            objectFit="contain"
+            objectPosition="left center"
+          />
+        </Box>
       </Flex>
-      {!collapsed && <Text px={5} pt={5} pb={2} fontSize="10px" fontWeight="800" color={mutedColor} textTransform="uppercase">Admin Workspace</Text>}
+      {!collapsed && <Text px={5} pt={5} pb={2} fontSize="10px" fontWeight="800" color="brand.600" textTransform="uppercase">Logistics operations</Text>}
       <Stack spacing={1} px={3} pb={6}>{renderRoutes(routes)}</Stack>
     </Box>
   )

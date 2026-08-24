@@ -65,11 +65,6 @@ const Sidebar = () => {
         icon: <DashboardOutlined />,
         label: 'Dashboard',
       },
-      {
-        key: '/logistics/',
-        icon: <TruckOutlined />,
-        label: 'Logistics Admin',
-      },
       { type: 'divider' },
 
       // 2. Order Lifecycle
@@ -371,11 +366,6 @@ const Sidebar = () => {
           icon: <DashboardOutlined />,
           label: 'Dashboard',
         },
-        {
-          key: '/logistics/',
-          icon: <TruckOutlined />,
-          label: 'Logistics Admin',
-        },
       ]
     }
 
@@ -383,7 +373,7 @@ const Sidebar = () => {
       .map((item) => {
         if (!item || item.type === 'divider') return item
 
-        if (item.key === 'logout' || item.key === '/logistics/') return item
+        if (item.key === 'logout') return item
 
         if ('children' in item && item.children) {
           const filteredChildren = item.children.filter(
@@ -460,11 +450,6 @@ const Sidebar = () => {
   }, [location.pathname])
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
-    if (key === '/logistics/') {
-      window.location.assign('/logistics/')
-      return
-    }
-
     if (key === 'logout') {
       logout()
       window.location.href = '/login'
@@ -548,8 +533,10 @@ const Sidebar = () => {
       collapsible
       collapsed={collapsed}
       onCollapse={setCollapsed}
+      breakpoint="lg"
+      collapsedWidth={0}
       width={240}
-      className="!bg-gray-900 text-gray-100 border-none shadow-lg"
+      className="kb-admin-sidebar"
       style={{
         height: '100vh',
         position: 'sticky',
@@ -561,29 +548,20 @@ const Sidebar = () => {
       }}
     >
       {/* Logo */}
-      <div
-        className="flex items-center justify-center py-6 border-b border-gray-800 px-4"
-        style={{ flexShrink: 0 }}
-      >
+      <div className="kb-admin-sidebar-brand" style={{ flexShrink: 0 }}>
         {collapsed ? (
-          <img
-            src="/brand/kourier-boyz-logo-nav-cropped.png"
-            alt="Kourier Boyz"
-            className="h-10 w-auto object-contain"
-          />
+          <div className="kb-admin-brand-mark" aria-label="Kourier Boyz">
+            <img src="/brand/kourier-boyz-logo-nav-cropped.png" alt="" />
+          </div>
         ) : (
-          <div className="flex items-center space-x-2">
+          <div className="kb-admin-brand-lockup">
             <img
               src="/brand/kourier-boyz-logo-nav-cropped.png"
               alt="Kourier Boyz"
-              className="h-10 w-auto object-contain"
+              className="kb-admin-brand-logo"
             />
-            <div className="flex flex-col">
-              <span className="font-bold text-xl text-white tracking-tight">Kourier Boyz</span>
-              <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">
-                {roleLabel}
-              </span>
-            </div>
+            <span className="kb-admin-workspace-label">Marketplace operations</span>
+            <span className="kb-admin-role-label">{roleLabel}</span>
           </div>
         )}
       </div>
@@ -603,7 +581,7 @@ const Sidebar = () => {
         }}
       >
         <Menu
-          theme="dark"
+          theme="light"
           mode="inline"
           selectedKeys={selectedKeys}
           openKeys={openKeys}
@@ -620,10 +598,10 @@ const Sidebar = () => {
 
       {/* Footer */}
       <div
-        className="border-t border-gray-800 text-center py-3 text-xs text-gray-400"
+        className="kb-admin-sidebar-footer"
         style={{ flexShrink: 0 }}
       >
-        © {new Date().getFullYear()} <span className="font-semibold text-gray-500">Kourier Boyz</span>
+        &copy; {new Date().getFullYear()} <span>Kourier Boyz</span>
       </div>
     </Sider>
   )

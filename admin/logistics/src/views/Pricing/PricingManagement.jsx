@@ -61,7 +61,7 @@ const PricingManagement = () => {
                   alignItems="flex-start"
                   borderWidth="1px"
                   borderColor="transparent"
-                  _selected={{ bg: 'brand.50', shadow: 'sm', color: 'brand.500', borderColor: 'rgba(49, 2, 118, 0.18)', cursor: 'pointer' }}
+                  _selected={{ bg: 'brand.50', shadow: 'sm', color: 'brand.500', borderColor: 'rgba(183, 129, 21, 0.22)', cursor: 'pointer' }}
                   _focus={{ boxShadow: 'none' }}
                 >
                   <Stack spacing={1} align="flex-start" width="100%">

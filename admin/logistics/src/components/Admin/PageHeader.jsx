@@ -11,14 +11,15 @@ export default function PageHeader({
   const borderColor = useColorModeValue('rgba(17, 17, 19, 0.08)', 'rgba(255, 255, 255, 0.08)')
   const titleColor = useColorModeValue('gray.800', 'white')
   const textColor = useColorModeValue('gray.600', 'gray.300')
-  const metaBg = useColorModeValue('rgba(75, 17, 150, 0.05)', 'rgba(255, 255, 255, 0.04)')
+  const metaBg = useColorModeValue('rgba(183, 129, 21, 0.07)', 'rgba(255, 255, 255, 0.04)')
 
   return (
     <Box
       bg={panelBg}
       borderWidth="1px"
       borderColor={borderColor}
-      borderRadius="14px"
+      borderRadius="8px"
+      backgroundImage="repeating-radial-gradient(circle at 92% 18%, transparent 0 28px, rgba(183,129,21,0.11) 29px 30px, transparent 31px 58px), repeating-linear-gradient(112deg, rgba(96,104,100,0.035) 0 1px, transparent 1px 12px)"
       px={{ base: 5, md: 6 }}
       py={{ base: 5, md: 6 }}
       boxShadow={useColorModeValue('0 18px 50px rgba(17, 17, 19, 0.08)', '0 22px 60px rgba(2, 6, 23, 0.42)')}
@@ -33,7 +34,7 @@ export default function PageHeader({
         <Stack spacing={3} maxW="780px">
           <Badge
             alignSelf="flex-start"
-            borderRadius="8px"
+            borderRadius="6px"
             px={3}
             py={1}
             fontSize="11px"
@@ -45,7 +46,7 @@ export default function PageHeader({
             {eyebrow}
           </Badge>
           <Stack spacing={1.5}>
-            <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="800" letterSpacing="-0.03em" color={titleColor}>
+            <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="800" letterSpacing="0" color={titleColor}>
               {title}
             </Text>
             {description ? (
@@ -61,7 +62,7 @@ export default function PageHeader({
                   key={item.label}
                   px={4}
                   py={3}
-                  borderRadius="10px"
+                  borderRadius="6px"
                   bg={metaBg}
                   borderWidth="1px"
                   borderColor={borderColor}

@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useAuthStore } from '../store/authStore'
+import { MARKETPLACE_ADMIN_STORAGE } from '../config/authStorage'
 import API from './axiosInstance'
 
 export const useLogin = () => {
@@ -11,9 +12,9 @@ export const useLogin = () => {
     },
     onSuccess: (data) => {
       // Save to localStorage
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('name', data.name)
-      localStorage.setItem('role', data.role)
+      localStorage.setItem(MARKETPLACE_ADMIN_STORAGE.token, data.token)
+      localStorage.setItem(MARKETPLACE_ADMIN_STORAGE.name, data.name)
+      localStorage.setItem(MARKETPLACE_ADMIN_STORAGE.role, data.role)
 
       // Update Zustand store
       useAuthStore.setState({

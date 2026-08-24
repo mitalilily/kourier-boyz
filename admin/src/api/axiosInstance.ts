@@ -1,4 +1,5 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import { clearMarketplaceAdminStorage, MARKETPLACE_ADMIN_STORAGE } from '../config/authStorage'
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5004/api',
@@ -6,7 +7,7 @@ const API = axios.create({
 })
 
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem(MARKETPLACE_ADMIN_STORAGE.token)
   // Only set Authorization header if token exists and is not null/undefined/empty
   if (token && token !== 'null' && token !== 'undefined' && token.trim() !== '' && config.headers) {
     config.headers.Authorization = `Bearer ${token}`
@@ -25,11 +26,7 @@ const handleLogout = async () => {
   } catch {
     // Fallback: manually clear storage if store is not available
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('token')
-      localStorage.removeItem('role')
-      localStorage.removeItem('name')
-      localStorage.removeItem('email')
-      localStorage.removeItem('userId')
+      clearMarketplaceAdminStorage()
     }
   }
   // Redirect to login page
@@ -101,7 +98,7 @@ API.interceptors.response.use(
           const newToken: string | undefined = refreshRes?.data?.token
 
           if (newToken) {
-            localStorage.setItem('token', newToken)
+            localStorage.setItem(MARKETPLACE_ADMIN_STORAGE.token, newToken)
             // Update auth store if available
             try {
               const { useAuthStore } = await import('../store/authStore')

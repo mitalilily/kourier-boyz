@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { clearLogisticsAdminStorage, LOGISTICS_ADMIN_STORAGE } from 'config/authStorage'
 
 const getDefaultApiBaseUrl = () => {
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
@@ -19,7 +20,7 @@ let refreshPromise = null
 
 // Request interceptor: attach access token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken')
+  const token = localStorage.getItem(LOGISTICS_ADMIN_STORAGE.accessToken)
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -36,12 +37,12 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      localStorage.getItem('refreshToken')
+      localStorage.getItem(LOGISTICS_ADMIN_STORAGE.refreshToken)
     ) {
       originalRequest._retry = true
 
       try {
-        const refreshToken = localStorage.getItem('refreshToken')
+        const refreshToken = localStorage.getItem(LOGISTICS_ADMIN_STORAGE.refreshToken)
         if (!refreshPromise) {
           refreshPromise = axios
             .post(
@@ -63,12 +64,12 @@ api.interceptors.response.use(
         const newRefreshToken = res.data.refreshToken
 
         // Save tokens
-        localStorage.setItem('accessToken', newAccessToken)
-        localStorage.setItem('refreshToken', newRefreshToken)
+        localStorage.setItem(LOGISTICS_ADMIN_STORAGE.accessToken, newAccessToken)
+        localStorage.setItem(LOGISTICS_ADMIN_STORAGE.refreshToken, newRefreshToken)
 
         // Update Zustand store - import it dynamically to avoid circular dependencies
         import('../store/useAuthStore').then(({ useAuthStore }) => {
-          const userId = localStorage.getItem('userId')
+          const userId = localStorage.getItem(LOGISTICS_ADMIN_STORAGE.userId)
           useAuthStore.getState().login(newAccessToken, userId, newRefreshToken)
         })
 
@@ -77,9 +78,7 @@ api.interceptors.response.use(
         return api(originalRequest)
       } catch (refreshErr) {
         console.error('❌ Refresh token failed:', refreshErr)
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-        localStorage.removeItem('userId')
+        clearLogisticsAdminStorage()
 
         // Update Zustand store
         import('../store/useAuthStore').then(({ useAuthStore }) => {

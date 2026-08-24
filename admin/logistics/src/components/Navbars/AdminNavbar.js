@@ -9,6 +9,7 @@ import {
 } from '@chakra-ui/react'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
+import AdminWorkspaceSwitch from 'components/AdminWorkspaceSwitch'
 import AdminNavbarLinks from './AdminNavbarLinks'
 
 export default function AdminNavbar(props) {
@@ -19,8 +20,8 @@ export default function AdminNavbar(props) {
   let secondaryText = useColorModeValue('gray.500', 'gray.400')
   let navbarPosition = 'fixed'
   let navbarShadow = 'none'
-  let navbarBg = useColorModeValue('#FFFFFF', '#202321')
-  let navbarBorder = useColorModeValue('#D9DCDA', 'rgba(255,255,255,0.08)')
+  let navbarBg = useColorModeValue('rgba(255,255,255,0.8)', 'rgba(32,35,33,0.88)')
+  let navbarBorder = useColorModeValue('rgba(255,255,255,0.88)', 'rgba(255,255,255,0.08)')
   let secondaryMargin = '0px'
   let paddingX = '18px'
 
@@ -65,42 +66,47 @@ export default function AdminNavbar(props) {
       boxShadow={navbarShadow}
       bg={navbarBg}
       borderColor={navbarBorder}
-      backdropFilter="none"
+      backdropFilter="blur(24px) saturate(165%)"
       borderWidth="1px"
       borderStyle="solid"
       transition="all 0.3s ease"
       alignItems={{ xl: 'center' }}
-      borderRadius="0"
+      borderRadius="8px"
       display="flex"
-      minH="70px"
+      minH="72px"
       justifyContent={{ xl: 'center' }}
-      mx="auto"
-      mt="0"
+      mx="14px"
+      mt="14px"
       left={document.documentElement.dir === 'rtl' ? '20px' : ''}
       right="0"
-      px={{ sm: paddingX, md: '26px' }}
+      px={{ base: '12px', md: paddingX, xl: '26px' }}
       pt="12px"
       pb="12px"
       top="0"
       w={{
-        sm: '100vw',
-        xl: `calc(100vw - ${sidebarWidth}px)`,
+        sm: 'calc(100vw - 28px)',
+        xl: `calc(100vw - ${sidebarWidth}px - 28px)`,
       }}
     >
-      <Flex w="100%" flexDirection={{ sm: 'column', md: 'row' }} alignItems={{ xl: 'center' }} gap={{ sm: 2, md: 0 }}>
-        <Box mb={{ sm: '4px', md: '0px' }} display="flex" alignItems="center" gap="14px">
+      <Flex w="100%" flexDirection={{ base: 'column', lg: 'row' }} alignItems={{ base: 'stretch', lg: 'center' }} gap={{ base: 2, lg: 3 }}>
+        <Box mb={{ base: '0', lg: '0px' }} display={{ base: 'none', lg: 'flex' }} alignItems="center" gap="14px">
           <Box
-            as="img"
-            src="/logistics/brand/kourier-boyz-mark.png"
-            alt="Kourier Boyz"
             h="36px"
             w="36px"
-            objectFit="contain"
             display={{ base: 'none', md: 'block' }}
-            borderRadius="8px"
-            p="3px"
-            bg={useColorModeValue('rgba(49, 2, 118, 0.08)', 'rgba(255, 255, 255, 0.08)')}
-          />
+            overflow="hidden"
+          >
+            <Box
+              as="img"
+              src="/logistics/brand/kourier-boyz-logo-transparent.png"
+              alt="Kourier Boyz"
+              w="154px"
+              maxW="none"
+              h="36px"
+              objectFit="contain"
+              objectPosition="left center"
+            />
+          </Box>
 
           <Box>
             <Breadcrumb separator="/" spacing="8px" mb="3px">
@@ -133,7 +139,9 @@ export default function AdminNavbar(props) {
           </Box>
         </Box>
 
-        <Box ms="auto" w={{ sm: '100%', md: 'unset' }}>
+        <AdminWorkspaceSwitch active="logistics" />
+
+        <Box ms={{ base: 0, lg: 'auto' }} w={{ base: '100%', lg: 'unset' }}>
           <AdminNavbarLinks onOpen={onOpen} logoText={props.logoText} secondary={secondary} fixed={fixed} />
         </Box>
       </Flex>

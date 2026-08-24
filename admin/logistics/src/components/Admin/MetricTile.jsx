@@ -9,10 +9,10 @@ export default function MetricTile({
   onClick,
   active = false,
 }) {
-  const bg = useColorModeValue('white', 'rgba(14, 23, 43, 0.9)')
+  const bg = useColorModeValue('rgba(255,255,255,0.94)', 'rgba(37, 41, 39, 0.94)')
   const activeBorderColor = useColorModeValue(
-    'rgba(49, 2, 118, 0.34)',
-    'rgba(249, 115, 22, 0.36)',
+    'rgba(183, 129, 21, 0.38)',
+    'rgba(227, 183, 67, 0.34)',
   )
   const inactiveBorderColor = useColorModeValue(
     'rgba(148, 163, 184, 0.24)',
@@ -22,18 +22,18 @@ export default function MetricTile({
   const titleColor = useColorModeValue('gray.500', 'gray.400')
   const valueColor = useColorModeValue('gray.800', 'white')
   const shadow = useColorModeValue(
-    '0 14px 34px rgba(15, 23, 42, 0.05)',
-    '0 16px 40px rgba(2, 8, 23, 0.32)',
+    '0 12px 30px rgba(37, 41, 39, 0.07)',
+    '0 16px 40px rgba(10, 12, 11, 0.32)',
   )
   const hoverBorderColor = useColorModeValue(
-    'rgba(49, 2, 118, 0.26)',
-    'rgba(249, 115, 22, 0.28)',
+    'rgba(183, 129, 21, 0.34)',
+    'rgba(227, 183, 67, 0.3)',
   )
   const hoverShadow = useColorModeValue(
-    '0 18px 40px rgba(67, 56, 202, 0.1)',
+    '0 18px 40px rgba(44, 48, 46, 0.12)',
     '0 20px 48px rgba(2, 8, 23, 0.42)',
   )
-  const iconBg = useColorModeValue('rgba(49, 2, 118, 0.08)', 'rgba(255,255,255,0.06)')
+  const iconBg = useColorModeValue('rgba(183, 129, 21, 0.1)', 'rgba(255,255,255,0.06)')
 
   return (
     <Flex
@@ -41,7 +41,7 @@ export default function MetricTile({
       justify="space-between"
       minH="136px"
       p={4.5}
-      borderRadius="22px"
+      borderRadius="8px"
       borderWidth="1px"
       borderColor={borderColor}
       bg={bg}
@@ -51,7 +51,7 @@ export default function MetricTile({
       _hover={
         onClick
           ? {
-              transform: 'translateY(-2px)',
+              transform: 'translateY(-4px)',
               borderColor: hoverBorderColor,
               boxShadow: hoverShadow,
             }
@@ -68,7 +68,7 @@ export default function MetricTile({
           justify="center"
           w="42px"
           h="42px"
-          borderRadius="16px"
+          borderRadius="8px"
           bg={iconBg}
           color={accent}
         >
@@ -76,7 +76,7 @@ export default function MetricTile({
         </Flex>
       </Flex>
       <Box>
-        <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="800" letterSpacing="-0.03em" color={valueColor}>
+        <Text fontSize={{ base: '2xl', md: '3xl' }} fontWeight="800" letterSpacing="0" color={valueColor}>
           {value}
         </Text>
         {muted ? (

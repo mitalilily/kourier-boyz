@@ -29,7 +29,7 @@ export default function HeaderLinks({ variant, children, fixed, secondary, onOpe
   const { isLoggedIn, logout } = useAuthStore()
   const inputBg = useColorModeValue('white', 'rgba(17, 17, 19, 0.92)')
   const inputBorder = useColorModeValue('rgba(17, 17, 19, 0.12)', 'rgba(255, 255, 255, 0.1)')
-  const hoverBg = useColorModeValue('rgba(75, 17, 150, 0.06)', 'rgba(255, 255, 255, 0.08)')
+  const hoverBg = useColorModeValue('rgba(183, 129, 21, 0.08)', 'rgba(255, 255, 255, 0.08)')
   const mainTextColor = useColorModeValue('gray.700', 'gray.100')
   const navbarIconColor = useColorModeValue('gray.600', 'gray.200')
   const searchIconColor = useColorModeValue('gray.500', 'gray.400')
@@ -49,6 +49,7 @@ export default function HeaderLinks({ variant, children, fixed, secondary, onOpe
   return (
     <Flex pe={{ sm: '0px', md: '8px' }} w={{ sm: '100%', md: 'auto' }} align="center" gap="2">
       <InputGroup
+        display={{ base: 'none', xl: 'flex' }}
         bg={styles.inputBg}
         borderRadius="10px"
         w={{ sm: '150px', md: '260px' }}
@@ -58,7 +59,7 @@ export default function HeaderLinks({ variant, children, fixed, secondary, onOpe
         transition="all 0.2s ease"
         _focusWithin={{
           borderColor: styles.accent,
-          boxShadow: '0 0 0 3px rgba(75, 17, 150, 0.12)',
+          boxShadow: '0 0 0 3px rgba(183, 129, 21, 0.14)',
         }}
       >
         <InputLeftElement pointerEvents="none" pl="14px">
@@ -99,7 +100,7 @@ export default function HeaderLinks({ variant, children, fixed, secondary, onOpe
                   _hover={{
                     bg: styles.hoverBg,
                     color: styles.accent,
-                    borderColor: 'rgba(75, 17, 150, 0.16)',
+                    borderColor: 'rgba(183, 129, 21, 0.2)',
                   }}
                 >
                   <Text display={{ sm: 'none', md: 'flex' }}>Logout</Text>
@@ -170,7 +171,7 @@ export default function HeaderLinks({ variant, children, fixed, secondary, onOpe
         _hover={{
           bg: styles.hoverBg,
           color: styles.accent,
-          borderColor: 'rgba(75, 17, 150, 0.16)',
+          borderColor: 'rgba(183, 129, 21, 0.2)',
         }}
       />
 

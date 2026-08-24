@@ -18,6 +18,7 @@ import { io as ioc } from 'socket.io-client'
 import { useNotifications, useUnreadNotificationCount } from '../api/notificationQueries'
 import { useAuthStore } from '../store/authStore'
 import { useNotificationStore } from '../store/notificationStore'
+import AdminWorkspaceSwitch from '../components/AdminWorkspaceSwitch'
 
 const { Header } = Layout
 
@@ -339,31 +340,32 @@ const HeaderBar = () => {
   }, [store, navigate])
 
   return (
-    <Header className="px-8! flex justify-between items-center h-16! sticky top-0 z-10">
+    <Header className="kb-admin-header sticky top-0 z-20">
       {/* Left: Breadcrumb + Page Title */}
-      <div className="flex items-center gap-4">
+      <div className="kb-admin-header-context">
         <div className="flex flex-col">
           <Breadcrumb
-            separator={<span className="mx-2 text-white/60">›</span>}
+            separator={<span className="kb-admin-breadcrumb-separator">/</span>}
             items={breadcrumbItems.map((b) => ({
               title: b.href ? (
                 <a
-                  className="no-underline text-[15px] md:text-[20px] hover:text-white transition-colors"
+                  className="kb-admin-breadcrumb-link"
                   href={b.href}
-                  style={{ color: 'rgba(255, 255, 255, 0.8)' }}
                 >
                   {b.title}
                 </a>
               ) : (
-                <span className="text-white font-medium text-[15px] md:text-[20px]">{b.title}</span>
+                <span className="kb-admin-breadcrumb-current">{b.title}</span>
               ),
             }))}
           />
         </div>
       </div>
 
+      <AdminWorkspaceSwitch active="marketplace" />
+
       {/* Right: Actions */}
-      <div className="flex items-center gap-4">
+      <div className="kb-admin-header-actions">
         {/* Notifications */}
         <Popover
           placement="bottomRight"
@@ -514,14 +516,14 @@ const HeaderBar = () => {
             icon={
               <Badge count={unreadCount} showZero size="small" offset={[-2, 2]}>
                 <BellOutlined
-                  style={{ color: 'white', fontSize: 20 }}
-                  color="white"
+                  style={{ color: '#424744', fontSize: 20 }}
+                  color="#424744"
                   size={20}
-                  className="text-white text-lg"
+                  className="text-lg"
                 />
               </Badge>
             }
-            className="flex items-center justify-center hover:bg-gray-700!"
+            className="kb-admin-icon-button flex items-center justify-center"
           />
         </Popover>
 
@@ -531,12 +533,12 @@ const HeaderBar = () => {
           placement="bottomRight"
           trigger={['click']}
         >
-          <div className="flex items-center gap-3 cursor-pointer px-3 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+          <div className="kb-admin-profile flex items-center gap-3 cursor-pointer px-3 py-2 transition-colors">
             <div className="text-right hidden md:block">
-              <p className="text-sm font-medium text-white">{name || 'Admin'}</p>
-              <p className="text-xs text-gray-300 capitalize">{role || 'Administrator'}</p>
+              <p className="text-sm font-semibold text-[#292d2b]">{name || 'Admin'}</p>
+              <p className="text-xs text-[#727875] capitalize">{role || 'Administrator'}</p>
             </div>
-            <Avatar size={40} className="bg-[#1890ff]" icon={<UserOutlined />} />
+            <Avatar size={40} className="kb-admin-avatar" icon={<UserOutlined />} />
           </div>
         </Dropdown>
       </div>

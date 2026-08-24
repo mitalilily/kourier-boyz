@@ -23,6 +23,7 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
+import { MARKETPLACE_ADMIN_STORAGE } from '../config/authStorage'
 
 const { Text } = Typography
 const { TextArea } = Input
@@ -99,7 +100,7 @@ const CategoryExtensionRequests = () => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['admin-category-extensions'],
     queryFn: async () => {
-      const token = localStorage.getItem('admin_token')
+      const token = localStorage.getItem(MARKETPLACE_ADMIN_STORAGE.token)
       const response = await axios.get(`${API_BASE}/admin/category-extensions`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -132,7 +133,7 @@ const CategoryExtensionRequests = () => {
     }
 
     try {
-      const token = localStorage.getItem('admin_token')
+      const token = localStorage.getItem(MARKETPLACE_ADMIN_STORAGE.token)
       const statusMap = {
         approve: 'APPROVED',
         reject: 'REJECTED',
@@ -159,8 +160,9 @@ const CategoryExtensionRequests = () => {
       setSelectedRequest(null)
       setRejectionReason('')
       refetch()
-    } catch (error: any) {
-      message.error(error?.response?.data?.error || 'Failed to update category extension request status')
+    } catch (error: unknown) {
+      const apiError = error as { response?: { data?: { error?: string } } }
+      message.error(apiError.response?.data?.error || 'Failed to update category extension request status')
     }
   }
 

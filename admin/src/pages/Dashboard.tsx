@@ -243,12 +243,13 @@ const Dashboard = () => {
     : 0
 
   return (
-    <div className="space-y-6 -m-6 p-6 bg-gray-50 min-h-full">
+    <div className="kb-admin-dashboard space-y-6 min-h-full">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="kb-admin-dashboard-intro flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <span className="kb-admin-eyebrow">Marketplace operations</span>
+          <h1 className="text-2xl font-bold text-[#202321]">Marketplace command center</h1>
+          <p className="text-[#626965] text-sm mt-1">
             Business overview for {dateRange[0].format('MMM DD')} -{' '}
             {dateRange[1].format('MMM DD, YYYY')}
           </p>

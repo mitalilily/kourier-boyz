@@ -1,6 +1,11 @@
 // store/useAuthStore.js
 import { jwtDecode } from 'jwt-decode'
 import { create } from 'zustand'
+import {
+  clearLogisticsAdminStorage,
+  LOGISTICS_ADMIN_STORAGE,
+  migrateLegacyLogisticsAdminStorage,
+} from 'config/authStorage'
 
 function isTokenExpired(token) {
   try {
@@ -12,14 +17,15 @@ function isTokenExpired(token) {
 }
 
 export const useAuthStore = create((set) => {
-  const accessToken = localStorage.getItem('accessToken')
-  const refreshToken = localStorage.getItem('refreshToken')
-  const userId = localStorage.getItem('userId')
+  migrateLegacyLogisticsAdminStorage()
+  const accessToken = localStorage.getItem(LOGISTICS_ADMIN_STORAGE.accessToken)
+  const refreshToken = localStorage.getItem(LOGISTICS_ADMIN_STORAGE.refreshToken)
+  const userId = localStorage.getItem(LOGISTICS_ADMIN_STORAGE.userId)
 
   const isRefreshValid = refreshToken && !isTokenExpired(refreshToken)
 
   if (!isRefreshValid) {
-    localStorage.clear()
+    clearLogisticsAdminStorage()
   }
 
   return {
@@ -29,9 +35,9 @@ export const useAuthStore = create((set) => {
     isLoggedIn: isRefreshValid && !!accessToken,
 
     login: (token, userId, refreshToken) => {
-      localStorage.setItem('accessToken', token)
-      localStorage.setItem('refreshToken', refreshToken)
-      localStorage.setItem('userId', userId)
+      localStorage.setItem(LOGISTICS_ADMIN_STORAGE.accessToken, token)
+      localStorage.setItem(LOGISTICS_ADMIN_STORAGE.refreshToken, refreshToken)
+      localStorage.setItem(LOGISTICS_ADMIN_STORAGE.userId, userId)
 
       set({
         token,
@@ -42,7 +48,7 @@ export const useAuthStore = create((set) => {
     },
 
     logout: () => {
-      localStorage.clear()
+      clearLogisticsAdminStorage()
       set({
         token: null,
         refreshToken: null,

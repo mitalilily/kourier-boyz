@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { loginAdmin } from "../../services/auth.service";
 import { useAuthStore } from "../../store/useAuthStore";
+import { LOGISTICS_ADMIN_STORAGE } from "../../config/authStorage";
 
 const isTokenValid = (token) => {
   try {
@@ -41,8 +42,8 @@ function SignIn() {
   const login = useAuthStore((state) => state.login);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem("accessToken");
-    const refreshToken = localStorage.getItem("refreshToken");
+    const accessToken = localStorage.getItem(LOGISTICS_ADMIN_STORAGE.accessToken);
+    const refreshToken = localStorage.getItem(LOGISTICS_ADMIN_STORAGE.refreshToken);
     if (accessToken && refreshToken && isTokenValid(refreshToken))
       history.replace("/admin/dashboard");
   }, [history]);

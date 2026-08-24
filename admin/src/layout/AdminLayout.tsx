@@ -21,13 +21,12 @@ const AdminLayout = () => {
   }, [permissions, setPermissions]);
 
   return (
-    <Layout className="min-h-screen">
+    <Layout className="kb-admin-shell min-h-screen">
       <Sidebar />
-      <Layout className="bg-gray-50">
+      <Layout className="kb-admin-main">
         <HeaderBar />
-        {/* Let content grow naturally and scroll when needed, instead of locking to viewport height */}
-        <Content className="m-6 overflow-y-auto">
-          <div className="bg-white rounded-lg shadow-sm p-6 min-h-[calc(100vh-64px-48px)] relative">
+        <Content className="kb-admin-content overflow-y-auto">
+          <div className="kb-admin-page min-h-[calc(100vh-92px)] relative">
             {isLoading ? <LoadingState /> : <Outlet />}
           </div>
         </Content>

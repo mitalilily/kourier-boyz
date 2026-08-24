@@ -64,7 +64,7 @@ function SidebarResponsive(props) {
               borderRadius="10px"
               w="100%"
               border="1px solid"
-              borderColor={isActive ? 'rgba(75, 17, 150, 0.26)' : 'transparent'}
+              borderColor={isActive ? 'rgba(183, 129, 21, 0.3)' : 'transparent'}
               _hover={{ bg: hoverBg, transform: 'translateX(2px)' }}
               _active={{ bg: 'inherit', transform: 'none' }}
               _focus={{ boxShadow: 'none' }}

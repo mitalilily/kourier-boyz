@@ -2,6 +2,11 @@ import { create } from 'zustand'
 
 import API from '../api/axiosInstance'
 import type { ModulePermissions } from '../api/roles'
+import {
+  clearMarketplaceAdminStorage,
+  MARKETPLACE_ADMIN_STORAGE,
+  migrateLegacyMarketplaceAdminStorage,
+} from '../config/authStorage'
 
 interface AuthState {
   token: string | null
@@ -22,12 +27,14 @@ const getStoredValue = (key: string): string | null => {
   return localStorage.getItem(key)
 }
 
+if (typeof window !== 'undefined') migrateLegacyMarketplaceAdminStorage()
+
 export const useAuthStore = create<AuthState>((set) => ({
-  token: getStoredValue('token'),
-  role: getStoredValue('role'),
-  name: getStoredValue('name'),
-  email: getStoredValue('email'),
-  userId: getStoredValue('userId'),
+  token: getStoredValue(MARKETPLACE_ADMIN_STORAGE.token),
+  role: getStoredValue(MARKETPLACE_ADMIN_STORAGE.role),
+  name: getStoredValue(MARKETPLACE_ADMIN_STORAGE.name),
+  email: getStoredValue(MARKETPLACE_ADMIN_STORAGE.email),
+  userId: getStoredValue(MARKETPLACE_ADMIN_STORAGE.userId),
   permissions: null,
   loading: false,
   error: null,
@@ -37,11 +44,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       const res = await API.post('/admin/auth/login', { email, password, role: 'super-admin' })
       const { token, role, name, email: userEmail, userId } = res.data
       if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token)
-        localStorage.setItem('role', role)
-        localStorage.setItem('name', name)
-        localStorage.setItem('email', userEmail)
-        localStorage.setItem('userId', userId)
+        localStorage.setItem(MARKETPLACE_ADMIN_STORAGE.token, token)
+        localStorage.setItem(MARKETPLACE_ADMIN_STORAGE.role, role)
+        localStorage.setItem(MARKETPLACE_ADMIN_STORAGE.name, name)
+        localStorage.setItem(MARKETPLACE_ADMIN_STORAGE.email, userEmail)
+        localStorage.setItem(MARKETPLACE_ADMIN_STORAGE.userId, userId)
       }
       set({ token, role, name, email: userEmail, userId, loading: false })
     } catch (err: unknown) {
@@ -52,11 +59,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     if (typeof window !== 'undefined') {
       void API.post('/admin/auth/logout').catch(() => undefined)
-      localStorage.removeItem('token')
-      localStorage.removeItem('role')
-      localStorage.removeItem('name')
-      localStorage.removeItem('email')
-      localStorage.removeItem('userId')
+      clearMarketplaceAdminStorage()
     }
     set({ 
       token: null, 

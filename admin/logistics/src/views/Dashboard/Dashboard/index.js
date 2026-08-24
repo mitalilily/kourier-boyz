@@ -52,10 +52,10 @@ export default function Dashboard() {
   const { data: statsData, isLoading, error, refetch, isRefetching } = useDashboardStats()
 
   const pageBg = useColorModeValue(
-    'linear-gradient(180deg, #F7F5FF 0%, #FFF8F2 42%, #F4F6FB 100%)',
-    'linear-gradient(180deg, #09111F 0%, #0F172A 46%, #111827 100%)',
+    'repeating-radial-gradient(circle at 90% 14%, transparent 0 32px, rgba(183,129,21,0.12) 33px 34px, transparent 35px 66px), linear-gradient(135deg, #F9FAF7 0%, #E8EBE9 48%, #F7F7F3 100%)',
+    'linear-gradient(135deg, #202321 0%, #303532 52%, #171a19 100%)',
   )
-  const panelBg = useColorModeValue('white', '#101D36')
+  const panelBg = useColorModeValue('white', '#252927')
   const borderColor = useColorModeValue('rgba(148,163,184,0.28)', 'rgba(148,163,184,0.2)')
   const textPrimary = useColorModeValue('gray.800', 'gray.100')
   const textSecondary = useColorModeValue('gray.600', 'gray.400')
@@ -199,8 +199,8 @@ export default function Dashboard() {
   }
 
   return (
-    <Box minH="100vh" pb={8} bg={pageBg}>
-      <Container maxW="full" pt={{ base: '120px', md: '75px' }} px={{ base: 4, md: 6 }}>
+    <Box minH="100vh" pb={8} bg={pageBg} className="kb-logistics-dashboard-pattern">
+      <Container maxW="full" pt="0" px={{ base: 4, md: 6 }}>
         <Box mb={6}>
           <PageHeader
             eyebrow="Kourier Boyz Admin"
