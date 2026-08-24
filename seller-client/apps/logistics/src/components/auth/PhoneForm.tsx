@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   FormControlLabel,
   Link,
   Stack,
@@ -8,7 +9,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
-import { FiMail } from 'react-icons/fi'
+import { FiMail, FiUser } from 'react-icons/fi'
 import { useRequestOtp } from '../../hooks/useOTP'
 import { TERMS_AND_CONDITIONS } from '../../utils/constants'
 import CustomIconLoadingButton from '../UI/button/CustomLoadingButton'
@@ -21,6 +22,7 @@ import PasswordLoginForm from './PasswordLoginForm'
 
 const BRAND_ORANGE = '#B78115'
 const BRAND_BLUE = '#8F650F'
+const DEMO_SELLER_EMAIL = 'merchant@kourier-boyz.local'
 
 const primaryButtonStyles = {
   width: '100%',
@@ -74,6 +76,7 @@ export default function PhoneForm() {
   const [step, setStep] = useState<number>(0)
   const [preferredLoginMethod, setPreferredLoginMethod] = useState<'phone' | 'password'>('phone')
   const [email, setEmail] = useState('')
+  const [demoOtp, setDemoOtp] = useState<string | null>(null)
   const [termsChecked, setTermsChecked] = useState(false)
   const [openTerms, setOpenTerms] = useState(false)
 
@@ -81,6 +84,7 @@ export default function PhoneForm() {
 
   const handleEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value.trim())
+    setDemoOtp(null)
   }, [])
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -103,7 +107,8 @@ export default function PhoneForm() {
       sessionStorage.setItem('preferredMethod', 'phone')
 
       sendOtpRequest(email.toLowerCase().trim(), {
-        onSuccess: () => {
+        onSuccess: (response) => {
+          setDemoOtp(response.demoOtp ?? null)
           setStep(1)
         },
         onError: (err: any) => {
@@ -183,6 +188,49 @@ export default function PhoneForm() {
             sx={authInputSx}
           />
 
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              justifyContent: 'space-between',
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: 1.2,
+              px: 1.5,
+              py: 1.25,
+              border: '1px solid #DED7C7',
+              borderRadius: 1.5,
+              backgroundColor: '#FBFAF7',
+            }}
+          >
+            <Box>
+              <Typography sx={{ color: '#202321', fontSize: '0.82rem', fontWeight: 800 }}>
+                Demo seller
+              </Typography>
+              <Typography sx={{ color: '#626966', fontSize: '0.76rem' }}>
+                {DEMO_SELLER_EMAIL}
+              </Typography>
+            </Box>
+            <Button
+              type="button"
+              size="small"
+              startIcon={<FiUser size={14} />}
+              onClick={() => {
+                setEmail(DEMO_SELLER_EMAIL)
+                setDemoOtp(null)
+              }}
+              sx={{
+                color: BRAND_BLUE,
+                borderColor: '#CDB56E',
+                fontWeight: 800,
+                textTransform: 'none',
+                whiteSpace: 'nowrap',
+              }}
+              variant="outlined"
+            >
+              Use demo seller
+            </Button>
+          </Box>
+
           <FormControlLabel
             sx={{
               m: 0,
@@ -226,7 +274,11 @@ export default function PhoneForm() {
     ) : (
       <OtpForm
         email={email}
-        onEditEmail={() => setStep(0)}
+        demoOtp={demoOtp}
+        onEditEmail={() => {
+          setDemoOtp(null)
+          setStep(0)
+        }}
       />
     )
 
@@ -268,6 +320,7 @@ export default function PhoneForm() {
             onChange={(_, value) => {
               if (!value) return
               setPreferredLoginMethod(value)
+              setDemoOtp(null)
               setStep(0)
             }}
             fullWidth

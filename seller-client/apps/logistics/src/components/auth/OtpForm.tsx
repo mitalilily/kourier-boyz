@@ -38,15 +38,17 @@ const ghostButtonStyles = {
 
 type Props = {
   email: string
+  demoOtp?: string | null
   onEditEmail: () => void
 }
 
-export default function OtpForm({ email, onEditEmail }: Props) {
+export default function OtpForm({ email, demoOtp: initialDemoOtp, onEditEmail }: Props) {
   const { setTokens, setUserId } = useAuth()
   const [otpDigits, setOtpDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''))
   const [error, setError] = useState('')
   const [resendEnabled, setResendEnabled] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(OTP_RESEND_DELAY_MS / 1000)
+  const [demoOtp, setDemoOtp] = useState(initialDemoOtp ?? null)
 
   const { mutate: verifyOtp, isPending: verifying } = useVerifyOtp()
   const { mutate: resendOtp, isPending: resending } = useRequestOtp()
@@ -55,6 +57,7 @@ export default function OtpForm({ email, onEditEmail }: Props) {
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
+    setDemoOtp(initialDemoOtp ?? null)
     setResendEnabled(false)
     setSecondsLeft(OTP_RESEND_DELAY_MS / 1000)
 
@@ -81,7 +84,7 @@ export default function OtpForm({ email, onEditEmail }: Props) {
       if (timerRef.current) clearTimeout(timerRef.current)
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current)
     }
-  }, [email])
+  }, [email, initialDemoOtp])
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return
@@ -140,8 +143,9 @@ export default function OtpForm({ email, onEditEmail }: Props) {
     if (!resendEnabled || resending) return
 
     resendOtp(email.toLowerCase().trim(), {
-      onSuccess: () => {
+      onSuccess: (response) => {
         setOtpDigits(Array(OTP_LENGTH).fill(''))
+        setDemoOtp(response.demoOtp ?? null)
         setError('')
         setResendEnabled(false)
         setSecondsLeft(OTP_RESEND_DELAY_MS / 1000)
@@ -202,6 +206,46 @@ export default function OtpForm({ email, onEditEmail }: Props) {
           </Box>
         </Typography>
       </Box>
+
+      {demoOtp && (
+        <Box
+          role="status"
+          aria-label={`Demo access code ${demoOtp}`}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 2,
+            px: 2,
+            py: 1.5,
+            border: '1px solid #CDB56E',
+            borderLeft: `4px solid ${BRAND_BLUE}`,
+            borderRadius: 1.5,
+            backgroundColor: '#FBFAF7',
+          }}
+        >
+          <Box>
+            <Typography sx={{ color: BRAND_DARK, fontSize: '0.82rem', fontWeight: 800 }}>
+              Demo access code
+            </Typography>
+            <Typography sx={{ color: '#626966', fontSize: '0.74rem', mt: 0.2 }}>
+              Enter this code below to continue.
+            </Typography>
+          </Box>
+          <Typography
+            sx={{
+              color: BRAND_BLUE,
+              fontFamily: 'monospace',
+              fontSize: { xs: '1.25rem', sm: '1.45rem' },
+              fontWeight: 900,
+              letterSpacing: 0,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {demoOtp}
+          </Typography>
+        </Box>
+      )}
 
       <Box
         sx={{
@@ -270,7 +314,9 @@ export default function OtpForm({ email, onEditEmail }: Props) {
       )}
 
       <Typography variant="caption" color="#626966" textAlign="center" sx={{ userSelect: 'none' }}>
-        Enter the code from your inbox to continue to Kourier Boyz.
+        {demoOtp
+          ? 'Use the demo code shown above to continue to Kourier Boyz.'
+          : 'Enter the code from your inbox to continue to Kourier Boyz.'}
       </Typography>
 
       <CustomIconLoadingButton

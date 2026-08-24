@@ -39,8 +39,7 @@ dotenv.config({ path: path.resolve(__dirname, `../../.env.${env}`), override: tr
 const client = twilio(process.env.TWILIO_ACCOUNT_SID!, process.env.TWILIO_AUTH_TOKEN!)
 
 const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000
-const demoOtpEnabled = isDemoOtpEnabled(process.env.DEMO_AUTH_SHOW_OTP)
-const shouldExposeDemoOtp = demoOtpEnabled
+const demoOtpEnabled = isDemoOtpEnabled(process.env.DEMO_AUTH_SHOW_OTP ?? 'true')
 
 export const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString()
 
@@ -235,6 +234,12 @@ export const requestOtp = async (req: Request, res: Response): Promise<any> => {
       }
     }
 
+    if (demoOtpEnabled && user && user.role !== 'customer') {
+      return res.status(403).json({
+        error: 'This account must use its dedicated administration login.',
+      })
+    }
+
     if (user) {
       await updateUserOtpByEmail(normalizedEmail, otp, expiry)
     } else {
@@ -247,21 +252,25 @@ export const requestOtp = async (req: Request, res: Response): Promise<any> => {
       })
     }
 
-    try {
-      await sendVerificationEmail(normalizedEmail, otp)
-    } catch (emailError: any) {
-      console.error('OTP email delivery failed after OTP was issued:', {
-        email: normalizedEmail,
-        error: emailError?.message || emailError,
-      })
-      return res.status(502).json({
-        error: 'Unable to send OTP email right now. Please try again shortly.',
-      })
+    if (!demoOtpEnabled) {
+      try {
+        await sendVerificationEmail(normalizedEmail, otp)
+      } catch (emailError: any) {
+        console.error('OTP email delivery failed after OTP was issued:', {
+          email: normalizedEmail,
+          error: emailError?.message || emailError,
+        })
+        return res.status(502).json({
+          error: 'Unable to send OTP email right now. Please try again shortly.',
+        })
+      }
     }
 
     return res.json({
-      message: 'OTP sent successfully to your email',
-      ...(shouldExposeDemoOtp
+      message: demoOtpEnabled
+        ? 'Demo verification code generated'
+        : 'OTP sent successfully to your email',
+      ...(demoOtpEnabled
         ? {
             demoOtp: otp,
             demoOtpExpiresAt: expiry.toISOString(),
