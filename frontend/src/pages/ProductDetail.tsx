@@ -312,7 +312,7 @@ const ProductDetail: React.FC = () => {
 
   // Track product view when product loads
   useEffect(() => {
-    if (product?._id && !isLoading) {
+    if (product?._id && !product._id.startsWith('demo-') && !isLoading) {
       // Track view asynchronously without blocking the UI
       trackProductView(product._id).catch((error) => {
         // Silently fail - view tracking shouldn't break the page
