@@ -7,7 +7,7 @@ import './TrackOrder.css'
 
 dayjs.extend(relativeTime)
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004/api'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace'
 const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5174'
 
 interface FooterSettings {

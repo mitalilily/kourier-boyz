@@ -6,10 +6,9 @@ dotenv.config()
 
 const seedInvoiceSettings = async () => {
   try {
-    // Connect to MongoDB
-    if (!process.env.MONGO_URI) throw new Error('MONGO_URI not defined in .env')
-    await mongoose.connect(process.env.MONGO_URI)
-    console.log('✅ Connected to MongoDB')
+    if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not defined in .env')
+    await mongoose.connect(process.env.DATABASE_URL)
+    console.log('✅ Connected to PostgreSQL')
 
     // Check if settings already exist
     const existingSettings = await AdminInvoiceSettings.findOne()
@@ -83,3 +82,4 @@ const seedInvoiceSettings = async () => {
 
 seedInvoiceSettings()
 
+import '../database/postgresMongoose'

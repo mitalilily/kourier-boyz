@@ -95,7 +95,7 @@ const CategoryExtensionRequests = () => {
   const [actionType, setActionType] = useState<'approve' | 'reject' | 'need_more_docs'>('approve')
   const [rejectionReason, setRejectionReason] = useState('')
 
-  const API_BASE = import.meta.env.VITE_API_URL?.replace('/seller', '') || 'http://localhost:5004/api'
+  const API_BASE = import.meta.env.VITE_API_URL?.replace('/seller', '') || 'http://localhost:4000/api/marketplace'
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['admin-category-extensions'],

@@ -159,12 +159,12 @@ const VariantGenerator = ({
         console.log('📤 generateSku function:', typeof generateSku, generateSku)
         console.log(
           '📤 API base URL:',
-          import.meta.env.VITE_API_URL || 'http://localhost:5004/api/seller',
+          import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace/seller',
         )
         console.log(
           '📤 Full API endpoint will be:',
           `${
-            import.meta.env.VITE_API_URL || 'http://localhost:5004/api/seller'
+            import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace/seller'
           }/products/generate-sku`,
         )
         console.log('📤 Token available:', !!localStorage.getItem('seller_token'))

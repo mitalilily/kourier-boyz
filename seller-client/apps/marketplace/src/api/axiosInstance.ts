@@ -3,13 +3,13 @@ import { useAuthStore } from '../store/authStore'
 
 // Authenticated seller API
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5004/api/seller',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace/seller',
   withCredentials: true,
 })
 
 // Public, unauthenticated API (used for things like product serviceability)
 export const PublicAPI = axios.create({
-  baseURL: import.meta.env.VITE_PUBLIC_API_URL || 'http://localhost:5004/api',
+  baseURL: import.meta.env.VITE_PUBLIC_API_URL || 'http://localhost:4000/api/marketplace',
   withCredentials: true,
 })
 

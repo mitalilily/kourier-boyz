@@ -333,10 +333,6 @@ class ShipmozoService {
   private readonly client: AxiosInstance
 
   constructor() {
-    if (!SHIPMOZO_PUBLIC_KEY || !SHIPMOZO_PRIVATE_KEY) {
-      throw new Error('Shipmozo API keys are not configured')
-    }
-
     this.client = axios.create({
       baseURL: SHIPMOZO_API_BASE_URL,
       headers: {
@@ -345,6 +341,13 @@ class ShipmozoService {
         'Content-Type': 'application/json',
       },
       timeout: 20000,
+    })
+
+    this.client.interceptors.request.use((config) => {
+      if (!SHIPMOZO_PUBLIC_KEY || !SHIPMOZO_PRIVATE_KEY) {
+        throw new Error('Shipmozo API keys are not configured')
+      }
+      return config
     })
   }
 

@@ -2,12 +2,20 @@
   "name": "kourier-boyz-backend",
   "private": true,
   "version": "1.0.0",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
+    "install:services": "npm ci --prefix marketplace && npm ci --prefix logistics",
     "dev:marketplace": "npm run dev --prefix marketplace",
     "dev:logistics": "npm run dev --prefix logistics",
     "build:marketplace": "npm run build --prefix marketplace",
     "build:logistics": "npm run build --prefix logistics",
     "build": "npm run build:marketplace && npm run build:logistics",
+    "railway:build": "npm run install:services && npm run build",
+    "start": "node unified-server.js",
+    "migrate": "npm run migrate --prefix logistics",
+    "test": "npm run test:postgres --prefix marketplace && npm run test --prefix logistics",
     "test:logistics": "npm run test --prefix logistics",
     "start:marketplace": "npm run start --prefix marketplace",
     "start:logistics": "npm run start --prefix logistics"

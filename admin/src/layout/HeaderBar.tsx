@@ -179,7 +179,7 @@ const HeaderBar = () => {
 
     if (!userId && userRole !== 'super-admin') return
 
-    const base = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5004'
+    const base = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000'
     const socket = ioc(base, {
       transports: ['websocket', 'polling'],
       reconnection: true,

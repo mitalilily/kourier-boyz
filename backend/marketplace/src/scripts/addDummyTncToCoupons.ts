@@ -18,14 +18,13 @@ const dummyTncList = [
 
 const addDummyTncToCoupons = async () => {
   try {
-    // Connect to MongoDB
-    if (!process.env.MONGO_URI) {
-      console.error('MONGO_URI is not defined in environment variables')
+    if (!process.env.DATABASE_URL) {
+      console.error('DATABASE_URL is not defined in environment variables')
       process.exit(1)
     }
 
-    await mongoose.connect(process.env.MONGO_URI)
-    console.log('Connected to MongoDB')
+    await mongoose.connect(process.env.DATABASE_URL)
+    console.log('Connected to PostgreSQL')
 
     // Find all coupons
     const coupons = await Coupon.find({})
@@ -66,7 +65,7 @@ const addDummyTncToCoupons = async () => {
     console.log(`Skipped (already had T&C): ${skippedCount}`)
 
     await mongoose.disconnect()
-    console.log('\nDisconnected from MongoDB')
+    console.log('\nDisconnected from PostgreSQL')
     process.exit(0)
   } catch (error) {
     console.error('Error adding dummy T&C to coupons:', error)
@@ -78,3 +77,4 @@ const addDummyTncToCoupons = async () => {
 // Run the script
 addDummyTncToCoupons()
 
+import '../database/postgresMongoose'

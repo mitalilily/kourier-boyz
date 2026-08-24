@@ -228,7 +228,7 @@ const LiveChat = () => {
 
     // Connect to Socket.io
     const socket = io(
-      import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5004',
+      import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000',
       {
         transports: ['websocket'],
       },

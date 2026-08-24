@@ -2,7 +2,7 @@ import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { clearMarketplaceAdminStorage, MARKETPLACE_ADMIN_STORAGE } from '../config/authStorage'
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5004/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace',
   withCredentials: true,
 })
 

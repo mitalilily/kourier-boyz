@@ -52,10 +52,10 @@ const decryptWithOldKey = (encryptedPhone: string, oldKeyHex: string): string | 
 
 const migratePhones = async () => {
   try {
-    // Connect to MongoDB
-    const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/kourier-boyz'
-    await mongoose.connect(mongoUri)
-    console.log('Connected to MongoDB')
+    const databaseUrl = process.env.DATABASE_URL
+    if (!databaseUrl) throw new Error('DATABASE_URL is required')
+    await mongoose.connect(databaseUrl)
+    console.log('Connected to PostgreSQL')
 
     // Find all users with phone numbers
     const users = await User.find({ phone: { $exists: true, $ne: null } })
@@ -129,3 +129,4 @@ const migratePhones = async () => {
 // Run migration
 migratePhones()
 
+import '../database/postgresMongoose'

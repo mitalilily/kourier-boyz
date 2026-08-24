@@ -14,13 +14,13 @@ import User from '../models/User'
 
 dotenv.config()
 
-const MONGO_URI = process.env.MONGO_URI || ''
+const DATABASE_URL = process.env.DATABASE_URL || ''
 
 async function testPaymentFlow() {
   try {
-    console.log('🔌 Connecting to MongoDB...')
-    await mongoose.connect(MONGO_URI)
-    console.log('✅ Connected to MongoDB\n')
+    console.log('🔌 Connecting to PostgreSQL...')
+    await mongoose.connect(DATABASE_URL)
+    console.log('✅ Connected to PostgreSQL\n')
 
     // Test 1: Check for stuck payment intents
     console.log('📊 Test 1: Checking for stuck payment intents...')
@@ -177,10 +177,11 @@ async function testPaymentFlow() {
     console.error('❌ Error testing payment flow:', error)
   } finally {
     await mongoose.disconnect()
-    console.log('🔌 Disconnected from MongoDB')
+    console.log('🔌 Disconnected from PostgreSQL')
   }
 }
 
 // Run the test
 testPaymentFlow()
 
+import '../database/postgresMongoose'

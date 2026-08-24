@@ -3,7 +3,7 @@ import axios from 'axios'
 import { clearAuthTokens, getAuthTokens, setAuthTokens } from './tokenVault'
 import { buildShopifyInstallPath, isEmbeddedShopifyContext } from '../utils/shopifyEmbedded'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
+const API_BASE_URL = import.meta.env.VITE_LOGISTICS_API_URL || import.meta.env.VITE_API_URL || '/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,

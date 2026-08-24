@@ -74,7 +74,7 @@ export const useCertificateTypes = () =>
     queryKey: ['certificate-types'],
     queryFn: async () => {
       // Use base API URL for public endpoint
-      const baseURL = import.meta.env.VITE_API_URL?.replace('/seller', '') || 'http://localhost:5004/api'
+      const baseURL = import.meta.env.VITE_API_URL?.replace('/seller', '') || 'http://localhost:4000/api/marketplace'
       const { data } = await axios.get(`${baseURL}/certificates/types`, {
         withCredentials: true,
         headers: {

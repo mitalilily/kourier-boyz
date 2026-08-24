@@ -14,7 +14,8 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-const WEBHOOK_URL = process.env.WEBHOOK_URL || 'http://localhost:5004/api/webhooks/razorpay'
+const WEBHOOK_URL =
+  process.env.WEBHOOK_URL || 'http://localhost:4000/api/marketplace/webhooks/razorpay'
 const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || ''
 
 function generateWebhookSignature(payload: string): string {

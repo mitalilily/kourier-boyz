@@ -68,7 +68,7 @@ const Login = () => {
         // Check for network errors (backend not running)
         if (axiosError.code === 'ERR_NETWORK' || axiosError.message === 'Network Error') {
           message.error({
-            content: 'Cannot connect to server. Please ensure the backend server is running on localhost:5004',
+            content: 'Cannot connect to the Kourier Boyz backend. Please try again shortly.',
             duration: 8,
           })
         } else {

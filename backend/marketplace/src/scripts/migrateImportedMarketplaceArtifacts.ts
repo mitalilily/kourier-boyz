@@ -36,10 +36,10 @@ const renameObjectKey = (
 })
 
 const migrate = async () => {
-  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI
-  if (!mongoUri) throw new Error('MONGO_URI is required')
+  const databaseUrl = process.env.DATABASE_URL
+  if (!databaseUrl) throw new Error('DATABASE_URL is required')
 
-  await mongoose.connect(mongoUri)
+  await mongoose.connect(databaseUrl)
 
   const importedLogisticsValue = readField('$$shipment', importedShipmentKey)
   const normalizedLogisticsValue = renameObjectKey(
@@ -138,3 +138,4 @@ migrate()
   .finally(async () => {
     await mongoose.disconnect()
   })
+import '../database/postgresMongoose'

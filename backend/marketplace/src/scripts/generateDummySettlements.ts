@@ -22,9 +22,9 @@ dotenv.config()
  */
 async function generateDummySettlements() {
   try {
-    if (!process.env.MONGO_URI) throw new Error('MONGO_URI not defined in .env')
-    await mongoose.connect(process.env.MONGO_URI)
-    console.log('✅ Connected to MongoDB')
+    if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not defined in .env')
+    await mongoose.connect(process.env.DATABASE_URL)
+    console.log('✅ Connected to PostgreSQL')
 
     // 1) Seed basic settlement settings for all approved sellers that don't have any yet
     const sellers = await User.find({ role: 'seller', isApproved: true }).select(
@@ -138,3 +138,4 @@ async function generateDummySettlements() {
 }
 
 generateDummySettlements()
+import '../database/postgresMongoose'

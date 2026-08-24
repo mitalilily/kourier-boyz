@@ -12,10 +12,10 @@ import User from '../models/User'
 
 const run = async () => {
   try {
-    const mongoUri =
-      process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/kourier-boyz'
-    await mongoose.connect(mongoUri)
-    console.log('Connected to MongoDB')
+    const databaseUrl = process.env.DATABASE_URL
+    if (!databaseUrl) throw new Error('DATABASE_URL is required')
+    await mongoose.connect(databaseUrl)
+    console.log('Connected to PostgreSQL')
 
     const result = await User.updateMany(
       {
@@ -40,3 +40,4 @@ const run = async () => {
 }
 
 run()
+import '../database/postgresMongoose'

@@ -38,7 +38,10 @@ export interface Category {
 }
 
 // Using the main API base URL since categories are shared (not seller-specific)
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5004/api";
+const SELLER_API_BASE =
+  import.meta.env.VITE_API_URL || "http://localhost:4000/api/marketplace/seller";
+const API_BASE =
+  import.meta.env.VITE_API_ROOT_URL || SELLER_API_BASE.replace(/\/seller\/?$/, "");
 
 // Create axios instance for categories (public endpoint, but may need token for some operations)
 const categoryApi = axios.create({
@@ -104,8 +107,7 @@ categoryApi.interceptors.response.use(
 
         isRefreshing = true;
         const refreshRes = await axios.post(
-          (import.meta.env.VITE_API_URL || "http://localhost:5004/api") +
-            "/seller/auth/refresh",
+          `${SELLER_API_BASE}/auth/refresh`,
           {},
           { withCredentials: true }
         );

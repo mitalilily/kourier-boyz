@@ -15,10 +15,9 @@ dotenv.config()
 
 const seedAlmostApplicableCoupons = async () => {
   try {
-    // Connect to MongoDB
-    if (!process.env.MONGO_URI) throw new Error('MONGO_URI not defined in .env')
-    await mongoose.connect(process.env.MONGO_URI)
-    console.log('✅ Connected to MongoDB')
+    if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not defined in .env')
+    await mongoose.connect(process.env.DATABASE_URL)
+    console.log('✅ Connected to PostgreSQL')
 
     // Find an admin user to use as createdBy
     const adminUser = await User.findOne({ role: 'super-admin' })
@@ -125,7 +124,7 @@ const seedAlmostApplicableCoupons = async () => {
     })
 
     await mongoose.disconnect()
-    console.log('\n✅ Disconnected from MongoDB')
+    console.log('\n✅ Disconnected from PostgreSQL')
     process.exit(0)
   } catch (error) {
     console.error('❌ Error seeding almost applicable coupons:', error)
@@ -145,3 +144,4 @@ seedAlmostApplicableCoupons()
 
 
 
+import '../database/postgresMongoose'

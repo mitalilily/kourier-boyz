@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv'
 import path from 'path'
 import { server } from './app'
 import './crons'
+import { initSocketServer } from './config/socketServer'
 import { testDatabaseConnection } from './models/client'
 
 // Determine environment
@@ -27,6 +28,7 @@ async function startServer() {
   // Set server timeout to 3.5 minutes (210000ms) to allow for slow external API calls
   // Default Node.js server timeout is 2 minutes (120000ms)
   server.timeout = 210000 // 3.5 minutes
+  initSocketServer(server)
 
   server.listen(PORT, () => {
     const url =

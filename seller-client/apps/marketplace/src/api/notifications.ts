@@ -2,7 +2,10 @@ import axios from 'axios'
 
 // Create a separate axios instance for notifications (uses /api/notifications, not /api/seller/notifications)
 const NotificationsAPI = axios.create({
-  baseURL: import.meta.env.VITE_API_URL?.replace('/api/seller', '/api') || 'http://localhost:5004/api',
+  baseURL:
+    import.meta.env.VITE_API_ROOT_URL ||
+    import.meta.env.VITE_API_URL?.replace(/\/seller\/?$/, '') ||
+    'http://localhost:4000/api/marketplace',
   withCredentials: true,
 })
 

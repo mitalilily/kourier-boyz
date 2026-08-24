@@ -6,7 +6,6 @@ import helmet from 'helmet'
 import http from 'http'
 import path from 'path'
 import { randomUUID } from 'crypto'
-import { initSocketServer } from './config/socketServer'
 import { corsOriginCallback } from './config/cors'
 import {
   delhiveryDocumentPushHandler,
@@ -89,9 +88,6 @@ if (env === 'production') {
 }
 
 app.use(helmet())
-
-// Init socket.io server
-initSocketServer(server)
 
 const normalizeJsonCharsetHeader = (contentType: string) =>
   contentType.replace(/charset=([^;]+)/i, (_match, charset) => `charset=${String(charset).trim().toLowerCase()}`)

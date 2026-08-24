@@ -5,7 +5,7 @@ import axios from 'axios'
 const getTicketAPI = () => {
   const token = localStorage.getItem('seller_token')
   const instance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL?.replace('/seller', '') || 'http://localhost:5004/api',
+    baseURL: import.meta.env.VITE_API_URL?.replace('/seller', '') || 'http://localhost:4000/api/marketplace',
     withCredentials: true,
   })
   

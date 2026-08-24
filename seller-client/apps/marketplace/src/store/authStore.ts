@@ -118,7 +118,7 @@ const getStoredUser = (): User | null => {
   }
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5004/api/seller'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace/seller'
 
 const sendLogoutRequest = async (): Promise<void> => {
   if (typeof window === 'undefined') return

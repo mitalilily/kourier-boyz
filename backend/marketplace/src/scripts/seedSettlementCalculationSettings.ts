@@ -12,8 +12,12 @@
  *   - Or run manually: node -e "require('./scripts/seedSettlementCalculationSettings.ts')"
  */
 
+import '../database/postgresMongoose'
+import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import AdminSettlementSettings from '../models/AdminSettlementSettings'
+
+dotenv.config()
 
 export const seedSettlementCalculationSettings = async () => {
   try {
@@ -110,13 +114,15 @@ export const seedSettlementCalculationSettings = async () => {
 
 // If run directly (not imported), execute the seed function
 if (require.main === module) {
-  // This would need MongoDB connection
-  // seedSettlementCalculationSettings()
-  //   .then(() => process.exit(0))
-  //   .catch((error) => {
-  //     console.error(error)
-  //     process.exit(1)
-  //   })
-  console.log('This script should be imported and run with a MongoDB connection.')
+  const databaseUrl = process.env.DATABASE_URL
+  if (!databaseUrl) throw new Error('DATABASE_URL is required')
+  void mongoose
+    .connect(databaseUrl)
+    .then(seedSettlementCalculationSettings)
+    .then(() => mongoose.disconnect())
+    .catch((error) => {
+      console.error(error)
+      process.exitCode = 1
+    })
 }
 

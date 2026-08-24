@@ -95,8 +95,8 @@ export const useProductShare = ({ product, variant, selectedImage }: UseProductS
     
     // If it's a path without leading slash, it might be from API or a CDN
     // Try to construct absolute URL from API base URL
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5004/api'
-    const baseUrl = apiUrl.replace('/api', '')
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace'
+    const baseUrl = new URL(apiUrl, window.location.origin).origin
     
     // If baseUrl ends with /, don't add another /
     const separator = baseUrl.endsWith('/') || imageUrl.startsWith('/') ? '' : '/'

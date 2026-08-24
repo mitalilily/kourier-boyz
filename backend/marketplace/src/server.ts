@@ -1,3 +1,4 @@
+import './database/postgresMongoose'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
@@ -73,8 +74,8 @@ import { fiveMinuteCache } from './utils/cache'
 
 dotenv.config()
 
-const app = express()
-const server = http.createServer(app)
+export const app = express()
+export const server = http.createServer(app)
 app.set('trust proxy', 1)
 
 const localOrigins = [
@@ -93,29 +94,38 @@ const configuredOrigins = (process.env.CORS_ORIGINS || '')
 
 const allowedOrigins = [...localOrigins, ...configuredOrigins]
 
-export const io = new SocketIOServer(server, {
-  cors: {
-    origin: allowedOrigins,
-  },
-})
+export let io: SocketIOServer
+let marketplaceSocketHandlersRegistered = false
 
-// Set IO instance for announcement scheduler
-setIOInstance(io)
+export const attachMarketplaceSocketServer = (
+  targetServer: http.Server,
+  existingSocketServer?: SocketIOServer,
+) => {
+  io =
+    existingSocketServer ||
+    new SocketIOServer(targetServer, {
+      cors: {
+        origin: allowedOrigins,
+      },
+    })
 
-io.on('connection', (socket) => {
-  socket.on('register', (payload: { role?: string; userId?: string }) => {
-    try {
-      if (payload?.role === 'super-admin') {
-        socket.join('super-admin')
-      }
-      if (payload?.userId) {
-        socket.join(`user:${payload.userId}`)
-      }
-    } catch (e) {
-      // ignore
-    }
-  })
-})
+  setIOInstance(io)
+  if (!marketplaceSocketHandlersRegistered) {
+    marketplaceSocketHandlersRegistered = true
+    io.on('connection', (socket) => {
+      socket.on('register', (payload: { role?: string; userId?: string } | string) => {
+        if (!payload || typeof payload !== 'object') return
+        try {
+          if (payload.role === 'super-admin') socket.join('super-admin')
+          if (payload.userId) socket.join(`user:${payload.userId}`)
+        } catch {
+          // A failed room registration must not terminate the socket connection.
+        }
+      })
+    })
+  }
+  return io
+}
 
 // CORS configuration - Allow frontend, admin panel, seller panel, and tracking frontend
 app.use(
@@ -213,11 +223,20 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT || 5004
 
-mongoose
-  .connect(process.env.MONGO_URI!)
-  .then(async () => {
-    console.log('MongoDB connected')
-    server.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+type MarketplaceRuntimeOptions = {
+  listen?: boolean
+  socketServer?: SocketIOServer
+  httpServer?: http.Server
+}
+
+export const startMarketplaceRuntime = async (options: MarketplaceRuntimeOptions = {}) => {
+    await mongoose.connect(process.env.DATABASE_URL!)
+    console.log('Marketplace PostgreSQL storage connected')
+    const targetServer = options.httpServer || server
+    attachMarketplaceSocketServer(targetServer, options.socketServer)
+    if (options.listen !== false) {
+      targetServer.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+    }
 
     // Auto-close inactive chats every hour
     const { autoCloseInactiveChats } = require('./controllers/supportChat.controller')
@@ -503,5 +522,11 @@ mongoose
     } catch (e) {
       console.warn('Failed to pre-warm suggestion cache', e)
     }
+}
+
+if (require.main === module) {
+  void startMarketplaceRuntime().catch((error) => {
+    console.error('Marketplace backend failed to start', error)
+    process.exitCode = 1
   })
-  .catch((err) => console.log(err))
+}
