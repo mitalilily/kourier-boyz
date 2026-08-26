@@ -76,6 +76,9 @@ const BRAND_BORDER = '#D9DCDA'
 const LOGO_WORDMARK_SRC = '/brand/kourier-boyz-logo.png'
 const LOGO_MARK_SRC = '/brand/kourier-boyz-mark.png'
 
+// Marketplace runs under /store, so return through the root app shell before opening a courier route.
+const buildConsoleHref = (path: string) => `/?kb_console_route=${encodeURIComponent(path)}`
+
 const navItems: NavItem[] = [
   {
     text: 'Overview',
@@ -417,7 +420,10 @@ export default function Sidebar({
                 <ListItemButton
                   {...(!hasChildren &&
                     (external || externalNavigation
-                      ? ({ component: 'a', href: path } as const)
+                      ? ({
+                          component: 'a',
+                          href: externalNavigation ? buildConsoleHref(path) : path,
+                        } as const)
                       : ({ component: NavLink, to: path } as const)))}
                   onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
                     if (hasChildren) {
@@ -514,7 +520,7 @@ export default function Sidebar({
                         <ListItemButton
                           key={child.path}
                           {...(externalNavigation
-                            ? ({ component: 'a', href: child.path } as const)
+                            ? ({ component: 'a', href: buildConsoleHref(child.path) } as const)
                             : ({ component: NavLink, to: child.path } as const))}
                           sx={{
                             minHeight: 34,
@@ -595,7 +601,7 @@ export default function Sidebar({
                   <ListItemButton
                     key={child.path}
                     {...(externalNavigation
-                      ? ({ component: 'a', href: child.path } as const)
+                      ? ({ component: 'a', href: buildConsoleHref(child.path) } as const)
                       : ({ component: NavLink, to: child.path } as const))}
                     onClick={handlePopoverClose}
                     sx={{

@@ -131,6 +131,11 @@ function AppEntryRoute() {
     return <Navigate to={buildShopifyInstallPath()} replace />
   }
 
+  const consoleRoute = new URLSearchParams(window.location.search).get('kb_console_route')
+  if (consoleRoute && consoleRoute.startsWith('/') && !consoleRoute.startsWith('//')) {
+    return <Navigate to={consoleRoute} replace />
+  }
+
   return <Login />
 }
 
