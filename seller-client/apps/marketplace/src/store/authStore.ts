@@ -100,6 +100,8 @@ interface AuthState {
 }
 
 export const DEMO_SELLER_TOKEN = 'kourier-boyz-demo-seller'
+export const DEMO_SELLER_EMAIL = 'demo.seller@kourierboyz.com'
+export const DEMO_SELLER_PASSWORD = 'Demo@123'
 
 export const isDemoSellerSession = () =>
   typeof window !== 'undefined' && localStorage.getItem('seller_token') === DEMO_SELLER_TOKEN
@@ -107,7 +109,7 @@ export const isDemoSellerSession = () =>
 const DEMO_SELLER: User = {
   id: 'demo-seller-001',
   name: 'Aarav Mehta',
-  email: 'demo.seller@kourierboyz.com',
+  email: DEMO_SELLER_EMAIL,
   phone: '9876543210',
   role: 'seller',
   businessName: 'Northstar Living',

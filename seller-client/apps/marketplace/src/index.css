@@ -802,6 +802,94 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
   backdrop-filter: blur(14px);
 }
 
+.kb-demo-login-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px 13px;
+  border: 1px solid rgba(183, 129, 21, 0.28);
+  border-radius: 8px;
+  background: linear-gradient(105deg, #fffaf0 0%, #ffffff 72%);
+  box-shadow: 0 8px 20px rgba(72, 55, 18, 0.07);
+}
+
+.kb-demo-login-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 1px solid rgba(183, 129, 21, 0.32);
+  border-radius: 7px;
+  color: #8f650f;
+  background: #f8efd7;
+  font-size: 16px;
+}
+
+.kb-demo-login-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.kb-demo-login-copy strong,
+.kb-demo-login-copy span,
+.kb-demo-login-copy code {
+  display: block;
+}
+
+.kb-demo-login-copy strong {
+  color: #202321;
+  font-size: 12px;
+}
+
+.kb-demo-login-copy span {
+  margin-top: 2px;
+  color: #69716d;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.kb-demo-login-copy code {
+  margin-top: 4px;
+  overflow: hidden;
+  color: #8f650f;
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kb-demo-login-panel .ant-btn {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding-inline: 12px;
+  border-color: #cdb56e;
+  border-radius: 5px;
+  color: #8f650f;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.kb-demo-login-panel .ant-btn:hover {
+  color: #fff !important;
+  border-color: #8f650f !important;
+  background: #8f650f !important;
+}
+
+@media (max-width: 520px) {
+  .kb-demo-login-panel {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .kb-demo-login-panel .ant-btn {
+    width: calc(100% - 46px);
+    margin-left: 46px;
+  }
+}
+
 /* Shared courier context for marketplace entry and authentication. */
 .kb-public-shell {
   --kb-rail-width: 238px;
