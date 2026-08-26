@@ -56,6 +56,8 @@ interface SidebarProps {
   role?: Role
   pinned?: boolean
   onPinChange?: (pinned: boolean) => void
+  /** Render the same courier navigation inside the marketplace bundle. */
+  externalNavigation?: boolean
 }
 
 const SIDEBAR_EXPANDED_WIDTH = 260
@@ -270,9 +272,12 @@ const navItems: NavItem[] = [
 export default function Sidebar({
   role = 'customer',
   pinned: initialPinned = false,
+  externalNavigation = false,
   // onPinChange,
 }: SidebarProps) {
-  const { pathname } = useLocation()
+  const { pathname: routerPathname } = useLocation()
+  const pathname =
+    externalNavigation && typeof window !== 'undefined' ? window.location.pathname : routerPathname
   const [pinned, setPinned] = useState(initialPinned)
   const [hovered, setHovered] = useState(false)
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
@@ -368,7 +373,15 @@ export default function Sidebar({
         >
           <Box
             component="img"
-            src={shouldShowExpanded ? LOGO_WORDMARK_SRC : LOGO_MARK_SRC}
+            src={
+              externalNavigation
+                ? shouldShowExpanded
+                  ? '/store/brand/kourier-boyz-logo-transparent.png'
+                  : '/store/brand/kourier-boyz-mark.png'
+                : shouldShowExpanded
+                  ? LOGO_WORDMARK_SRC
+                  : LOGO_MARK_SRC
+            }
             alt="Kourier Boyz"
             sx={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
           />
@@ -394,7 +407,7 @@ export default function Sidebar({
               <Tooltip title={shouldShowExpanded || hasChildren ? '' : text} placement="right">
                 <ListItemButton
                   {...(!hasChildren &&
-                    (external
+                    (external || externalNavigation
                       ? ({ component: 'a', href: path } as const)
                       : ({ component: NavLink, to: path } as const)))}
                   onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
@@ -491,8 +504,9 @@ export default function Sidebar({
                       return (
                         <ListItemButton
                           key={child.path}
-                          component={NavLink}
-                          to={child.path}
+                          {...(externalNavigation
+                            ? ({ component: 'a', href: child.path } as const)
+                            : ({ component: NavLink, to: child.path } as const))}
                           sx={{
                             minHeight: 44,
                             px: 1.5,
@@ -571,8 +585,9 @@ export default function Sidebar({
                 return (
                   <ListItemButton
                     key={child.path}
-                    component={NavLink}
-                    to={child.path}
+                    {...(externalNavigation
+                      ? ({ component: 'a', href: child.path } as const)
+                      : ({ component: NavLink, to: child.path } as const))}
                     onClick={handlePopoverClose}
                     sx={{
                       px: 1.5,

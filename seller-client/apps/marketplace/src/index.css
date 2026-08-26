@@ -1091,7 +1091,7 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
 
 @media (max-width: 760px) {
   .kb-public-shell {
-    display: block;
+    display: flex;
   }
 
   .kb-public-shell-rail {
