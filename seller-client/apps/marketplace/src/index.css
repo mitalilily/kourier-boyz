@@ -878,6 +878,11 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
   width: 37px;
   height: 37px;
   object-fit: contain;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  filter: brightness(1.16) contrast(1.1) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.28));
 }
 
 .kb-public-shell-brand strong,
@@ -1152,5 +1157,110 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
   .kb-store-entry-nav,
   .kb-store-entry-hero {
     width: calc(100% - 20px);
+  }
+}
+
+/* Desktop viewport fit: keep the complete seller entry visible at default zoom. */
+@media (min-width: 761px) {
+  .kb-store-entry-page {
+    min-height: calc(100vh - 42px);
+    overflow: hidden;
+  }
+
+  .kb-store-entry-nav {
+    height: 64px;
+    margin-top: 12px;
+    padding: 7px 14px 7px 16px;
+  }
+
+  .kb-store-entry-nav img {
+    width: 252px;
+    height: 50px;
+    padding: 5px 11px;
+    border: 1px solid rgba(223, 183, 67, 0.68);
+    background: #1b211f;
+    filter: brightness(1.2) contrast(1.12) drop-shadow(0 3px 4px rgba(0, 0, 0, 0.22));
+  }
+
+  .kb-store-entry-signin {
+    min-height: 38px;
+    padding-inline: 15px;
+  }
+
+  .kb-store-entry-hero {
+    min-height: calc(100vh - 132px);
+    height: calc(100vh - 132px);
+    margin-top: 12px;
+  }
+
+  .kb-store-entry-copy {
+    width: 53%;
+    padding: clamp(28px, 3.2vw, 48px) clamp(28px, 4.2vw, 68px) 150px;
+  }
+
+  .kb-store-entry-kicker {
+    margin-bottom: 11px;
+  }
+
+  .kb-store-entry-route {
+    margin-top: 0;
+    margin-bottom: 13px;
+  }
+
+  .kb-store-entry-copy h1 {
+    max-width: 600px;
+    font-size: clamp(43px, 4.15vw, 62px);
+    line-height: 0.98;
+  }
+
+  .kb-store-entry-copy > p {
+    max-width: 560px;
+    margin-top: 17px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .kb-store-entry-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
+    margin-top: 17px;
+  }
+
+  .kb-store-entry-benefits span {
+    gap: 7px;
+    font-size: 12px;
+  }
+
+  .kb-store-entry-actions {
+    gap: 9px;
+    margin-top: 22px;
+  }
+
+  .kb-store-entry-actions .ant-btn {
+    min-height: 43px;
+    padding-inline: 17px;
+    font-size: 13px;
+  }
+
+  .kb-store-entry-proof {
+    right: 20px;
+    bottom: 18px;
+    left: 20px;
+  }
+
+  .kb-store-entry-proof div {
+    min-height: 78px;
+    padding: 13px 18px;
+    grid-template-columns: 27px 1fr;
+    column-gap: 10px;
+  }
+
+  .kb-store-entry-proof strong {
+    font-size: 14px;
+  }
+
+  .kb-store-entry-proof small {
+    margin-top: 2px;
+    font-size: 10px;
   }
 }
