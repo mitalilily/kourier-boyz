@@ -20,7 +20,7 @@ import {
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   useBulkUpdateSellerOrderStatus,
   useCancelSellerOrder,
@@ -172,6 +172,7 @@ const itemsColumns: ColumnsType<SellerOrderItem> = [
 ]
 
 const OrderDetail = () => {
+  const navigate = useNavigate()
   const { id, batchId } = useParams<{ id?: string; batchId?: string }>()
   const { message } = App.useApp()
   const [shipModalOpen, setShipModalOpen] = useState(false)
@@ -598,7 +599,7 @@ const OrderDetail = () => {
           <Button
             type="default"
             size="small"
-            onClick={() => window.history.back()}
+            onClick={() => navigate('/orders')}
             className="flex items-center gap-1"
           >
             ← Back

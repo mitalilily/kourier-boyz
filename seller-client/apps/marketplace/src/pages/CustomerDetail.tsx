@@ -25,6 +25,7 @@ const CustomerDetail = () => {
   const orderLimit = 10
 
   const { data: customer, isLoading, error } = useSellerCustomer(id || '', orderPage, orderLimit)
+  const returnToCustomers = () => navigate('/customers')
 
   if (isLoading) {
     return (
@@ -38,7 +39,7 @@ const CustomerDetail = () => {
     return (
       <Card title="Customer Details">
         <p>Error loading customer details or customer not found.</p>
-        <Button onClick={() => navigate(-1)}>Back</Button>
+        <Button onClick={returnToCustomers}>Back</Button>
       </Card>
     )
   }
@@ -47,7 +48,7 @@ const CustomerDetail = () => {
     <Card
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
+          <Button icon={<ArrowLeftOutlined />} onClick={returnToCustomers}>
             Back
           </Button>
           <Title level={3} style={{ margin: 0 }}>

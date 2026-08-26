@@ -151,7 +151,7 @@ const SellerLedger = () => {
               <Button
                 size="small"
                 type="link"
-                onClick={() => window.location.href = '/credit-notes'}
+                onClick={() => navigate('/credit-notes')}
                 style={{ padding: 0, fontSize: 11 }}
               >
                 View All Credit Notes →

@@ -37,11 +37,13 @@ import TdsReport from './pages/TdsReport'
 import Tickets from './pages/Tickets'
 import VerifyEmail from './pages/VerifyEmail'
 import WaitingApproval from './pages/WaitingApproval'
+import RouteErrorBoundary from './components/RouteErrorBoundary'
 
 const AppRoutes = () => {
   return (
     <HashRouter>
-      <Routes>
+      <RouteErrorBoundary>
+        <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -114,7 +116,8 @@ const AppRoutes = () => {
 
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+        </Routes>
+      </RouteErrorBoundary>
     </HashRouter>
   )
 }

@@ -32,6 +32,12 @@ const refreshClient = axios.create({
   withCredentials: true,
 })
 
+const redirectToSellerLogin = () => {
+  if (typeof window === 'undefined') return
+  const pathname = window.location.pathname || '/store/'
+  window.location.assign(`${pathname}#/login`)
+}
+
 type RetriableRequest = AxiosRequestConfig & { _retry?: boolean }
 
 API.interceptors.response.use(
@@ -58,7 +64,7 @@ API.interceptors.response.use(
       }
       // Only redirect if we're not already on the login page
       if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
-        window.location.href = '/login'
+        redirectToSellerLogin()
       }
       // Always reject the error so the component can handle it
       return Promise.reject(error)
@@ -77,7 +83,7 @@ API.interceptors.response.use(
           void 0
         }
         if (typeof window !== 'undefined') {
-          window.location.href = '/login'
+          redirectToSellerLogin()
         }
         return Promise.reject(error)
       }
@@ -142,7 +148,7 @@ API.interceptors.response.use(
         void 0
       }
       if (typeof window !== 'undefined') {
-        window.location.href = '/login'
+        redirectToSellerLogin()
       }
     }
 
