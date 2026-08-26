@@ -31,7 +31,7 @@ import type { RegisterData } from '../api/auth'
 import { useRegister } from '../api/authQueries'
 import MarketplacePublicShell from '../components/MarketplacePublicShell'
 
-const { Title, Text, Paragraph } = Typography
+const { Text, Paragraph } = Typography
 
 const getPasswordChecks = (password?: string) => {
   const value = password || ''
@@ -169,60 +169,73 @@ const Register = () => {
   return (
     <MarketplacePublicShell>
       <div
-      style={{
-        minHeight: '100vh',
-        background: 'radial-gradient(circle at top left, #e6f7ff 0, #f0f2f5 40%, #ffffff 100%)',
-        padding: '48px 16px',
-      }}
+        className="kb-register-page"
+        style={{
+          minHeight: '100vh',
+          background: 'radial-gradient(circle at top left, #e6f7ff 0, #f0f2f5 40%, #ffffff 100%)',
+          padding: '48px 16px',
+        }}
     >
-      <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-        {/* Header */}
-        <Space direction="vertical" size="large" style={{ width: '100%', marginBottom: 32 }}>
-          <div style={{ textAlign: 'center' }}>
+      <div className="kb-register-container" style={{ maxWidth: 1000, margin: '0 auto' }}>
+        <div className="kb-register-layout">
+          <section className="kb-register-intro" aria-labelledby="seller-registration-title">
             <div
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 12,
-                marginBottom: 20,
-              }}
+              className="kb-register-brand"
             >
-              <div
-                style={{
-                  width: 64,
-                  height: 64,
-
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  overflow: 'hidden',
-                }}
-              >
+              <div className="kb-register-logo-frame">
                 <img
                   src="/store/brand/kourier-boyz-mark.png"
                   alt="Kourier Boyz"
-                  style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
               </div>
-              <div style={{ textAlign: 'left' }}>
-                <Title level={2} style={{ margin: 0 }}>
-                  Kourier Boyz Seller Hub
-                </Title>
-                <Text type="secondary" style={{ fontSize: 13 }}>
-                  Grow your business with the official Kourier Boyz marketplace platform
-                </Text>
+              <div>
+                <strong>Kourier Boyz</strong>
+                <span>Seller workspace</span>
               </div>
             </div>
-            <Paragraph style={{ fontSize: 16, color: '#595959', margin: 0 }}>
-              Create your professional seller account on Kourier Boyz and start reaching customers across
-              India.
-            </Paragraph>
-          </div>
-        </Space>
+
+            <div className="kb-register-intro-copy">
+              <span className="kb-register-eyebrow">Seller onboarding</span>
+              <h1 id="seller-registration-title">Turn your next idea into a store that moves.</h1>
+              <p>
+                Create one seller account for your catalogue, orders, customers, and delivery
+                workflow. Start with the marketplace and add fulfilment when your business needs it.
+              </p>
+            </div>
+
+            <div className="kb-register-steps" aria-label="Seller onboarding steps">
+              <div className="is-current">
+                <span>01</span>
+                <div>
+                  <strong>Create your account</strong>
+                  <small>Basic details and secure access</small>
+                </div>
+              </div>
+              <div>
+                <span>02</span>
+                <div>
+                  <strong>Complete your profile</strong>
+                  <small>KYC, GST, pickup, and payout details</small>
+                </div>
+              </div>
+              <div>
+                <span>03</span>
+                <div>
+                  <strong>Start selling</strong>
+                  <small>Publish products and manage every order</small>
+                </div>
+              </div>
+            </div>
+
+            <div className="kb-register-intro-footer">
+              <span className="kb-register-live-dot" />
+              <span>Built for marketplace sellers and independent shippers</span>
+            </div>
+          </section>
 
         {/* Main Card */}
         <Card
+          className="kb-register-card"
           bordered={false}
           style={{
             boxShadow:
@@ -530,6 +543,7 @@ const Register = () => {
             </Space>
           </Form>
         </Card>
+        </div>
 
         {/* Footer */}
         <Text
