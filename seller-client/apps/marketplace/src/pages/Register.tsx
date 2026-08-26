@@ -147,7 +147,7 @@ const Register = () => {
     if (registerMutation.isSuccess) {
       message.success('🎉 Registration successful! Please complete your KYC.')
       // Auto-login and redirect to KYC page
-      setTimeout(() => navigate('/submit-kyc'), 1500)
+      navigate('/submit-kyc', { replace: true })
     }
   }, [registerMutation.isSuccess, navigate, message])
 
@@ -169,7 +169,7 @@ const Register = () => {
   return (
     <MarketplacePublicShell>
       <div
-        className="kb-register-page"
+        className="kb-auth-page kb-register-page"
         style={{
           minHeight: '100vh',
           background: 'radial-gradient(circle at top left, #e6f7ff 0, #f0f2f5 40%, #ffffff 100%)',

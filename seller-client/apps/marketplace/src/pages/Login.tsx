@@ -169,7 +169,7 @@ const Login = () => {
   return (
     <MarketplacePublicShell>
       <div
-      className="min-h-screen flex overflow-hidden"
+      className="kb-auth-page kb-login-page min-h-screen flex overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #4F5552 0%, #303537 100%)' }}
     >
       {/* Left Side - Branding */}
@@ -243,7 +243,7 @@ const Login = () => {
                 }}
               >
                 <div
-                  className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                  className="kb-login-feature-icon w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
                   style={{
                     background: 'rgba(255, 255, 255, 0.2)',
                   }}

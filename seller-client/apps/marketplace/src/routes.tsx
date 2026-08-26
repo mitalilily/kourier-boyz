@@ -38,6 +38,7 @@ import Tickets from './pages/Tickets'
 import VerifyEmail from './pages/VerifyEmail'
 import WaitingApproval from './pages/WaitingApproval'
 import RouteErrorBoundary from './components/RouteErrorBoundary'
+import PublicSellerRoute from './components/PublicSellerRoute'
 
 const AppRoutes = () => {
   return (
@@ -45,8 +46,22 @@ const AppRoutes = () => {
       <RouteErrorBoundary>
         <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/login"
+          element={
+            <PublicSellerRoute>
+              <Login />
+            </PublicSellerRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicSellerRoute>
+              <Register />
+            </PublicSellerRoute>
+          }
+        />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/verify-email/:token" element={<VerifyEmail />} />

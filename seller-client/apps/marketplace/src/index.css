@@ -1711,3 +1711,240 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
     font-size: 36px;
   }
 }
+
+/* Integrated seller workspace: the public handoff uses the courier console's visual language. */
+.kb-public-shell {
+  --kb-ink: #202321;
+  --kb-muted: #5f6863;
+  --kb-gold: #b78115;
+  --kb-gold-bright: #d4a83d;
+  --kb-paper: #f5f6f4;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(212, 168, 61, 0.12), transparent 24%),
+    repeating-linear-gradient(120deg, rgba(32, 35, 33, 0.018) 0 1px, transparent 1px 30px),
+    #f5f6f4;
+}
+
+.kb-public-shell-content {
+  min-height: 100vh;
+  background: transparent;
+}
+
+.kb-auth-page {
+  color: var(--kb-ink);
+  font-family: 'Manrope', 'Inter', 'Segoe UI', sans-serif;
+}
+
+.kb-login-page {
+  min-height: 100vh !important;
+  background:
+    radial-gradient(circle at 86% 16%, rgba(212, 168, 61, 0.13), transparent 25%),
+    repeating-linear-gradient(120deg, rgba(32, 35, 33, 0.022) 0 1px, transparent 1px 28px),
+    #f5f6f4 !important;
+}
+
+.kb-login-page > .hidden.lg\\:flex {
+  position: relative;
+  width: 44% !important;
+  min-height: 100vh;
+  padding: 48px clamp(28px, 4vw, 72px) !important;
+  background:
+    radial-gradient(circle at 82% 16%, rgba(212, 168, 61, 0.24), transparent 26%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 22px),
+    #242a28 !important;
+  border-right: 1px solid rgba(212, 168, 61, 0.24);
+}
+
+.kb-login-page > .hidden.lg\\:flex::after {
+  position: absolute;
+  right: -90px;
+  bottom: 12%;
+  width: 210px;
+  height: 210px;
+  content: '';
+  border: 1px solid rgba(212, 168, 61, 0.24);
+  border-radius: 50%;
+  box-shadow: 0 0 0 26px rgba(212, 168, 61, 0.045), 0 0 0 52px rgba(212, 168, 61, 0.025);
+  pointer-events: none;
+}
+
+.kb-login-page > .hidden.lg\\:flex > div:last-child {
+  max-width: 500px;
+}
+
+.kb-login-page > .hidden.lg\\:flex img,
+.kb-login-page .lg\\:hidden img {
+  box-sizing: border-box;
+  padding: 7px;
+  border: 1px solid rgba(212, 168, 61, 0.58);
+  border-radius: 9px;
+  background: #171c1a;
+  filter: brightness(1.15) contrast(1.18) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.26));
+}
+
+.kb-login-page .kb-login-feature-icon {
+  position: relative;
+  border: 1px solid rgba(212, 168, 61, 0.32) !important;
+  border-radius: 7px !important;
+  background: rgba(183, 129, 21, 0.18) !important;
+  color: #e6c36a;
+  font-size: 0 !important;
+}
+
+.kb-login-page .kb-login-feature-icon::before {
+  color: #e6c36a;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+}
+
+.kb-login-page .space-y-6 > div:nth-child(1) .kb-login-feature-icon::before { content: '01'; }
+.kb-login-page .space-y-6 > div:nth-child(2) .kb-login-feature-icon::before { content: '02'; }
+.kb-login-page .space-y-6 > div:nth-child(3) .kb-login-feature-icon::before { content: '03'; }
+.kb-login-page .space-y-6 > div:nth-child(4) .kb-login-feature-icon::before { content: '04'; }
+
+.kb-login-page > :last-child {
+  width: 56% !important;
+  padding: 36px clamp(22px, 5vw, 84px) !important;
+  background: rgba(245, 246, 244, 0.94) !important;
+}
+
+.kb-login-page > :last-child > .absolute.inset-0 {
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+.kb-login-page > :last-child > div:last-child {
+  max-width: 500px !important;
+}
+
+.kb-login-page .ant-card {
+  padding: 0 !important;
+  border: 1px solid rgba(32, 35, 33, 0.13) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.97) !important;
+  box-shadow: 0 20px 45px rgba(32, 35, 33, 0.11) !important;
+}
+
+.kb-login-page .ant-card-body {
+  padding: 28px 30px 24px !important;
+}
+
+.kb-login-page .ant-typography h2,
+.kb-login-page h2 {
+  color: var(--kb-ink) !important;
+  font-size: clamp(27px, 2.4vw, 35px) !important;
+  font-weight: 850 !important;
+  letter-spacing: -0.02em;
+}
+
+.kb-login-page .ant-form-item-label > label {
+  color: #303735 !important;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.kb-login-page .ant-input,
+.kb-login-page .ant-input-affix-wrapper {
+  min-height: 43px;
+  border-color: #cbd1cd;
+  border-radius: 6px !important;
+  background: #fbfcfb;
+  box-shadow: none;
+}
+
+.kb-login-page .ant-input:focus,
+.kb-login-page .ant-input-affix-wrapper-focused {
+  border-color: var(--kb-gold) !important;
+  box-shadow: 0 0 0 3px rgba(183, 129, 21, 0.12) !important;
+}
+
+.kb-login-page .ant-btn-primary,
+.kb-register-card button[type='submit'] {
+  min-height: 43px !important;
+  border-color: #93680d !important;
+  border-radius: 6px !important;
+  background: linear-gradient(110deg, #8d630c, #bd9027) !important;
+  box-shadow: 0 8px 16px rgba(143, 101, 15, 0.2) !important;
+  font-weight: 850 !important;
+}
+
+.kb-login-page .ant-btn-primary:hover,
+.kb-register-card button[type='submit']:hover {
+  border-color: #725009 !important;
+  background: #725009 !important;
+  transform: translateY(-1px);
+}
+
+.kb-login-page .kb-demo-login-panel {
+  margin-bottom: 18px;
+  border-color: rgba(183, 129, 21, 0.36);
+  border-radius: 7px;
+  background: #fffaf0;
+  box-shadow: none;
+}
+
+.kb-login-page .kb-demo-login-panel .ant-btn {
+  background: #202321;
+  border-color: #202321;
+  color: #fff;
+}
+
+.kb-login-page .kb-demo-login-panel .ant-btn:hover {
+  background: #8f650f !important;
+  border-color: #8f650f !important;
+}
+
+.kb-register-page {
+  background:
+    radial-gradient(circle at 84% 10%, rgba(212, 168, 61, 0.14), transparent 25%),
+    repeating-linear-gradient(120deg, rgba(32, 35, 33, 0.02) 0 1px, transparent 1px 28px),
+    #f5f6f4 !important;
+}
+
+.kb-register-intro {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(212, 168, 61, 0.2), transparent 27%),
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 22px),
+    #242a28 !important;
+  box-shadow: 0 20px 44px rgba(32, 35, 33, 0.16) !important;
+}
+
+.kb-register-card {
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 20px 44px rgba(32, 35, 33, 0.11) !important;
+}
+
+.kb-register-card .ant-input,
+.kb-register-card .ant-input-affix-wrapper,
+.kb-register-card .ant-input-group-addon {
+  border-color: #cbd1cd;
+  background: #fbfcfb;
+}
+
+.kb-register-card .ant-input:focus,
+.kb-register-card .ant-input-affix-wrapper-focused {
+  border-color: var(--kb-gold) !important;
+  box-shadow: 0 0 0 3px rgba(183, 129, 21, 0.12) !important;
+}
+
+@media (max-width: 900px) {
+  .kb-login-page {
+    min-height: calc(100vh - 12px) !important;
+  }
+
+  .kb-login-page > :last-child {
+    width: 100% !important;
+    padding: 30px 18px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .kb-login-page .ant-card-body {
+    padding: 22px 18px 20px !important;
+  }
+
+  .kb-register-page {
+    padding-inline: 12px !important;
+  }
+}
