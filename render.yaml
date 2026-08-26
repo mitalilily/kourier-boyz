@@ -1,0 +1,18 @@
+services:
+  - type: web
+    runtime: static
+    name: kourier-boyz-seller-client
+    buildCommand: npm ci --prefix seller-client --include=dev && npm run build --prefix seller-client
+    staticPublishPath: seller-client/dist
+    routes:
+      # Marketplace uses its own base path and HashRouter entry document.
+      - type: rewrite
+        source: /store
+        destination: /store/index.html
+      - type: rewrite
+        source: /store/*
+        destination: /store/index.html
+      # Logistics uses BrowserRouter, so every unknown root path needs the root app shell.
+      - type: rewrite
+        source: /*
+        destination: /index.html
