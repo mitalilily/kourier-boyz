@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons'
 import { Button } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
+import MarketplacePublicShell from '../components/MarketplacePublicShell'
 import { useAuthStore } from '../store/authStore'
 
 const benefits = [
@@ -25,7 +26,8 @@ const StoreEntry = () => {
   }
 
   return (
-    <main className="kb-store-entry-page">
+    <MarketplacePublicShell>
+      <main className="kb-store-entry-page">
       <header className="kb-store-entry-nav">
         <img src="/store/brand/kourier-boyz-logo-transparent.png" alt="Kourier Boyz" />
         <Link to="/login" className="kb-store-entry-signin">
@@ -43,11 +45,18 @@ const StoreEntry = () => {
 
         <div className="kb-store-entry-copy">
           <span className="kb-store-entry-kicker">Kourier Boyz Marketplace</span>
-          <h1>Your products deserve a store built to move.</h1>
+          <div className="kb-store-entry-route">
+            <span>Sell</span>
+            <i />
+            <span>Ship</span>
+            <i />
+            <span>Grow</span>
+          </div>
+          <h1>Open your store. Ship what sells.</h1>
           <p>
-            Build your catalogue, manage every order, and move parcels through one connected seller
-            workspace. The marketplace and courier network work together, while each remains
-            completely optional.
+            Put your catalogue, customer orders, and delivery workflow in one clear seller workspace.
+            Sell through the marketplace when you want to, and choose Kourier Boyz fulfilment only
+            when it helps your business move faster.
           </p>
 
           <div className="kb-store-entry-benefits">
@@ -66,7 +75,7 @@ const StoreEntry = () => {
               </Button>
             </Link>
             <Button size="large" icon={<EyeOutlined />} onClick={handleDemo}>
-              Explore demo seller hub
+              Preview seller workspace
             </Button>
           </div>
         </div>
@@ -85,7 +94,8 @@ const StoreEntry = () => {
           ))}
         </div>
       </section>
-    </main>
+      </main>
+    </MarketplacePublicShell>
   )
 }
 

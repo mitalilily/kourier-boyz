@@ -9,6 +9,7 @@ import { Alert, App, Button, Card, Checkbox, Divider, Form, Input, Spin, Typogra
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLogin } from '../api/authQueries'
+import MarketplacePublicShell from '../components/MarketplacePublicShell'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -146,7 +147,8 @@ const Login = () => {
   }
 
   return (
-    <div
+    <MarketplacePublicShell>
+      <div
       className="min-h-screen flex overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #4F5552 0%, #303537 100%)' }}
     >
@@ -522,7 +524,8 @@ const Login = () => {
           </p>
         </div>
       </div>
-    </div>
+      </div>
+    </MarketplacePublicShell>
   )
 }
 

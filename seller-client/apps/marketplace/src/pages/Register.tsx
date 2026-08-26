@@ -29,6 +29,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAgreementByType } from '../api/agreementQueries'
 import type { RegisterData } from '../api/auth'
 import { useRegister } from '../api/authQueries'
+import MarketplacePublicShell from '../components/MarketplacePublicShell'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -166,7 +167,8 @@ const Register = () => {
   }
 
   return (
-    <div
+    <MarketplacePublicShell>
+      <div
       style={{
         minHeight: '100vh',
         background: 'radial-gradient(circle at top left, #e6f7ff 0, #f0f2f5 40%, #ffffff 100%)',
@@ -655,7 +657,8 @@ const Register = () => {
           <Paragraph>Privacy Policy content not available. Please contact support.</Paragraph>
         )}
       </Modal>
-    </div>
+      </div>
+    </MarketplacePublicShell>
   )
 }
 
