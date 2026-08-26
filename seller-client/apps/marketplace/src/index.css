@@ -1712,6 +1712,217 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
   }
 }
 
+/* Marketplace seller console: match the courier workspace without flattening store workflows. */
+:root {
+  --kb-surface: #ffffff;
+  --kb-canvas: #f2f4f3;
+  --kb-ink: #202321;
+  --kb-muted: #65706a;
+  --kb-line: #d6dcd8;
+  --kb-gold: #b78115;
+}
+
+body {
+  background:
+    radial-gradient(circle at 88% 7%, rgba(223, 183, 67, 0.1), transparent 22%),
+    repeating-linear-gradient(125deg, rgba(32, 35, 33, 0.018) 0 1px, transparent 1px 32px),
+    var(--kb-canvas);
+}
+
+.ant-layout,
+.site-layout {
+  background: transparent !important;
+}
+
+.kb-marketplace-sidebar {
+  border-right: 1px solid rgba(32, 35, 33, 0.13);
+  background: linear-gradient(180deg, #f7f9f8 0%, #ffffff 46%, #f0f3f1 100%) !important;
+}
+
+.kb-marketplace-sidebar-logo {
+  box-sizing: border-box;
+  height: 34px !important;
+  max-width: 170px;
+  padding: 3px !important;
+  border: 1px solid rgba(183, 129, 21, 0.28);
+  border-radius: 5px;
+  background: #ffffff;
+  object-fit: contain;
+  filter: contrast(1.06) saturate(0.92);
+}
+
+.kb-marketplace-sidebar .ant-menu {
+  color: #53605a;
+}
+
+.kb-marketplace-sidebar .ant-menu-item,
+.kb-marketplace-sidebar .ant-menu-submenu-title {
+  min-height: 38px;
+  margin: 2px 9px !important;
+  border-radius: 6px !important;
+  font-size: 12px;
+  font-weight: 700;
+  transition: transform 160ms ease, color 160ms ease, background-color 160ms ease;
+}
+
+.kb-marketplace-sidebar .ant-menu-item:hover,
+.kb-marketplace-sidebar .ant-menu-submenu-title:hover {
+  color: #8f650f !important;
+  background: rgba(183, 129, 21, 0.08) !important;
+  transform: translateX(2px);
+}
+
+.kb-marketplace-sidebar .ant-menu-item-selected {
+  color: #8f650f !important;
+  background: #f6f0df !important;
+  box-shadow: inset 3px 0 #b78115;
+  font-weight: 850;
+}
+
+.kb-marketplace-sidebar .ant-menu-item-selected::after {
+  display: none;
+}
+
+.kb-marketplace-sidebar .ant-menu-item-divider {
+  margin: 7px 15px !important;
+  border-color: rgba(32, 35, 33, 0.09);
+}
+
+.site-layout .ant-layout-content {
+  color: var(--kb-ink);
+}
+
+.site-layout .ant-layout-content > div {
+  border: 1px solid rgba(32, 35, 33, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 10px 28px rgba(32, 35, 33, 0.055);
+}
+
+.ant-card {
+  border-color: rgba(32, 35, 33, 0.11);
+  border-radius: 8px;
+  box-shadow: 0 7px 20px rgba(32, 35, 33, 0.055);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.ant-card-hoverable:hover,
+.ant-card:hover {
+  border-color: rgba(183, 129, 21, 0.34);
+  box-shadow: 0 14px 30px rgba(32, 35, 33, 0.1);
+  transform: translateY(-2px);
+}
+
+.ant-card-head {
+  min-height: 48px;
+  border-bottom-color: rgba(32, 35, 33, 0.09);
+}
+
+.ant-card-head-title {
+  color: var(--kb-ink);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.ant-btn {
+  min-height: 36px;
+  border-radius: 6px;
+  font-weight: 750;
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.ant-btn:hover {
+  transform: translateY(-1px);
+}
+
+.ant-btn-primary {
+  border-color: #8f650f !important;
+  background: #b78115 !important;
+  box-shadow: 0 6px 14px rgba(183, 129, 21, 0.18);
+}
+
+.ant-btn-primary:hover {
+  border-color: #76520a !important;
+  background: #8f650f !important;
+}
+
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector,
+.ant-picker {
+  border-color: #cbd2ce !important;
+  border-radius: 6px !important;
+  background: #fbfcfb !important;
+  box-shadow: none !important;
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector,
+.ant-picker-focused {
+  border-color: var(--kb-gold) !important;
+  box-shadow: 0 0 0 3px rgba(183, 129, 21, 0.11) !important;
+}
+
+.ant-table-wrapper {
+  border: 1px solid rgba(32, 35, 33, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ant-table-thead > tr > th {
+  color: #4f5853 !important;
+  background: #eef1ef !important;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ant-table-tbody > tr {
+  transition: background-color 160ms ease;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #fcf8ed !important;
+}
+
+.ant-tag {
+  border-radius: 5px;
+  font-weight: 750;
+}
+
+.ant-alert,
+.ant-modal-content,
+.ant-dropdown,
+.ant-popover-inner {
+  border: 1px solid rgba(32, 35, 33, 0.11);
+  border-radius: 8px;
+  box-shadow: 0 16px 36px rgba(32, 35, 33, 0.12);
+}
+
+.ant-tabs-tab {
+  font-weight: 700;
+}
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #8f650f;
+}
+
+.ant-tabs-ink-bar {
+  background: #b78115;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ant-card,
+  .ant-btn,
+  .ant-menu-item,
+  .ant-menu-submenu-title,
+  .ant-table-tbody > tr {
+    transition: none;
+  }
+}
+
 /* Integrated seller workspace: the public handoff uses the courier console's visual language. */
 .kb-public-shell {
   --kb-ink: #202321;

@@ -236,7 +236,10 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
   }
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#fff' }}>
+    <div
+      className="kb-marketplace-sidebar"
+      style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#fff' }}
+    >
       {/* Logo */}
       <div
         style={{
@@ -262,8 +265,9 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <img
-              src="/store/brand/kourier-boyz-logo-transparent.png"
+              src="/store/brand/kourier-boyz-logo.png"
               alt="Kourier Boyz"
+              className="kb-marketplace-sidebar-logo"
               style={{
                 height: 28,
                 width: 'auto',
