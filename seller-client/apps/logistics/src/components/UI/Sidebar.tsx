@@ -60,8 +60,8 @@ interface SidebarProps {
   externalNavigation?: boolean
 }
 
-const SIDEBAR_EXPANDED_WIDTH = 260
-const SIDEBAR_COLLAPSED_WIDTH = 84
+const SIDEBAR_EXPANDED_WIDTH = 238
+const SIDEBAR_COLLAPSED_WIDTH = 76
 const ICON_SIZE_MD = 20 // Material Design
 const ICON_SIZE_FA = 18 // Font Awesome (slightly smaller to match MD)
 const ICON_SIZE_TB = 20 // Tabler
@@ -73,7 +73,7 @@ const BRAND_BLUE = '#B78115'
 const BRAND_SURFACE = '#FFFEFB'
 const BRAND_INK = '#202321'
 const BRAND_BORDER = '#D9DCDA'
-const LOGO_WORDMARK_SRC = '/brand/kourier-boyz-logo-transparent.png'
+const LOGO_WORDMARK_SRC = '/brand/kourier-boyz-logo.png'
 const LOGO_MARK_SRC = '/brand/kourier-boyz-mark.png'
 
 const navItems: NavItem[] = [
@@ -334,7 +334,7 @@ export default function Sidebar({
         top: 0,
         display: 'flex',
         flexDirection: 'column',
-        background: 'linear-gradient(180deg, #fffef9 0%, #ffffff 46%, #f6f9fc 100%)',
+        background: 'linear-gradient(180deg, #f8faf9 0%, #ffffff 46%, #f1f4f2 100%)',
         color: BRAND_INK,
         borderRight: `1px solid ${BRAND_BORDER}`,
         boxShadow: '8px 0 28px rgba(72, 55, 18, 0.08)',
@@ -351,24 +351,26 @@ export default function Sidebar({
         justifyContent={shouldShowExpanded ? 'space-between' : 'center'}
         sx={{
           px: shouldShowExpanded ? 1.5 : 1,
-          py: 1.5,
+          py: 0.9,
           borderBottom: `1px solid ${BRAND_BORDER}`,
-          background: 'linear-gradient(135deg, #222726 0%, #3b4140 68%, #715313 140%)',
+          background:
+            'linear-gradient(135deg, #eef2ef 0%, #ffffff 68%, rgba(223,183,67,0.18) 140%)',
           flexShrink: 0,
         }}
       >
         <Box
           sx={{
-            width: shouldShowExpanded ? 152 : 52,
-            height: 48,
-            borderRadius: 1.5,
+            width: shouldShowExpanded ? 182 : 52,
+            height: 46,
+            borderRadius: 1.25,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            border: '1px solid rgba(223,183,67,0.22)',
-            background: 'rgba(255,255,255,0.035)',
-            p: 0.45,
+            border: '1px solid rgba(183,129,21,0.36)',
+            background: '#ffffff',
+            p: 0.35,
+            boxShadow: '0 4px 12px rgba(32,35,33,0.1)',
           }}
         >
           <Box
@@ -376,14 +378,21 @@ export default function Sidebar({
             src={
               externalNavigation
                 ? shouldShowExpanded
-                  ? '/store/brand/kourier-boyz-logo-transparent.png'
+                  ? '/store/brand/kourier-boyz-logo.png'
                   : '/store/brand/kourier-boyz-mark.png'
                 : shouldShowExpanded
                   ? LOGO_WORDMARK_SRC
                   : LOGO_MARK_SRC
             }
             alt="Kourier Boyz"
-            sx={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left center' }}
+            className="kb-sidebar-logo"
+            sx={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'center',
+              imageRendering: 'auto',
+            }}
           />
         </Box>
       </Stack>
@@ -392,7 +401,7 @@ export default function Sidebar({
         sx={{
           flex: 1,
           px: 0.5,
-          py: 1,
+          py: 0.6,
           overflowY: 'auto',
           overflowX: 'hidden',
         }}
@@ -436,10 +445,10 @@ export default function Sidebar({
                     }
                   }}
                   sx={{
-                    minHeight: 56,
-                    px: shouldShowExpanded ? 1.5 : 0.75,
-                    mb: 0.5,
-                    borderRadius: 1.5,
+                    minHeight: 44,
+                    px: shouldShowExpanded ? 1.25 : 0.6,
+                    mb: 0.25,
+                    borderRadius: 1.1,
                     justifyContent: shouldShowExpanded ? 'flex-start' : 'center',
                     background: isActive_ ? alpha(BRAND_BLUE, 0.08) : 'transparent',
                     border: `1px solid ${isActive_ ? alpha(BRAND_BLUE, 0.26) : alpha(BRAND_INK, 0.08)}`,
@@ -508,14 +517,14 @@ export default function Sidebar({
                             ? ({ component: 'a', href: child.path } as const)
                             : ({ component: NavLink, to: child.path } as const))}
                           sx={{
-                            minHeight: 44,
-                            px: 1.5,
-                            mb: 0.25,
+                            minHeight: 34,
+                            px: 1.15,
+                            mb: 0.15,
                             borderRadius: 1,
                             color: childIsActive ? BRAND_BLUE : '#747A77',
                             background: childIsActive ? alpha(BRAND_BLUE, 0.08) : 'transparent',
                             border: `1px solid ${childIsActive ? alpha(BRAND_BLUE, 0.22) : alpha(BRAND_INK, 0.08)}`,
-                            fontSize: '0.85rem',
+                            fontSize: '0.78rem',
                             fontWeight: childIsActive ? 600 : 500,
                             '&:hover': {
                               background: childIsActive

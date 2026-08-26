@@ -95,6 +95,16 @@ img[src*="/brand/kourier-boyz-mark.png"] {
   box-shadow: 0 10px 24px rgba(22, 27, 25, 0.14);
 }
 
+/* The sidebar uses a light logo frame so the silver wordmark stays crisp at every width. */
+.kb-sidebar-logo {
+  background: #f8faf9 !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  padding: 2px !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
 .MuiCard-root,
 .MuiPaper-root {
   background-image: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(255, 252, 239, 0.64));
