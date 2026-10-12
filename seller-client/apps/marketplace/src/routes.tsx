@@ -39,12 +39,15 @@ import VerifyEmail from './pages/VerifyEmail'
 import WaitingApproval from './pages/WaitingApproval'
 import RouteErrorBoundary from './components/RouteErrorBoundary'
 import PublicSellerRoute from './components/PublicSellerRoute'
+import CourierSessionBridge from './components/CourierSessionBridge'
+import MarketplacePublicShell from './components/MarketplacePublicShell'
 
 const AppRoutes = () => {
   return (
     <HashRouter>
       <RouteErrorBoundary>
-        <Routes>
+        <CourierSessionBridge>
+          <Routes>
         {/* Public Routes */}
         <Route
           path="/login"
@@ -71,7 +74,9 @@ const AppRoutes = () => {
           path="/submit-kyc"
           element={
             <ProtectedRoute>
-              <KYCSubmission />
+              <MarketplacePublicShell>
+                <KYCSubmission />
+              </MarketplacePublicShell>
             </ProtectedRoute>
           }
         />
@@ -81,7 +86,9 @@ const AppRoutes = () => {
           path="/waiting-approval"
           element={
             <ProtectedRoute>
-              <WaitingApproval />
+              <MarketplacePublicShell>
+                <WaitingApproval />
+              </MarketplacePublicShell>
             </ProtectedRoute>
           }
         />
@@ -131,7 +138,8 @@ const AppRoutes = () => {
 
         {/* Catch all */}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
+          </Routes>
+        </CourierSessionBridge>
       </RouteErrorBoundary>
     </HashRouter>
   )

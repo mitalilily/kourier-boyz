@@ -43,6 +43,7 @@ const Sidebar = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [collapsed, setCollapsed] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [openKeys, setOpenKeys] = useState<string[]>([])
   const permissions = useAuthStore((state) => state.permissions)
   const logout = useAuthStore((state) => state.logout)
@@ -89,7 +90,7 @@ const Sidebar = () => {
           {
             key: '/sellers',
             icon: <ShopOutlined />,
-            label: 'Sellers',
+            label: 'Marketplace Sellers',
           },
           {
             key: '/sellers/deactivation-requests',
@@ -408,7 +409,7 @@ const Sidebar = () => {
 
     // Settlements group routes
     if (path.startsWith('/settlements')) {
-      keys.push('settlements-group')
+      keys.push('finance-group')
     }
 
     // Reports group routes
@@ -423,7 +424,10 @@ const Sidebar = () => {
       path.startsWith('/coupons') ||
       path.startsWith('/seller-coupons') ||
       path.startsWith('/categories') ||
+      path.startsWith('/brand-approvals') ||
+      path.startsWith('/category-extensions') ||
       path.startsWith('/banners') ||
+      path.startsWith('/announcements') ||
       path.startsWith('/blogs') ||
       path.startsWith('/promotional-emails')
     ) {
@@ -436,7 +440,9 @@ const Sidebar = () => {
       path.startsWith('/settings') ||
       path.startsWith('/agreements') ||
       path.startsWith('/roles') ||
-      path.startsWith('/feedback')
+      path.startsWith('/users') ||
+      path.startsWith('/feedback') ||
+      path.startsWith('/guide')
     ) {
       keys.push('settings-group')
     }
@@ -459,7 +465,7 @@ const Sidebar = () => {
     // Don't navigate for parent group items
     if (
       key === 'users-group' ||
-      key === 'settlements-group' ||
+      key === 'finance-group' ||
       key === 'reports-group' ||
       key === 'catalog-group' ||
       key === 'settings-group' ||
@@ -534,8 +540,9 @@ const Sidebar = () => {
       collapsed={collapsed}
       onCollapse={setCollapsed}
       breakpoint="lg"
-      collapsedWidth={0}
-      width={240}
+      onBreakpoint={setIsMobile}
+      collapsedWidth={isMobile ? 0 : 76}
+      width={248}
       className="kb-admin-sidebar"
       style={{
         height: '100vh',
@@ -601,7 +608,7 @@ const Sidebar = () => {
         className="kb-admin-sidebar-footer"
         style={{ flexShrink: 0 }}
       >
-        &copy; {new Date().getFullYear()} <span>Kourier Boyz</span>
+        {collapsed ? new Date().getFullYear() : <>&copy; {new Date().getFullYear()} <span>Kourier Boyz</span></>}
       </div>
     </Sider>
   )

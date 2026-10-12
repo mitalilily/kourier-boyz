@@ -8,8 +8,14 @@ import {
 } from '@ant-design/icons'
 import { Button, Card, Form, Input, message, Typography } from 'antd'
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useLogin } from '../api/auth'
+import {
+  ADMIN_WORKSPACE_STORAGE,
+  getAdminWorkspaceDestination,
+  hasAdminWorkspaceSession,
+  type AdminWorkspace,
+} from '../config/adminWorkspace'
 import { useAuthStore } from '../store/authStore'
 
 const { Title, Text } = Typography
@@ -17,20 +23,45 @@ const { Title, Text } = Typography
 const Login = () => {
   const [form] = Form.useForm()
   const loginMutation = useLogin()
-  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const token = useAuthStore((state) => state.token)
 
+  const requestedWorkspace: AdminWorkspace =
+    searchParams.get('workspace') === 'logistics' ? 'logistics' : 'marketplace'
+
+  const enterWorkspace = (workspace: AdminWorkspace) => {
+    localStorage.setItem(ADMIN_WORKSPACE_STORAGE.active, workspace)
+    window.location.replace(getAdminWorkspaceDestination(workspace))
+  }
+
   useEffect(() => {
-    if (token) {
-      navigate('/dashboard', { replace: true })
+    if (loginMutation.isPending) return
+
+    if (hasAdminWorkspaceSession(requestedWorkspace)) {
+      enterWorkspace(requestedWorkspace)
+      return
     }
-  }, [token, navigate])
+
+    if (token) enterWorkspace('marketplace')
+  }, [loginMutation.isPending, requestedWorkspace, token])
 
   const onFinish = (values: { email: string; password: string }) => {
     loginMutation.mutate(values, {
+      onSuccess: (session) => {
+        if (requestedWorkspace === 'logistics' && session.logistics) {
+          enterWorkspace('logistics')
+          return
+        }
+
+        if (session.marketplace) {
+          enterWorkspace('marketplace')
+          return
+        }
+
+        enterWorkspace('logistics')
+      },
       onError: (err: unknown) => {
-        const axiosError = err as { response?: { data?: { error?: string } } }
-        message.error(axiosError.response?.data?.error || 'Login failed')
+        message.error(err instanceof Error ? err.message : 'Login failed')
       },
     })
   }
@@ -116,7 +147,7 @@ const Login = () => {
                 Welcome back
               </Title>
               <Text className="text-base !text-[#626966]">
-                Sign in with your authorized admin account.
+                One secure sign-in for marketplace and courier operations.
               </Text>
             </div>
 
@@ -163,7 +194,9 @@ const Login = () => {
 
             <div className="mt-8 flex items-center justify-center gap-2 border-t border-[#e4e7e5] pt-6">
               <SafetyOutlined className="text-[#8f650f]" />
-              <Text className="text-sm !text-[#626966]">Secure admin access</Text>
+              <Text className="text-sm !text-[#626966]">
+                Access is granted independently for each workspace
+              </Text>
             </div>
           </Card>
 

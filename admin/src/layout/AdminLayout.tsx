@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { Layout } from "antd";
 import { Outlet } from "react-router-dom";
 import { usePermissions } from "../api/permissions";
@@ -27,7 +27,13 @@ const AdminLayout = () => {
         <HeaderBar />
         <Content className="kb-admin-content overflow-y-auto">
           <div className="kb-admin-page min-h-[calc(100vh-92px)] relative">
-            {isLoading ? <LoadingState /> : <Outlet />}
+            {isLoading ? (
+              <LoadingState />
+            ) : (
+              <Suspense fallback={<LoadingState />}>
+                <Outlet />
+              </Suspense>
+            )}
           </div>
         </Content>
       </Layout>

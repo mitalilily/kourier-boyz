@@ -29,6 +29,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAgreementByType } from '../api/agreementQueries'
 import type { RegisterData } from '../api/auth'
 import { useRegister } from '../api/authQueries'
+import { getRegistrationProfile } from '../api/logisticsSession'
 import MarketplacePublicShell from '../components/MarketplacePublicShell'
 
 const { Text, Paragraph } = Typography
@@ -122,6 +123,7 @@ const Register = () => {
   const registerMutation = useRegister()
   const googleOAuthMutation = { isPending: false }
   const [form] = Form.useForm()
+  const [linkedCourierProfile] = useState(getRegistrationProfile)
   const passwordValue = Form.useWatch('password', form)
   const passwordChecks = getPasswordChecks(passwordValue)
   const isPasswordStrong =
@@ -142,6 +144,16 @@ const Register = () => {
   const { data: privacyAgreement, isLoading: privacyLoading } = useAgreementByType(
     privacyModalOpen ? 'seller-privacy-policy' : null,
   )
+
+  useEffect(() => {
+    if (!linkedCourierProfile) return
+    form.setFieldsValue({
+      name: linkedCourierProfile.name,
+      email: linkedCourierProfile.email,
+      phone: linkedCourierProfile.phone,
+      businessName: linkedCourierProfile.businessName,
+    })
+  }, [form, linkedCourierProfile])
 
   useEffect(() => {
     if (registerMutation.isSuccess) {
@@ -291,6 +303,7 @@ const Register = () => {
                       prefix={<MailOutlined />}
                       placeholder="john@example.com"
                       autoComplete="email"
+                      disabled={Boolean(linkedCourierProfile?.email)}
                     />
                   </Form.Item>
                 </Col>
@@ -395,6 +408,15 @@ const Register = () => {
             </Space>
 
             {/* Info Alert */}
+            {linkedCourierProfile && (
+              <Alert
+                message="Connected to your courier account"
+                description={`This store will stay linked to ${linkedCourierProfile.email}, so future visits open the marketplace workspace automatically.`}
+                type="success"
+                showIcon
+                style={{ marginBottom: 16 }}
+              />
+            )}
             <Alert
               message="What happens after you create your Kourier Boyz account?"
               description={

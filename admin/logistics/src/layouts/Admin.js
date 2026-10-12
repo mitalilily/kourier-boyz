@@ -22,20 +22,39 @@ import PanelContent from '../components/Layout/PanelContent'
 
 export default function Dashboard(props) {
   const { ...rest } = props
+  const collapsedSidebarWidth = 84
+  const expandedSidebarWidth = 248
   // states and functions
   const [sidebarVariant, setSidebarVariant] = useState('opaque')
   const [fixed, setFixed] = useState(false)
 
   // 🆕 Sidebar resizing state
-  const [sidebarWidth, setSidebarWidth] = useState(260) // default width
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const storedWidth = Number(localStorage.getItem('kb_logistics_admin_sidebar_width'))
+    return Number.isFinite(storedWidth) && storedWidth >= collapsedSidebarWidth
+      ? storedWidth
+      : expandedSidebarWidth
+  })
   const [isResizing, setIsResizing] = useState(false)
+
+  const updateSidebarWidth = (width) => {
+    setSidebarWidth(width)
+    localStorage.setItem('kb_logistics_admin_sidebar_width', String(width))
+  }
+
+  const toggleSidebar = () => {
+    updateSidebarWidth(sidebarWidth <= 140 ? expandedSidebarWidth : collapsedSidebarWidth)
+  }
 
   // Resizing logic
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (isResizing) {
-        const newWidth = Math.min(Math.max(e.clientX, 200), 400) // min 200, max 400
-        setSidebarWidth(newWidth)
+        const newWidth =
+          e.clientX < 170
+            ? collapsedSidebarWidth
+            : Math.min(Math.max(e.clientX, 220), 360)
+        updateSidebarWidth(newWidth)
       }
     }
     const handleMouseUp = () => setIsResizing(false)
@@ -119,6 +138,7 @@ export default function Dashboard(props) {
         logoText={'Kourier Boyz'}
         sidebarVariant={sidebarVariant}
         sidebarWidth={sidebarWidth}
+        onToggle={toggleSidebar}
         {...rest}
       />
 

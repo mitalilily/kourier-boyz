@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getDemoOrders } from "../demo/marketplaceData";
+import { isDemoSellerSession } from "../store/authStore";
 import {
   type CreateShipmentPayload,
   type RequestPickupPayload,
@@ -31,9 +33,12 @@ export const useSellerOrders = (params?: {
   page?: number;
   limit?: number;
 }) => {
+  const isDemo = isDemoSellerSession();
   return useQuery({
     queryKey: ["seller-orders", params],
     queryFn: () => fetchSellerOrders(params),
+    enabled: !isDemo,
+    initialData: isDemo ? getDemoOrders(params) : undefined,
   });
 };
 

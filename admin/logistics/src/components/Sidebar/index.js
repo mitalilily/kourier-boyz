@@ -8,7 +8,8 @@ function Sidebar(props) {
   const mainPanel = React.useRef()
   let variantChange = '0.2s linear'
 
-  const { logoText, routes, sidebarVariant, sidebarWidth } = props
+  const { logoText, routes, sidebarVariant, sidebarWidth, onToggle } = props
+  const collapsed = sidebarWidth <= 140
 
   //  BRAND
   let sidebarBg = 'none'
@@ -28,8 +29,8 @@ function Sidebar(props) {
           bg={sidebarBg}
           transition={variantChange}
           w={`${sidebarWidth}px`} // ✅ dynamic width from Dashboard
-          maxW="400px"
-          minW="200px"
+          maxW="360px"
+          minW={collapsed ? '84px' : '220px'}
           ms={{ sm: '16px' }}
           my={{ sm: '16px' }}
           h="100vh"
@@ -43,6 +44,7 @@ function Sidebar(props) {
             routes={routes}
             logoText={logoText || 'Kourier Boyz'}
             sidebarVariant={sidebarVariant}
+            onToggle={onToggle}
           />
         </Box>
       </Box>

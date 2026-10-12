@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { create } from 'zustand'
+import { marketplaceSellerApiUrl } from '../api/runtime'
 
-interface User {
+export interface User {
   id: string
   name: string
   email: string
@@ -16,6 +17,13 @@ interface User {
   businessRegistrationNumber?: string
   dateOfEstablishment?: string
   storeDescription?: string
+  shippingPolicy?: string
+  returnPolicy?: string
+  storeEmail?: string
+  storePhone?: string
+  supportEmail?: string
+  sellerAgreementSigned?: boolean
+  returnRefundPolicyAccepted?: boolean
 
   // Business Address
   addressLine1?: string
@@ -115,6 +123,14 @@ const DEMO_SELLER: User = {
   businessName: 'Northstar Living',
   businessType: 'Proprietorship',
   storeDescription: 'Considered home, travel, and everyday essentials.',
+  storeLogo: '/store/brand/kourier-boyz-mark.png',
+  shippingPolicy: 'Orders are packed within one business day and dispatched with tracking.',
+  returnPolicy: 'Unused products may be returned within seven days of delivery.',
+  storeEmail: DEMO_SELLER_EMAIL,
+  storePhone: '9876543210',
+  supportEmail: 'support@kourierboyz.com',
+  sellerAgreementSigned: true,
+  returnRefundPolicyAccepted: true,
   addressLine1: '21 Market Street',
   city: 'New Delhi',
   state: 'Delhi',
@@ -167,7 +183,7 @@ const getStoredUser = (): User | null => {
   }
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace/seller'
+const API_BASE_URL = marketplaceSellerApiUrl
 
 const sendLogoutRequest = async (): Promise<void> => {
   if (typeof window === 'undefined') return
@@ -215,6 +231,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       void sendLogoutRequest()
       localStorage.removeItem('seller_token')
       localStorage.removeItem('seller_data')
+      localStorage.removeItem('cc_access')
+      localStorage.removeItem('cc_refresh')
+      localStorage.removeItem('kourier_boyz_demo_logistics')
     }
     set({ token: null, user: null })
   },

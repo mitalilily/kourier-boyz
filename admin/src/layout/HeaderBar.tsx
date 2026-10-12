@@ -179,7 +179,9 @@ const HeaderBar = () => {
 
     if (!userId && userRole !== 'super-admin') return
 
-    const base = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000'
+    const base =
+      import.meta.env.VITE_SOCKET_URL ||
+      (window.location.hostname === 'localhost' ? 'http://localhost:4000' : window.location.origin)
     const socket = ioc(base, {
       transports: ['websocket', 'polling'],
       reconnection: true,

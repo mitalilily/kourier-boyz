@@ -1,9 +1,10 @@
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import { Box, Button, Collapse, Flex, Stack, Text, useColorModeValue } from '@chakra-ui/react'
+import { Box, Button, Collapse, Flex, IconButton, Stack, Text, Tooltip, useColorModeValue } from '@chakra-ui/react'
+import { IconLayoutSidebarLeftCollapse, IconLayoutSidebarLeftExpand } from '@tabler/icons-react'
 import React, { useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 
-const SidebarContent = ({ logoText, routes, sidebarWidth }) => {
+const SidebarContent = ({ logoText, routes, sidebarWidth, onToggle }) => {
   const location = useLocation()
   const [openGroups, setOpenGroups] = React.useState({})
   const collapsed = sidebarWidth <= 160
@@ -97,19 +98,40 @@ const SidebarContent = ({ logoText, routes, sidebarWidth }) => {
       transition="width .25s ease"
       css={{ '&::-webkit-scrollbar': { width: '4px' }, '&::-webkit-scrollbar-thumb': { background: '#B6BCBA' } }}
     >
-      <Flex h="104px" px={collapsed ? 3 : 5} align="center" borderBottom="1px solid" borderColor={borderColor}>
-        <Box w={collapsed ? '42px' : '190px'} h={collapsed ? '42px' : '58px'} overflow="hidden">
+      <Flex
+        h="104px"
+        px={collapsed ? 2 : 4}
+        py={collapsed ? 2 : 0}
+        align="center"
+        justify="space-between"
+        direction={collapsed ? 'column' : 'row'}
+        borderBottom="1px solid"
+        borderColor={borderColor}
+      >
+        <Box w={collapsed ? '42px' : '174px'} h={collapsed ? '42px' : '58px'} overflow="hidden" flexShrink={0}>
           <Box
             as="img"
             src="/logistics/brand/kourier-boyz-logo-transparent.png"
             alt={logoText}
-            w={collapsed ? '180px' : '190px'}
+            w={collapsed ? '180px' : '174px'}
             maxW="none"
             h={collapsed ? '42px' : '58px'}
             objectFit="contain"
             objectPosition="left center"
           />
         </Box>
+        <Tooltip label={collapsed ? 'Expand navigation' : 'Collapse navigation'} placement="right">
+          <IconButton
+            aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+            icon={collapsed ? <IconLayoutSidebarLeftExpand size={18} /> : <IconLayoutSidebarLeftCollapse size={18} />}
+            size="sm"
+            variant="ghost"
+            color={mutedColor}
+            borderRadius="6px"
+            onClick={onToggle}
+            _hover={{ bg: hoverBg, color: 'brand.500' }}
+          />
+        </Tooltip>
       </Flex>
       {!collapsed && <Text px={5} pt={5} pb={2} fontSize="10px" fontWeight="800" color="brand.600" textTransform="uppercase">Logistics operations</Text>}
       <Stack spacing={1} px={3} pb={6}>{renderRoutes(routes)}</Stack>

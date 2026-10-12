@@ -16,16 +16,20 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import { IconLogout } from '@tabler/icons-react'
+import { ADMIN_WORKSPACE_STORAGE } from 'config/adminWorkspace'
 import { SettingsIcon } from 'components/Icons/Icons'
 import SidebarResponsive from 'components/Sidebar/SidebarResponsive'
 import PropTypes from 'prop-types'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import routes from 'routes.js'
 import { useAuthStore } from 'store/useAuthStore'
 import NotificationMenu from './NotificationMenu'
 
 export default function HeaderLinks({ variant, children, fixed, secondary, onOpen, ...rest }) {
   const settingsRef = useRef()
+  const history = useHistory()
+  const [searchQuery, setSearchQuery] = useState('')
   const { isLoggedIn, logout } = useAuthStore()
   const inputBg = useColorModeValue('white', 'rgba(17, 17, 19, 0.92)')
   const inputBorder = useColorModeValue('rgba(17, 17, 19, 0.12)', 'rgba(255, 255, 255, 0.1)')
@@ -71,7 +75,13 @@ export default function HeaderLinks({ variant, children, fixed, secondary, onOpe
           pl="42px"
           pr="14px"
           color={styles.mainText}
-          placeholder="Search orders, users, AWB"
+          placeholder="Search order or AWB"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key !== 'Enter' || !searchQuery.trim()) return
+            history.push(`/admin/orders?search=${encodeURIComponent(searchQuery.trim())}`)
+          }}
           borderRadius="inherit"
           _placeholder={{ color: styles.placeholder }}
           border="none"
@@ -139,7 +149,13 @@ export default function HeaderLinks({ variant, children, fixed, secondary, onOpe
                       _hover={{ bg: 'red.600' }}
                       onClick={() => {
                         logout()
+                        localStorage.removeItem(ADMIN_WORKSPACE_STORAGE.marketplaceToken)
+                        localStorage.removeItem('kb_marketplace_admin_role')
+                        localStorage.removeItem('kb_marketplace_admin_name')
+                        localStorage.removeItem('kb_marketplace_admin_email')
+                        localStorage.removeItem('kb_marketplace_admin_user_id')
                         onClose()
+                        window.location.assign('/login')
                       }}
                     >
                       Logout

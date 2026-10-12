@@ -50,6 +50,7 @@ import {
   TopCategoriesChart,
   TopSellersTable,
 } from '../components/dashboard'
+import SellerOperationsBar from '../components/dashboard/SellerOperationsBar'
 
 const { RangePicker } = DatePicker
 
@@ -278,6 +279,8 @@ const Dashboard = () => {
           </Tooltip>
         </Space>
       </div>
+
+      <SellerOperationsBar />
 
       {/* Section 1: Financial Overview */}
       <Row gutter={[16, 16]}>

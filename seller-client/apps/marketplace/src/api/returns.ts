@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getDemoReturns } from '../demo/marketplaceData'
+import { isDemoSellerSession } from '../store/authStore'
 import API from './axiosInstance'
 
 export type ReturnStatus =
@@ -104,9 +106,12 @@ export const fetchSellerReturns = async (params?: {
 }
 
 export const useSellerReturns = (params?: { status?: string; page?: number; limit?: number }) => {
+  const isDemo = isDemoSellerSession()
   return useQuery({
     queryKey: ['seller-returns', params],
     queryFn: () => fetchSellerReturns(params),
+    enabled: !isDemo,
+    initialData: isDemo ? getDemoReturns(params) : undefined,
   })
 }
 

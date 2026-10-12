@@ -1712,6 +1712,115 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
   }
 }
 
+/* One seller console: courier navigation remains present inside marketplace tools. */
+.kb-seller-shell {
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 91% 8%, rgba(212, 168, 61, 0.12), transparent 23%),
+    repeating-linear-gradient(120deg, rgba(32, 35, 33, 0.018) 0 1px, transparent 1px 30px),
+    #f2f4f3;
+}
+
+.kb-seller-workspace {
+  min-width: 0;
+  min-height: 100vh;
+}
+
+.kb-demo-workspace-notice {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  color: #5f4308;
+  background: #fbf4df;
+  border-bottom: 1px solid #ead69f;
+  font-size: 12px;
+  font-weight: 750;
+  text-align: center;
+}
+
+.kb-seller-content {
+  min-width: 0;
+  min-height: calc(100vh - 112px);
+  overflow: initial;
+}
+
+.kb-seller-content-surface {
+  min-width: 0;
+  min-height: 360px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(32, 35, 33, 0.1);
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(32, 35, 33, 0.065);
+}
+
+.kb-seller-footer {
+  padding: 14px 16px 18px;
+  color: #737c77;
+  font-size: 12px;
+  text-align: center;
+}
+
+.kb-session-bridge {
+  display: grid;
+  min-height: 100vh;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 24px;
+  color: #202321;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(212, 168, 61, 0.14), transparent 24%),
+    repeating-linear-gradient(120deg, rgba(32, 35, 33, 0.02) 0 1px, transparent 1px 28px),
+    #f5f6f4;
+}
+
+.kb-session-bridge img {
+  width: 54px;
+  height: 54px;
+  padding: 6px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid rgba(183, 129, 21, 0.36);
+  border-radius: 8px;
+  box-shadow: 0 10px 22px rgba(32, 35, 33, 0.09);
+}
+
+.kb-session-bridge strong {
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+.kb-session-bridge span {
+  color: #68716c;
+  font-size: 13px;
+}
+
+.kb-store-entry-inline-link {
+  align-self: center;
+  color: #66521e;
+  font-size: 13px;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .kb-seller-shell > aside,
+  .kb-seller-shell > nav {
+    flex: 0 0 auto;
+  }
+
+  .kb-seller-content-surface {
+    padding: 14px !important;
+  }
+}
+
 /* Marketplace seller console: match the courier workspace without flattening store workflows. */
 :root {
   --kb-surface: #ffffff;

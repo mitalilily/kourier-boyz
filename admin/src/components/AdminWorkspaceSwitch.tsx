@@ -1,20 +1,23 @@
 import { ShopOutlined, TruckOutlined } from '@ant-design/icons'
-
-type AdminWorkspace = 'marketplace' | 'logistics'
+import { useEffect } from 'react'
+import {
+  openAdminWorkspace,
+  rememberAdminWorkspacePath,
+  type AdminWorkspace,
+} from '../config/adminWorkspace'
 
 interface AdminWorkspaceSwitchProps {
   active: AdminWorkspace
 }
 
-const ADMIN_WORKSPACE_KEY = 'kb_admin_workspace'
-
 const AdminWorkspaceSwitch = ({ active }: AdminWorkspaceSwitchProps) => {
+  useEffect(() => {
+    rememberAdminWorkspacePath(active, `${window.location.pathname}${window.location.search}`)
+  }, [active])
+
   const selectWorkspace = (workspace: AdminWorkspace) => {
-    localStorage.setItem(ADMIN_WORKSPACE_KEY, workspace)
-
     if (workspace === active) return
-
-    window.location.assign(workspace === 'marketplace' ? '/' : '/logistics/')
+    openAdminWorkspace(workspace)
   }
 
   return (
@@ -25,6 +28,7 @@ const AdminWorkspaceSwitch = ({ active }: AdminWorkspaceSwitchProps) => {
         aria-selected={active === 'marketplace'}
         className={active === 'marketplace' ? 'is-active' : ''}
         onClick={() => selectWorkspace('marketplace')}
+        title="Manage marketplace sellers, catalog, orders and settlements"
       >
         <ShopOutlined />
         <span>Marketplace</span>
@@ -35,9 +39,10 @@ const AdminWorkspaceSwitch = ({ active }: AdminWorkspaceSwitchProps) => {
         aria-selected={active === 'logistics'}
         className={active === 'logistics' ? 'is-active' : ''}
         onClick={() => selectWorkspace('logistics')}
+        title="Manage courier clients, shipments, rates and reconciliation"
       >
         <TruckOutlined />
-        <span>Logistics</span>
+        <span>Courier Ops</span>
       </button>
     </div>
   )

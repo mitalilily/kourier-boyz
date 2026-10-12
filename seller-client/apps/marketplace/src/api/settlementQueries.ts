@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
+import { getDemoSettlements } from '../demo/marketplaceData'
+import { isDemoSellerSession } from '../store/authStore'
 import {
   fetchSellerSettlementBatchDetail,
   fetchSellerSettlementBatches,
@@ -13,9 +15,12 @@ export const useSellerSettlementBatches = (params?: {
   page?: number
   limit?: number
 }) => {
+  const isDemo = isDemoSellerSession()
   return useQuery({
     queryKey: ['seller-settlement-batches', params],
     queryFn: () => fetchSellerSettlementBatches(params),
+    enabled: !isDemo,
+    initialData: isDemo ? getDemoSettlements(params) : undefined,
   })
 }
 

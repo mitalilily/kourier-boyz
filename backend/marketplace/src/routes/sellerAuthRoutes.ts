@@ -9,6 +9,7 @@ import {
   markOnboardingTourCompleted,
   refreshSeller,
   registerSeller,
+  resumeSellerFromLogistics,
   resendVerificationEmail,
   resetPassword,
   updateSellerProfile,
@@ -25,6 +26,7 @@ const router = Router()
 
 // Public routes
 router.post('/register', registerSeller)
+router.post('/logistics-session', resumeSellerFromLogistics)
 router.post('/login', loginSeller)
 router.post('/google-oauth', googleOAuthSeller)
 router.post('/refresh', refreshSeller)

@@ -1,8 +1,16 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { clearMarketplaceAdminStorage, MARKETPLACE_ADMIN_STORAGE } from '../config/authStorage'
 
+const getDefaultApiBaseUrl = () => {
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+    return `${window.location.origin}/api/marketplace`
+  }
+
+  return 'http://localhost:4000/api/marketplace'
+}
+
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace',
+  baseURL: import.meta.env.VITE_API_URL || getDefaultApiBaseUrl(),
   withCredentials: true,
 })
 

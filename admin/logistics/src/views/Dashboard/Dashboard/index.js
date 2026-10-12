@@ -27,6 +27,7 @@ import {
 } from '@tabler/icons-react'
 import MetricTile from 'components/Admin/MetricTile'
 import PageHeader from 'components/Admin/PageHeader'
+import SellerWorkspaceBar from 'components/Admin/SellerWorkspaceBar'
 import Card from 'components/Card/Card'
 import CardBody from 'components/Card/CardBody'
 import CardHeader from 'components/Card/CardHeader'
@@ -233,6 +234,8 @@ export default function Dashboard() {
             }
           />
         </Box>
+
+        <SellerWorkspaceBar />
 
         <SimpleGrid columns={{ base: 1, sm: 2, xl: 4 }} spacing={4} mb={6}>
           <MetricTile

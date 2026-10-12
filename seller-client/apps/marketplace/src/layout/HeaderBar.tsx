@@ -5,7 +5,6 @@ import {
   CompassOutlined,
   FileTextOutlined,
   LogoutOutlined,
-  MenuOutlined,
   MessageOutlined,
   PlusOutlined,
   QuestionCircleOutlined,
@@ -43,15 +42,11 @@ import FeedbackModal from '../components/FeedbackModal'
 import { useAuthStore } from '../store/authStore'
 import { type SellerNotification, useSellerNotificationStore } from '../store/notificationStore'
 import { useSellerTourStore } from '../store/sellerTourStore'
+import { marketplaceSocketUrl } from '../api/runtime'
 
 const { Header } = Layout
 
-interface HeaderBarProps {
-  collapsed: boolean
-  setCollapsed: (collapsed: boolean) => void
-}
-
-const HeaderBar = ({ collapsed, setCollapsed }: HeaderBarProps) => {
+const HeaderBar = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { message } = App.useApp()
@@ -156,8 +151,7 @@ const HeaderBar = ({ collapsed, setCollapsed }: HeaderBarProps) => {
   useEffect(() => {
     if (!user?.id || user.isDemo) return
 
-    const base = import.meta.env.VITE_SOCKET_URL || 'http://localhost:4000'
-    const socket = ioc(base, {
+    const socket = ioc(marketplaceSocketUrl, {
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
@@ -419,7 +413,7 @@ const HeaderBar = ({ collapsed, setCollapsed }: HeaderBarProps) => {
       socket.off('notification:new')
       socket.close()
     }
-  }, [user?.id, pushNotification])
+  }, [user?.id, user?.isDemo, pushNotification])
 
   const userMenuItems = [
     {
@@ -511,22 +505,6 @@ const HeaderBar = ({ collapsed, setCollapsed }: HeaderBarProps) => {
           overflow: 'hidden',
         }}
       >
-        {/* Mobile Hamburger Menu */}
-        <Button
-          type="text"
-          icon={<MenuOutlined style={{ fontSize: 20 }} />}
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            display: isMobile ? 'flex' : 'none',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: 40,
-            height: 40,
-            fontSize: 20,
-            color: '#000',
-            flexShrink: 0,
-          }}
-        />
         {/* Breadcrumb - Hide on mobile, show only last item */}
         {!isMobile && (
           <Breadcrumb

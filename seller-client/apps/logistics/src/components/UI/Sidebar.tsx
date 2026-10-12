@@ -40,6 +40,7 @@ export interface SubItem {
   text: string
   path: string
   icon?: JSX.Element
+  workspace?: 'courier' | 'marketplace'
 }
 
 export interface NavItem {
@@ -58,6 +59,8 @@ interface SidebarProps {
   onPinChange?: (pinned: boolean) => void
   /** Render the same courier navigation inside the marketplace bundle. */
   externalNavigation?: boolean
+  /** Add marketplace seller tools to the shared courier navigation. */
+  marketplaceNavigation?: boolean
 }
 
 const SIDEBAR_EXPANDED_WIDTH = 238
@@ -276,6 +279,7 @@ export default function Sidebar({
   role = 'customer',
   pinned: initialPinned = false,
   externalNavigation = false,
+  marketplaceNavigation = false,
   // onPinChange,
 }: SidebarProps) {
   const { pathname: routerPathname } = useLocation()
@@ -301,8 +305,54 @@ export default function Sidebar({
   const sidebarWidth = shouldShowExpanded ? SIDEBAR_EXPANDED_WIDTH : SIDEBAR_COLLAPSED_WIDTH
 
   const filteredItems = useMemo(() => {
-    return navItems.filter((item) => item.roles.includes(role))
-  }, [role])
+    return navItems
+      .filter((item) => item.roles.includes(role))
+      .map((item) => {
+        if (item.text !== 'Marketplace Store' || !marketplaceNavigation) return item
+
+        return {
+          ...item,
+          children: [
+            {
+              text: 'Seller Dashboard',
+              path: '/dashboard',
+              icon: <MdDashboard size={ICON_SIZE_MD} />,
+              workspace: 'marketplace' as const,
+            },
+            {
+              text: 'Products & Inventory',
+              path: '/products',
+              icon: <FaBox size={ICON_SIZE_FA} />,
+              workspace: 'marketplace' as const,
+            },
+            {
+              text: 'Marketplace Orders',
+              path: '/orders',
+              icon: <FaFileAlt size={ICON_SIZE_FA} />,
+              workspace: 'marketplace' as const,
+            },
+            {
+              text: 'Returns',
+              path: '/returns',
+              icon: <MdOutlineKeyboardReturn size={ICON_SIZE_MD} />,
+              workspace: 'marketplace' as const,
+            },
+            {
+              text: 'Settlements',
+              path: '/settlements',
+              icon: <FaMoneyBill size={ICON_SIZE_FA} />,
+              workspace: 'marketplace' as const,
+            },
+            {
+              text: 'Store Settings',
+              path: '/store-settings',
+              icon: <RiSettings2Line size={ICON_SIZE_RI} />,
+              workspace: 'marketplace' as const,
+            },
+          ],
+        }
+      })
+  }, [marketplaceNavigation, role])
 
   const handlePopoverOpen = (event: React.MouseEvent<HTMLButtonElement>, itemText: string) => {
     setAnchorEl(event.currentTarget)
@@ -411,8 +461,14 @@ export default function Sidebar({
       >
         {filteredItems.map(({ text, icon, path, children, external }) => {
           const hasChildren = Boolean(children?.length)
-          const childActive = children?.some((child) => isActive(child.path, pathname))
-          const isActive_ = isActive(path, pathname) || childActive
+          const childActive = children?.some((child) =>
+            isActive(
+              child.path,
+              child.workspace === 'marketplace' ? routerPathname : pathname,
+            ),
+          )
+          const isMarketplaceRoot = externalNavigation && external && pathname.startsWith('/store')
+          const isActive_ = isMarketplaceRoot || isActive(path, pathname) || childActive
 
           return (
             <Box key={text}>
@@ -422,7 +478,12 @@ export default function Sidebar({
                     (external || externalNavigation
                       ? ({
                           component: 'a',
-                          href: externalNavigation ? buildConsoleHref(path) : path,
+                          href:
+                            externalNavigation && external && path.startsWith('/store')
+                              ? '/store/'
+                              : externalNavigation
+                                ? buildConsoleHref(path)
+                                : path,
                         } as const)
                       : ({ component: NavLink, to: path } as const)))}
                   onMouseEnter={(e: React.MouseEvent<HTMLElement>) => {
@@ -448,6 +509,11 @@ export default function Sidebar({
                           handlePopoverClose()
                         }
                       }, 200)
+                    }
+                  }}
+                  onClick={() => {
+                    if (hasChildren) {
+                      setExpandedItemText(text)
                     }
                   }}
                   sx={{
@@ -515,11 +581,15 @@ export default function Sidebar({
                 <Collapse in={expandedItemText === text} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding sx={{ pl: 2 }}>
                     {children?.map((child) => {
-                      const childIsActive = isActive(child.path, pathname)
+                      const childIsMarketplace = child.workspace === 'marketplace'
+                      const childIsActive = isActive(
+                        child.path,
+                        childIsMarketplace ? routerPathname : pathname,
+                      )
                       return (
                         <ListItemButton
                           key={child.path}
-                          {...(externalNavigation
+                          {...(externalNavigation && !childIsMarketplace
                             ? ({ component: 'a', href: buildConsoleHref(child.path) } as const)
                             : ({ component: NavLink, to: child.path } as const))}
                           sx={{
@@ -596,11 +666,15 @@ export default function Sidebar({
             {filteredItems
               .find((item) => item.text === hoveredItemText)
               ?.children?.map((child) => {
-                const active = isActive(child.path, pathname)
+                const childIsMarketplace = child.workspace === 'marketplace'
+                const active = isActive(
+                  child.path,
+                  childIsMarketplace ? routerPathname : pathname,
+                )
                 return (
                   <ListItemButton
                     key={child.path}
-                    {...(externalNavigation
+                    {...(externalNavigation && !childIsMarketplace
                       ? ({ component: 'a', href: buildConsoleHref(child.path) } as const)
                       : ({ component: NavLink, to: child.path } as const))}
                     onClick={handlePopoverClose}

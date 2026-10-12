@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import axios from 'axios'
 import { Request, Response, type CookieOptions } from 'express'
 import { OAuth2Client } from 'google-auth-library'
 import jwt from 'jsonwebtoken'
@@ -17,6 +18,89 @@ const PICKUP_WAREHOUSE_REQUIRED_ERROR = 'PICKUP_WAREHOUSE_REQUIRED'
 const PICKUP_WAREHOUSE_DUPLICATE_ERROR = 'PICKUP_WAREHOUSE_DUPLICATE'
 const PICKUP_RTO_REQUIRED_ERROR = 'PICKUP_RTO_REQUIRED'
 const PICKUP_PHONE_INVALID_ERROR = 'PICKUP_PHONE_INVALID'
+
+type LogisticsIdentity = {
+  userId: string
+  email: string
+  name: string
+  phone?: string
+  businessName?: string
+}
+
+const getLogisticsAuthorization = (req: Request) => {
+  const delegated = req.headers['x-logistics-authorization']
+  const value = Array.isArray(delegated) ? delegated[0] : delegated || req.headers.authorization
+  return typeof value === 'string' && value.startsWith('Bearer ') ? value : undefined
+}
+
+const normalizeIndianPhone = (value: unknown) => {
+  const digits = String(value || '').replace(/\D/g, '')
+  return digits.length >= 10 ? digits.slice(-10) : undefined
+}
+
+const resolveLogisticsIdentity = async (req: Request): Promise<LogisticsIdentity | null> => {
+  const authorization = getLogisticsAuthorization(req)
+  if (!authorization) return null
+
+  const logisticsApiUrl = String(
+    process.env.KOURIER_BOYZ_LOGISTICS_API_URL || 'http://127.0.0.1:4000/api',
+  ).replace(/\/+$/, '')
+
+  const response = await axios.get(`${logisticsApiUrl}/profile/user`, {
+    headers: { Authorization: authorization },
+    timeout: 8_000,
+  })
+  const profile = response.data || {}
+  const company = profile.companyInfo || {}
+  const userId = String(profile.userId || profile.id || '').trim()
+  const email = String(company.contactEmail || company.companyEmail || '').trim().toLowerCase()
+  const name = String(company.contactPerson || company.businessName || email.split('@')[0] || '').trim()
+
+  if (!userId || !email || !name) {
+    const error = new Error('Complete your courier company profile before opening a marketplace store')
+    ;(error as Error & { statusCode?: number; code?: string }).statusCode = 422
+    ;(error as Error & { statusCode?: number; code?: string }).code = 'COURIER_PROFILE_INCOMPLETE'
+    throw error
+  }
+
+  return {
+    userId,
+    email,
+    name,
+    phone: normalizeIndianPhone(company.contactNumber || company.companyContactNumber),
+    businessName: String(company.brandName || company.businessName || '').trim() || undefined,
+  }
+}
+
+const sellerSessionPayload = (seller: any) => ({
+  id: seller._id,
+  name: seller.name,
+  email: seller.email,
+  phone: seller.phone,
+  role: seller.role,
+  businessName: seller.businessName,
+  isApproved: seller.isApproved,
+  kycSubmitted: seller.kycSubmitted,
+  isEmailVerified: seller.isEmailVerified,
+  sellerLifecycleStatus: seller.sellerLifecycleStatus,
+  storeStatus: seller.storeStatus,
+})
+
+const issueSellerSession = (res: Response, seller: any) => {
+  const sessionVersion = seller.sessionVersion ?? 0
+  const payload = { userId: seller._id, role: seller.role, sessionVersion }
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET || 'your-secret-key', {
+    expiresIn: '15m',
+  })
+  const refreshToken = jwt.sign(
+    payload,
+    process.env.REFRESH_SECRET || 'your-seller-refresh-secret',
+    { expiresIn: '7d' },
+  )
+
+  res.cookie('seller_refresh', refreshToken, buildSellerRefreshCookieOptions())
+  return { token: accessToken, seller: sellerSessionPayload(seller) }
+}
 
 const normalizeBaseUrl = (baseUrl: string): string => {
   const trimmed = baseUrl.trim()
@@ -77,12 +161,32 @@ const generateUniqueStoreSlug = async (
 // Register Seller
 export const registerSeller = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, phone } = req.body
+    const { name, email, password, phone, businessName } = req.body
+    const logisticsIdentity = await resolveLogisticsIdentity(req)
+    const normalizedEmail = String(email || '').trim().toLowerCase()
+
+    if (logisticsIdentity && normalizedEmail !== logisticsIdentity.email) {
+      return res.status(409).json({
+        error: 'Use the same verified email as your courier account to link this store.',
+        code: 'COURIER_EMAIL_MISMATCH',
+      })
+    }
 
     // Check if email exists for seller role
-    let user = await User.findOne({ email, role: 'seller' })
+    let user = await User.findOne({ email: normalizedEmail, role: 'seller' })
     
     if (user) {
+      if (
+        logisticsIdentity &&
+        user.logisticsUserId &&
+        user.logisticsUserId !== logisticsIdentity.userId
+      ) {
+        return res.status(409).json({
+          error: 'This marketplace store is already linked to another courier account.',
+          code: 'STORE_ALREADY_LINKED',
+        })
+      }
+
       // Check if this is an OAuth-only account (no password set)
       if (!user.password && user.oauthProvider === 'google') {
         // Link password to existing OAuth account
@@ -95,33 +199,14 @@ export const registerSeller = async (req: Request, res: Response) => {
         if (phone && !user.phone) {
           user.phone = phone
         }
-        await user.save()
-        
-        // Generate token and return success (same as new registration)
-        const sessionVersion = user.sessionVersion ?? 0
-        const token = jwt.sign(
-          { userId: user._id, role: user.role, sessionVersion },
-          process.env.JWT_SECRET!,
-          {
-            expiresIn: '7d',
-          },
-        )
-
-        const sellerData = {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-          isApproved: user.isApproved,
-          kycSubmitted: user.kycSubmitted,
-          isEmailVerified: user.isEmailVerified,
+        if (logisticsIdentity && !user.logisticsUserId) {
+          user.logisticsUserId = logisticsIdentity.userId
         }
+        await user.save()
 
         return res.status(200).json({
           message: 'Password linked successfully! You can now sign in with either email/password or Google.',
-          token,
-          seller: sellerData,
+          ...issueSellerSession(res, user),
         })
       }
       
@@ -138,11 +223,13 @@ export const registerSeller = async (req: Request, res: Response) => {
     const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
 
     user = new User({
-      name,
-      email,
+      name: logisticsIdentity?.name || name,
+      email: normalizedEmail,
       password: hashedPassword,
       role: 'seller',
-      phone,
+      phone: logisticsIdentity?.phone || phone,
+      businessName: logisticsIdentity?.businessName || businessName,
+      logisticsUserId: logisticsIdentity?.userId,
       isApproved: false,
       kycSubmitted: false, // KYC not submitted yet - will be done after login
       isEmailVerified: false,
@@ -181,36 +268,74 @@ export const registerSeller = async (req: Request, res: Response) => {
     }
 
     // Generate JWT token and auto-login the user
-    const sessionVersion = user.sessionVersion ?? 0
-    const token = jwt.sign(
-      { userId: user._id, role: user.role, sessionVersion },
-      process.env.JWT_SECRET!,
-      {
-        expiresIn: '7d',
-      },
-    )
-
-    // Return user data without password
-    const sellerData = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      isApproved: user.isApproved,
-      kycSubmitted: user.kycSubmitted,
-      isEmailVerified: user.isEmailVerified,
-    }
-
     return res.status(201).json({
       message: 'Registration successful! Please complete your KYC verification.',
       emailSent: emailResult.success,
-      token,
-      seller: sellerData,
+      ...issueSellerSession(res, user),
     })
   } catch (err: unknown) {
+    const statusCode = (err as { statusCode?: number }).statusCode
+    const code = (err as { code?: string }).code
+    if (statusCode) {
+      return res.status(statusCode).json({ error: (err as Error).message, code })
+    }
     console.error('Error registering seller:', err)
     res.status(500).json({ error: 'Server error' })
+  }
+}
+
+export const resumeSellerFromLogistics = async (req: Request, res: Response) => {
+  try {
+    const identity = await resolveLogisticsIdentity(req)
+    if (!identity) {
+      return res.status(401).json({
+        error: 'Courier session required',
+        code: 'COURIER_SESSION_REQUIRED',
+      })
+    }
+
+    let seller = await User.findOne({ logisticsUserId: identity.userId, role: 'seller' })
+    if (!seller) {
+      seller = await User.findOne({ email: identity.email, role: 'seller' })
+      if (seller?.logisticsUserId && seller.logisticsUserId !== identity.userId) {
+        return res.status(409).json({
+          error: 'This marketplace store is already linked to another courier account.',
+          code: 'STORE_ALREADY_LINKED',
+        })
+      }
+      if (seller && !seller.logisticsUserId) {
+        seller.logisticsUserId = identity.userId
+        await seller.save()
+      }
+    }
+
+    if (!seller) {
+      return res.json({ status: 'registration_required', profile: identity })
+    }
+
+    if (seller.sellerLifecycleStatus === 'DEACTIVATED') {
+      return res.status(403).json({
+        error: 'Your marketplace seller account has been deactivated.',
+        code: 'ACCOUNT_DEACTIVATED',
+      })
+    }
+
+    return res.json({ status: 'linked', ...issueSellerSession(res, seller) })
+  } catch (err: unknown) {
+    const upstreamStatus = axios.isAxiosError(err) ? err.response?.status : undefined
+    const statusCode = (err as { statusCode?: number }).statusCode || upstreamStatus || 500
+    const code =
+      (err as { code?: string }).code ||
+      (statusCode === 401 ? 'COURIER_SESSION_EXPIRED' : 'COURIER_SESSION_UNAVAILABLE')
+
+    if (statusCode >= 500) console.error('Error resuming marketplace seller session:', err)
+    return res.status(statusCode).json({
+      error:
+        statusCode === 401
+          ? 'Your courier session has expired. Sign in again to continue.'
+          : (err as Error).message || 'Could not connect the courier and marketplace workspaces.',
+      code,
+    })
   }
 }
 
@@ -338,34 +463,7 @@ export const loginSeller = async (req: Request, res: Response) => {
     // Allow login regardless of email verification or approval status
     // The frontend will handle redirecting based on kycSubmitted and isApproved
 
-    const sessionVersion = seller.sessionVersion ?? 0
-    const payload = { userId: seller._id, role: seller.role, sessionVersion }
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET || 'your-secret-key', {
-      expiresIn: '15m',
-    })
-    const refreshToken = jwt.sign(
-      payload,
-      process.env.REFRESH_SECRET || 'your-seller-refresh-secret',
-      { expiresIn: '7d' },
-    )
-
-    res.cookie('seller_refresh', refreshToken, buildSellerRefreshCookieOptions())
-
-    res.json({
-      token: accessToken,
-      seller: {
-        id: seller._id,
-        name: seller.name,
-        email: seller.email,
-        phone: seller.phone,
-        role: seller.role,
-        businessName: seller.businessName,
-        isApproved: seller.isApproved,
-        kycSubmitted: seller.kycSubmitted,
-        isEmailVerified: seller.isEmailVerified,
-        sellerLifecycleStatus: seller.sellerLifecycleStatus,
-      },
-    })
+    res.json(issueSellerSession(res, seller))
   } catch (err: unknown) {
     console.error('Error logging in seller:', err)
     res.status(500).json({ error: 'Server error' })

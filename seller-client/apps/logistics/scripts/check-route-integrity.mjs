@@ -51,6 +51,14 @@ const navigationOnlyParents = new Set([
   '/support',
 ])
 const mountedAppPrefixes = ['/store']
+const marketplaceWorkspaceRoutes = new Set([
+  '/dashboard',
+  '/products',
+  '/orders',
+  '/returns',
+  '/settlements',
+  '/store-settings',
+])
 
 const withoutQuery = (routePath) => routePath.replace(/\?.*$/, '')
 const matchesRoute = (reference, route) => {
@@ -66,9 +74,15 @@ const matchesRoute = (reference, route) => {
   return routeParts.every((part, index) => part.startsWith(':') || part === referenceParts[index])
 }
 
-const unresolved = routeReferences.filter(({ path: reference }) => {
+const unresolved = routeReferences.filter(({ path: reference, sourceFile }) => {
   const normalizedReference = withoutQuery(reference)
   if (navigationOnlyParents.has(normalizedReference)) return false
+  if (
+    sourceFile.endsWith(path.join('components', 'UI', 'Sidebar.tsx')) &&
+    marketplaceWorkspaceRoutes.has(normalizedReference)
+  ) {
+    return false
+  }
   if (
     mountedAppPrefixes.some(
       (prefix) => normalizedReference === prefix || normalizedReference.startsWith(`${prefix}/`),

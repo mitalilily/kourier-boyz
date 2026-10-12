@@ -166,7 +166,7 @@ const dashRoutes = [
   },
   {
     path: '/users-management',
-    name: 'Users Management',
+    name: 'Courier Clients',
     icon: <IconUser size={20} />,
     component: () => (
       <AdminRoute>

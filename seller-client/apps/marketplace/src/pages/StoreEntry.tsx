@@ -2,7 +2,6 @@ import {
   ArrowRightOutlined,
   CheckCircleFilled,
   EyeOutlined,
-  LoginOutlined,
   ShopOutlined,
 } from '@ant-design/icons'
 import { Button } from 'antd'
@@ -28,13 +27,6 @@ const StoreEntry = () => {
   return (
     <MarketplacePublicShell>
       <main className="kb-store-entry-page">
-      <header className="kb-store-entry-nav">
-        <img src="/store/brand/kourier-boyz-logo-transparent.png" alt="Kourier Boyz" />
-        <Link to="/login" className="kb-store-entry-signin">
-          <LoginOutlined /> Seller sign in
-        </Link>
-      </header>
-
       <section className="kb-store-entry-hero">
         <img
           className="kb-store-entry-image"
@@ -77,6 +69,9 @@ const StoreEntry = () => {
             <Button size="large" icon={<EyeOutlined />} onClick={handleDemo}>
               Preview seller workspace
             </Button>
+            <Link to="/login" className="kb-store-entry-inline-link">
+              Already sell here? Sign in
+            </Link>
           </div>
         </div>
 

@@ -105,6 +105,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const clearTokens = () => {
     clearAuthTokens()
     localStorage.removeItem(DEMO_LOGISTICS_SESSION_KEY)
+    localStorage.removeItem('seller_token')
+    localStorage.removeItem('seller_data')
     setIsDemo(false)
     setIsAuthenticated(false)
     queryClient.removeQueries({ queryKey: ['userInfo'] })

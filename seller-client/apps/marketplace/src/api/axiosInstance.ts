@@ -1,15 +1,16 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { isDemoSellerSession, useAuthStore } from '../store/authStore'
+import { marketplacePublicApiUrl, marketplaceSellerApiUrl } from './runtime'
 
 // Authenticated seller API
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:4000/api/marketplace/seller',
+  baseURL: marketplaceSellerApiUrl,
   withCredentials: true,
 })
 
 // Public, unauthenticated API (used for things like product serviceability)
 export const PublicAPI = axios.create({
-  baseURL: import.meta.env.VITE_PUBLIC_API_URL || 'http://localhost:4000/api/marketplace',
+  baseURL: marketplacePublicApiUrl,
   withCredentials: true,
 })
 

@@ -1,66 +1,65 @@
-import { Spin } from 'antd'
-import { lazy, Suspense } from 'react'
+import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminLayout from './layout/AdminLayout'
-import AgreementsPage from './pages/Agreements'
-import AnnouncementsPage from './pages/Announcements'
-import AuditLogs from './pages/AuditLogs'
-import BannersPage from './pages/Banners'
-import BlogsPage from './pages/Blogs'
-import BrandApprovals from './pages/BrandApprovals'
-import CategoriesPage from './pages/Categories'
-import CategoryExtensionRequests from './pages/CategoryExtensionRequests'
-import ContactForms from './pages/ContactForms'
-import CouponsPage from './pages/Coupons'
-import CreditNotesPage from './pages/CreditNotes'
-import CustomerDetail from './pages/CustomerDetail'
-import Customers from './pages/Customers'
-import Dashboard from './pages/Dashboard'
-import FeedbackPage from './pages/Feedback'
 import Login from './pages/Login'
-import NotificationsPage from './pages/Notifications'
-import AdminOrderDetail from './pages/Orders/OrderDetail'
-import OrdersList from './pages/Orders/OrdersList'
-import ProductDetail from './pages/ProductDetail'
-import ProductsPage from './pages/Products'
-import PromotionalEmailsPage from './pages/PromotionalEmails'
-import Requests from './pages/Requests'
-import ReturnsPage from './pages/Returns'
-import ReviewsPage from './pages/Reviews'
-import Roles from './pages/Roles'
-import SellerCouponsPage from './pages/SellerCoupons'
-import Settings from './pages/Settings'
-import SettlementBatchDetail from './pages/SettlementBatchDetail'
-import SettlementInvoicesPage from './pages/SettlementInvoices'
-import SettlementsPage from './pages/Settlements'
-import SettlementSettingsPage from './pages/SettlementSettings'
-import SuperAdminProfile from './pages/SuperAdminProfile'
-import SupportArticles from './pages/SupportArticles'
-
-// Lazy load Calculations page for code splitting
-const Calculations = lazy(() => import('./pages/Calculations'))
-// import SupportChats from './pages/SupportChats'
-import AdminGuide from './pages/AdminGuide'
 import NotFound from './pages/NotFound'
 import RouteErrorPage from './pages/RouteErrorPage'
-import CourierChargesReport from './pages/Reports/CourierChargesReport'
-import NewSellerRegistrationReport from './pages/Reports/NewSellerRegistrationReport'
-import PortalIncomeReport from './pages/Reports/PortalIncomeReport'
-import SalesPendingStatusReport from './pages/Reports/SalesPendingStatusReport'
-import SalesReport from './pages/Reports/SalesReport'
-import SettlementDueReport from './pages/Reports/SettlementDueReport'
-import TcsReport from './pages/Reports/TcsReport'
-import TdsReport from './pages/Reports/TdsReport'
-import TicketSystemReport from './pages/Reports/TicketSystemReport'
-import SellerDeactivationRequests from './pages/SellerDeactivationRequests'
-import SellerReports from './pages/SellerReports'
-import Tickets from './pages/Tickets'
-import UserDetail from './pages/UserDetail'
-import UserManagement from './pages/UserManagement'
-import Users from './pages/Users'
 import VerifyDevicePasswordChange from './pages/VerifyDevicePasswordChange'
-import WebhookEvents from './pages/WebhookEvents'
+
+const AdminGuide = lazy(() => import('./pages/AdminGuide'))
+const AgreementsPage = lazy(() => import('./pages/Agreements'))
+const AnnouncementsPage = lazy(() => import('./pages/Announcements'))
+const AuditLogs = lazy(() => import('./pages/AuditLogs'))
+const BannersPage = lazy(() => import('./pages/Banners'))
+const BlogsPage = lazy(() => import('./pages/Blogs'))
+const BrandApprovals = lazy(() => import('./pages/BrandApprovals'))
+const Calculations = lazy(() => import('./pages/Calculations'))
+const CategoriesPage = lazy(() => import('./pages/Categories'))
+const CategoryExtensionRequests = lazy(() => import('./pages/CategoryExtensionRequests'))
+const ContactForms = lazy(() => import('./pages/ContactForms'))
+const CouponsPage = lazy(() => import('./pages/Coupons'))
+const CreditNotesPage = lazy(() => import('./pages/CreditNotes'))
+const CustomerDetail = lazy(() => import('./pages/CustomerDetail'))
+const Customers = lazy(() => import('./pages/Customers'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const FeedbackPage = lazy(() => import('./pages/Feedback'))
+const NotificationsPage = lazy(() => import('./pages/Notifications'))
+const AdminOrderDetail = lazy(() => import('./pages/Orders/OrderDetail'))
+const OrdersList = lazy(() => import('./pages/Orders/OrdersList'))
+const ProductDetail = lazy(() => import('./pages/ProductDetail'))
+const ProductsPage = lazy(() => import('./pages/Products'))
+const PromotionalEmailsPage = lazy(() => import('./pages/PromotionalEmails'))
+const Requests = lazy(() => import('./pages/Requests'))
+const ReturnsPage = lazy(() => import('./pages/Returns'))
+const ReviewsPage = lazy(() => import('./pages/Reviews'))
+const Roles = lazy(() => import('./pages/Roles'))
+const SellerCouponsPage = lazy(() => import('./pages/SellerCoupons'))
+const Settings = lazy(() => import('./pages/Settings'))
+const SettlementBatchDetail = lazy(() => import('./pages/SettlementBatchDetail'))
+const SettlementInvoicesPage = lazy(() => import('./pages/SettlementInvoices'))
+const SettlementsPage = lazy(() => import('./pages/Settlements'))
+const SettlementSettingsPage = lazy(() => import('./pages/SettlementSettings'))
+const SuperAdminProfile = lazy(() => import('./pages/SuperAdminProfile'))
+const SupportArticles = lazy(() => import('./pages/SupportArticles'))
+const CourierChargesReport = lazy(() => import('./pages/Reports/CourierChargesReport'))
+const NewSellerRegistrationReport = lazy(
+  () => import('./pages/Reports/NewSellerRegistrationReport'),
+)
+const PortalIncomeReport = lazy(() => import('./pages/Reports/PortalIncomeReport'))
+const SalesPendingStatusReport = lazy(() => import('./pages/Reports/SalesPendingStatusReport'))
+const SalesReport = lazy(() => import('./pages/Reports/SalesReport'))
+const SettlementDueReport = lazy(() => import('./pages/Reports/SettlementDueReport'))
+const TcsReport = lazy(() => import('./pages/Reports/TcsReport'))
+const TdsReport = lazy(() => import('./pages/Reports/TdsReport'))
+const TicketSystemReport = lazy(() => import('./pages/Reports/TicketSystemReport'))
+const SellerDeactivationRequests = lazy(() => import('./pages/SellerDeactivationRequests'))
+const SellerReports = lazy(() => import('./pages/SellerReports'))
+const Tickets = lazy(() => import('./pages/Tickets'))
+const UserDetail = lazy(() => import('./pages/UserDetail'))
+const UserManagement = lazy(() => import('./pages/UserManagement'))
+const Users = lazy(() => import('./pages/Users'))
+const WebhookEvents = lazy(() => import('./pages/WebhookEvents'))
 
 export const router = createBrowserRouter([
   // Public routes
@@ -140,15 +139,7 @@ export const router = createBrowserRouter([
       {
         path: '/calculations',
         element: (
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center min-h-[400px]">
-                <Spin size="large" />
-              </div>
-            }
-          >
-            <Calculations />
-          </Suspense>
+          <Calculations />
         ),
       },
       {

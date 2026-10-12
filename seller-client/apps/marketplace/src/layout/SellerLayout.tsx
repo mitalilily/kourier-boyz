@@ -1,18 +1,17 @@
 import { Button, Layout, Modal, Progress, Space, Typography } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
+import CourierSidebar from '../../../logistics/src/components/UI/Sidebar'
 import { useProfileSync } from '../api/profileQueries'
+import SellerOnboardingTutorial from '../components/SellerOnboardingTutorial'
 import { useAuthStore } from '../store/authStore'
 import { useSellerTourStore } from '../store/sellerTourStore'
-import SellerOnboardingTutorial from '../components/SellerOnboardingTutorial'
 import HeaderBar from './HeaderBar'
-import Sidebar from './Sidebar'
 
-const { Sider, Content } = Layout
+const { Content } = Layout
 const { Text, Paragraph } = Typography
 
 const SellerLayout = () => {
-  const [collapsed, setCollapsed] = useState(window.innerWidth < 992)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const navigate = useNavigate()
@@ -22,10 +21,8 @@ const SellerLayout = () => {
   const setRunTour = useSellerTourStore((state) => state.setRunTour)
   const handleTourComplete = useCallback(() => setRunTour(false), [setRunTour])
 
-  // Automatically sync profile data to detect approval status changes
   useProfileSync()
 
-  // Check if account is deactivated and log out immediately
   useEffect(() => {
     if (user?.role === 'seller' && user?.sellerLifecycleStatus === 'DEACTIVATED') {
       logout()
@@ -33,7 +30,6 @@ const SellerLayout = () => {
     }
   }, [user?.sellerLifecycleStatus, user?.role, logout, navigate])
 
-  // Compute a simple account completion percentage for sellers
   const getAccountCompletionPercentage = () => {
     if (!user || user.role !== 'seller') return 100
 
@@ -48,130 +44,45 @@ const SellerLayout = () => {
     return Math.round((completed / total) * 100)
   }
 
-  // Show "complete profile" modal whenever a seller is logged in
-  // and their account is not 100% complete.
   useEffect(() => {
     const percent = getAccountCompletionPercentage()
-    if (user && user.role === 'seller' && percent < 100) {
-      setShowProfileModal(true)
-    } else {
-      setShowProfileModal(false)
-    }
+    setShowProfileModal(Boolean(user?.role === 'seller' && percent < 100))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth < 992
-      setIsMobile(mobile)
-    }
+    const handleResize = () => setIsMobile(window.innerWidth < 992)
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider
-        collapsible={!isMobile}
-        collapsed={collapsed}
-        onCollapse={setCollapsed}
-        width={260}
-        collapsedWidth={0}
-        trigger={null}
-        breakpoint="lg"
-        style={{
-          overflow: 'auto',
-          height: '100vh',
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          boxShadow: 'none',
-          borderRight: '1px solid #e8e8e8',
-          zIndex: 100,
-        }}
-        theme="light"
-      >
-        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-      </Sider>
+    <div className="kb-seller-shell">
+      <CourierSidebar
+        role="customer"
+        pinned={false}
+        externalNavigation
+        marketplaceNavigation
+      />
 
-      {/* Mobile backdrop overlay */}
-      {!collapsed && isMobile && (
-        <div
-          onClick={() => setCollapsed(true)}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.45)',
-            zIndex: 99,
-          }}
-        />
-      )}
-
-      <Layout
-        style={{
-          marginLeft: collapsed || isMobile ? 0 : 260,
-          transition: 'all 0.2s',
-        }}
-        className="site-layout"
-      >
+      <Layout className="site-layout kb-seller-workspace">
         {user?.role === 'seller' && (
           <SellerOnboardingTutorial run={runTour} onComplete={handleTourComplete} />
         )}
-        <HeaderBar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <HeaderBar />
         {user?.isDemo && (
-          <div
-            style={{
-              minHeight: 36,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '8px 16px',
-              color: '#5f4308',
-              background: '#fbf4df',
-              borderBottom: '1px solid #ead69f',
-              fontSize: 12,
-              fontWeight: 700,
-              textAlign: 'center',
-            }}
-          >
+          <div className="kb-demo-workspace-notice">
             Demo workspace: explore the seller tools freely. Demo changes stay in this browser.
           </div>
         )}
-        <Content
-          style={{
-            margin: isMobile ? '8px' : '16px',
-            overflow: 'initial',
-            minHeight: 'calc(100vh - 112px)',
-          }}
-        >
-          <div
-            style={{
-              padding: isMobile ? '16px' : '24px',
-              background: '#fff',
-              borderRadius: 8,
-              minHeight: 360,
-            }}
-          >
+        <Content className="kb-seller-content" style={{ margin: isMobile ? 8 : 16 }}>
+          <div className="kb-seller-content-surface" style={{ padding: isMobile ? 16 : 24 }}>
             <Outlet />
           </div>
         </Content>
-        <div
-          style={{
-            textAlign: 'center',
-            padding: isMobile ? '12px' : '16px',
-            color: '#999',
-            fontSize: isMobile ? 11 : 12,
-          }}
-        >
-          Kourier Boyz Seller Hub ©2025
-        </div>
+        <footer className="kb-seller-footer">Kourier Boyz Seller Hub (c) 2026</footer>
       </Layout>
 
-      {/* Global profile completion modal for sellers */}
       <Modal
         open={showProfileModal}
         closable
@@ -196,8 +107,7 @@ const SellerLayout = () => {
       >
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Paragraph type="secondary">
-            For the best experience and faster approvals, please complete your seller profile and
-            KYC details.
+            Complete your seller profile and KYC details to publish products and receive payouts.
           </Paragraph>
           <div>
             <Text strong>Profile completion</Text>
@@ -214,7 +124,7 @@ const SellerLayout = () => {
           </ul>
         </Space>
       </Modal>
-    </Layout>
+    </div>
   )
 }
 

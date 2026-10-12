@@ -16,6 +16,7 @@ export interface IUser extends Document {
   email: string
   password: string
   role: UserRole
+  logisticsUserId?: string
   recentSearches?: Array<{ query: string; searchedAt: Date }>
   phone?: string
   profilePhoto?: string // Profile photo URL
@@ -288,6 +289,7 @@ const UserSchema = new Schema<IUser>(
       enum: ['super-admin', 'customer', 'seller', 'user'],
       default: 'customer',
     },
+    logisticsUserId: { type: String },
     phone: { type: String },
     profilePhoto: { type: String }, // Profile photo URL
     dateOfBirth: { type: Date },
@@ -783,6 +785,9 @@ UserSchema.pre('save', function (next) {
 
 // Create compound unique index on email + role to allow same email for different roles
 UserSchema.index({ email: 1, role: 1 }, { unique: true })
+
+// One courier account can own at most one marketplace seller workspace.
+UserSchema.index({ logisticsUserId: 1 }, { unique: true, sparse: true })
 
 // Index for storeSlug lookup (only for sellers)
 UserSchema.index({ storeSlug: 1 }, { unique: true, sparse: true })

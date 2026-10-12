@@ -10,8 +10,8 @@ export type RegisterData = {
   email: string
   password: string
   phone: string
-  businessName: string
-  businessAddress: string
+  businessName?: string
+  businessAddress?: string
   gstNumber?: string
 }
 
@@ -21,7 +21,12 @@ export const login = async (data: LoginData) => {
 }
 
 export const register = async (data: RegisterData) => {
-  const response = await API.post('/auth/register', data)
+  const courierToken = localStorage.getItem('cc_access')
+  const response = await API.post('/auth/register', data, {
+    headers: courierToken
+      ? { 'X-Logistics-Authorization': `Bearer ${courierToken}` }
+      : undefined,
+  })
   return response.data
 }
 

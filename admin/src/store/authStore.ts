@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
 import API from '../api/axiosInstance'
+import { ADMIN_WORKSPACE_STORAGE } from '../config/adminWorkspace'
 import type { ModulePermissions } from '../api/roles'
 import {
   clearMarketplaceAdminStorage,
@@ -60,6 +61,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (typeof window !== 'undefined') {
       void API.post('/admin/auth/logout').catch(() => undefined)
       clearMarketplaceAdminStorage()
+      localStorage.removeItem(ADMIN_WORKSPACE_STORAGE.logisticsAccessToken)
+      localStorage.removeItem(ADMIN_WORKSPACE_STORAGE.logisticsRefreshToken)
+      localStorage.removeItem(ADMIN_WORKSPACE_STORAGE.logisticsUserId)
     }
     set({ 
       token: null, 
