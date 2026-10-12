@@ -149,9 +149,9 @@ const Register = () => {
         <Card className="bg-white/95 backdrop-blur-sm shadow-xl border border-slate-200/50 rounded-2xl">
           <CardHeader className="text-center space-y-1 px-5 pt-5 pb-3">
             <img
-              src="/brand/kourier-boyz-logo.png"
+              src="/brand/kourier-boyz-logo-transparent.png"
               alt="Kourier Boyz"
-              className="w-20 h-12 object-contain mb-2 mx-auto drop-shadow-lg"
+              className="mx-auto mb-2 h-14 w-48 rounded-md border border-[#d9dcda] bg-[#fffefb] px-3 py-2 object-contain shadow-sm"
             />
             <CardTitle className="text-xl font-bold text-slate-900">Create Account</CardTitle>
             <CardDescription className="text-xs text-slate-600">

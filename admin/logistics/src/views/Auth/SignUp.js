@@ -64,11 +64,18 @@ function SignUp() {
             <Flex align="center" gap={4} mb={8}>
               <Box
                 as="img"
-                src="/logistics/brand/kourier-boyz-logo.png"
+                src="/logistics/brand/kourier-boyz-logo-transparent.png"
                 alt="Kourier Boyz"
                 h="76px"
                 w="190px"
                 objectFit="contain"
+                bg="#fffefb"
+                border="1px solid"
+                borderColor="gray.200"
+                borderRadius="6px"
+                px="12px"
+                py="8px"
+                boxShadow="sm"
               />
               <Box>
                 <Text fontSize="xs" fontWeight="800" letterSpacing="0.16em" textTransform="uppercase" color="brand.500">

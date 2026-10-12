@@ -97,7 +97,21 @@ function SidebarResponsive(props) {
   const brand = (
     <Box pt="24px" mb="10px">
       <Flex align="center" justify="center" gap="10px" mb="16px" fontWeight="bold">
-        <Box as="img" src="/logistics/brand/kourier-boyz-logo.png" alt={logoText} h="72px" w="180px" objectFit="contain" />
+        <Box
+          as="img"
+          src="/logistics/brand/kourier-boyz-logo-transparent.png"
+          alt={logoText}
+          h="62px"
+          w="190px"
+          objectFit="contain"
+          bg="#fffefb"
+          border="1px solid"
+          borderColor="gray.200"
+          borderRadius="6px"
+          px="10px"
+          py="8px"
+          boxShadow="sm"
+        />
       </Flex>
       <Box h="1px" bg={dividerColor} mx="4px" mb="12px" />
     </Box>

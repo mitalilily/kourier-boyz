@@ -88,16 +88,16 @@ img {
 img[src*="/brand/kourier-boyz-logo-transparent.png"],
 img[src*="/brand/kourier-boyz-mark.png"] {
   box-sizing: border-box;
-  background: linear-gradient(135deg, #202524 0%, #3c4240 72%, #705315 145%);
-  border: 1px solid rgba(223, 183, 67, 0.28);
+  background: linear-gradient(145deg, #ffffff 0%, #f5f7f6 72%, #fff9e8 100%);
+  border: 1px solid rgba(114, 122, 118, 0.2);
   border-radius: 8px;
   padding: 5px 8px;
-  box-shadow: 0 10px 24px rgba(22, 27, 25, 0.14);
+  box-shadow: 0 8px 20px rgba(47, 52, 49, 0.09);
 }
 
 /* The sidebar uses a light logo frame so the silver wordmark stays crisp at every width. */
 .kb-sidebar-logo {
-  background: #f8faf9 !important;
+  background: #fffefb !important;
   border: 0 !important;
   border-radius: 5px !important;
   padding: 2px !important;

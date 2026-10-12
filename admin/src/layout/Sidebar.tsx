@@ -558,12 +558,12 @@ const Sidebar = () => {
       <div className="kb-admin-sidebar-brand" style={{ flexShrink: 0 }}>
         {collapsed ? (
           <div className="kb-admin-brand-mark" aria-label="Kourier Boyz">
-            <img src="/brand/kourier-boyz-logo-nav-cropped.png" alt="" />
+            <img src="/brand/kourier-boyz-mark.png" alt="" />
           </div>
         ) : (
           <div className="kb-admin-brand-lockup">
             <img
-              src="/brand/kourier-boyz-logo-nav-cropped.png"
+              src="/brand/kourier-boyz-logo-transparent.png"
               alt="Kourier Boyz"
               className="kb-admin-brand-logo"
             />

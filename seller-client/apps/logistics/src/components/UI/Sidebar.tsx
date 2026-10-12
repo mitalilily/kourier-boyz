@@ -76,7 +76,7 @@ const BRAND_BLUE = '#B78115'
 const BRAND_SURFACE = '#FFFEFB'
 const BRAND_INK = '#202321'
 const BRAND_BORDER = '#D9DCDA'
-const LOGO_WORDMARK_SRC = '/brand/kourier-boyz-logo.png'
+const LOGO_WORDMARK_SRC = '/brand/kourier-boyz-logo-transparent.png'
 const LOGO_MARK_SRC = '/brand/kourier-boyz-mark.png'
 
 // Marketplace runs under /store, so return through the root app shell before opening a courier route.
@@ -431,7 +431,7 @@ export default function Sidebar({
             src={
               externalNavigation
                 ? shouldShowExpanded
-                  ? '/store/brand/kourier-boyz-logo.png'
+                  ? '/store/brand/kourier-boyz-logo-transparent.png'
                   : '/store/brand/kourier-boyz-mark.png'
                 : shouldShowExpanded
                   ? LOGO_WORDMARK_SRC

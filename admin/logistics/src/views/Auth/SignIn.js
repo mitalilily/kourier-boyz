@@ -37,6 +37,13 @@ function SignIn() {
           w="230px"
           h="64px"
           objectFit="contain"
+          bg="#fffefb"
+          border="1px solid"
+          borderColor="gray.200"
+          borderRadius="6px"
+          px="14px"
+          py="9px"
+          boxShadow="sm"
         />
         <Spinner size="lg" color="brand.500" thickness="3px" />
         <Text color="#626965" fontSize="sm">

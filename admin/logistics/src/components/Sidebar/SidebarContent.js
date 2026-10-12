@@ -108,16 +108,27 @@ const SidebarContent = ({ logoText, routes, sidebarWidth, onToggle }) => {
         borderBottom="1px solid"
         borderColor={borderColor}
       >
-        <Box w={collapsed ? '42px' : '174px'} h={collapsed ? '42px' : '58px'} overflow="hidden" flexShrink={0}>
+        <Box
+          w={collapsed ? '42px' : '174px'}
+          h={collapsed ? '42px' : '58px'}
+          overflow="hidden"
+          flexShrink={0}
+          bg="#fffefb"
+          border="1px solid"
+          borderColor="gray.200"
+          borderRadius="6px"
+          px={collapsed ? 1 : 2}
+          boxShadow="sm"
+        >
           <Box
             as="img"
             src="/logistics/brand/kourier-boyz-logo-transparent.png"
             alt={logoText}
-            w={collapsed ? '180px' : '174px'}
-            maxW="none"
+            w="100%"
+            maxW="100%"
             h={collapsed ? '42px' : '58px'}
             objectFit="contain"
-            objectPosition="left center"
+            objectPosition="center"
           />
         </Box>
         <Tooltip label={collapsed ? 'Expand navigation' : 'Collapse navigation'} placement="right">

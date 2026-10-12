@@ -265,7 +265,7 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <img
-              src="/store/brand/kourier-boyz-logo.png"
+              src="/store/brand/kourier-boyz-logo-transparent.png"
               alt="Kourier Boyz"
               className="kb-marketplace-sidebar-logo"
               style={{

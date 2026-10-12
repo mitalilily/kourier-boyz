@@ -754,11 +754,11 @@ code {
 img[src*="/store/brand/kourier-boyz-logo-transparent.png"],
 img[src*="/store/brand/kourier-boyz-mark.png"] {
   box-sizing: border-box;
-  background: linear-gradient(135deg, #202524 0%, #3c4240 72%, #705315 145%);
-  border: 1px solid rgba(223, 183, 67, 0.3);
+  background: linear-gradient(145deg, #ffffff 0%, #f4f6f5 74%, #fff8e4 100%);
+  border: 1px solid rgba(114, 122, 118, 0.2);
   border-radius: 8px;
   padding: 5px 8px;
-  box-shadow: 0 10px 24px rgba(22, 27, 25, 0.15);
+  box-shadow: 0 8px 20px rgba(47, 52, 49, 0.09);
 }
 
 .ant-layout,
@@ -956,10 +956,10 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
   height: 46px;
   flex: 0 0 46px;
   place-items: center;
-  border: 1px solid rgba(223, 183, 67, 0.52);
+  border: 1px solid rgba(183, 129, 21, 0.28);
   border-radius: 8px;
-  background: #3a403e;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(145deg, #ffffff, #eef1ef);
+  box-shadow: 0 8px 20px rgba(32, 35, 33, 0.12);
 }
 
 .kb-public-shell-mark img {
@@ -970,7 +970,7 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
   border: 0;
   background: transparent;
   box-shadow: none;
-  filter: brightness(1.16) contrast(1.1) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.28));
+  filter: contrast(1.06) drop-shadow(0 2px 2px rgba(32, 35, 33, 0.12));
 }
 
 .kb-public-shell-brand strong,
@@ -1426,10 +1426,10 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
   height: 47px;
   flex: 0 0 47px;
   place-items: center;
-  border: 1px solid rgba(223, 183, 67, 0.62);
+  border: 1px solid rgba(183, 129, 21, 0.3);
   border-radius: 8px;
-  background: #151a19;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+  background: linear-gradient(145deg, #ffffff, #eef1ef);
+  box-shadow: 0 8px 18px rgba(32, 35, 33, 0.12);
 }
 
 .kb-register-logo-frame img {
@@ -1440,7 +1440,7 @@ img[src*="/store/brand/kourier-boyz-mark.png"] {
   border: 0;
   background: transparent;
   box-shadow: none;
-  filter: brightness(1.2) contrast(1.14) drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+  filter: contrast(1.06) drop-shadow(0 2px 2px rgba(32, 35, 33, 0.12));
 }
 
 .kb-register-brand strong,

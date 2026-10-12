@@ -93,10 +93,11 @@ export default function Navbar({ handleDrawerToggle, pinned = false, onPinChange
                   objectFit: 'contain',
                   objectPosition: 'left center',
                   flexShrink: 0,
-                  background: 'linear-gradient(135deg, #202524, #3c4240)',
-                  border: '1px solid rgba(223,183,67,0.24)',
+                  background: 'linear-gradient(145deg, #ffffff, #f2f5f3)',
+                  border: '1px solid rgba(114,122,118,0.22)',
                   borderRadius: 1.5,
                   padding: '5px 8px',
+                  boxShadow: '0 4px 12px rgba(32,35,33,0.08)',
                 }}
               />
             </>

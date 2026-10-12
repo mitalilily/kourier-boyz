@@ -95,16 +95,21 @@ export default function AdminNavbar(props) {
             w="36px"
             display={{ base: 'none', md: 'block' }}
             overflow="hidden"
+            bg="#fffefb"
+            border="1px solid"
+            borderColor="gray.200"
+            borderRadius="6px"
+            p="3px"
           >
             <Box
               as="img"
-              src="/logistics/brand/kourier-boyz-logo-transparent.png"
+              src="/logistics/brand/kourier-boyz-mark.png"
               alt="Kourier Boyz"
-              w="154px"
-              maxW="none"
-              h="36px"
+              w="100%"
+              maxW="100%"
+              h="100%"
               objectFit="contain"
-              objectPosition="left center"
+              objectPosition="center"
             />
           </Box>
 

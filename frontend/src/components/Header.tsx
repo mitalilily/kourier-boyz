@@ -148,7 +148,7 @@ const StoreHeader: React.FC = () => {
                 style={{ height: '100%', display: 'flex', alignItems: 'center' }}
               >
                 <img
-                  src="/brand/kourier-boyz-logo-nav-cropped.png"
+                  src="/brand/kourier-boyz-logo-transparent.png"
                   alt="Kourier Boyz"
                   className="h-11 w-40 object-contain sm:w-44 xl:h-12 xl:w-48"
                 />

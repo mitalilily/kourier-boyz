@@ -95,7 +95,7 @@ const Footer = () => {
         <div className="grid gap-12 border-b border-black/10 py-14 lg:grid-cols-[1.1fr_1.4fr] lg:py-18">
           <div>
             <Link to="/" className="inline-flex" aria-label="Kourier Boyz home">
-              <img src="/brand/kourier-boyz-logo-nav-cropped.png" alt="Kourier Boyz" className="h-auto w-56 object-contain sm:w-64" loading="lazy" />
+              <img src="/brand/kourier-boyz-logo-transparent.png" alt="Kourier Boyz" className="h-auto w-56 object-contain sm:w-64" loading="lazy" />
             </Link>
             <p className="mt-6 max-w-md text-base leading-7 text-[#555b58]">
               {settings?.description || 'A connected marketplace and courier platform for buyers, independent shippers, and growing Indian sellers.'}

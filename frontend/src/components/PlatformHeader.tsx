@@ -34,7 +34,7 @@ const PlatformHeader = () => {
         <div className="kb-platform-nav-inner">
           <Link to="/" className="flex shrink-0 items-center" aria-label="Kourier Boyz home">
             <img
-              src="/brand/kourier-boyz-logo-nav-cropped.png"
+              src="/brand/kourier-boyz-logo-transparent.png"
               alt="Kourier Boyz"
               className="kb-platform-logo"
             />

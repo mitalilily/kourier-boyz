@@ -33,7 +33,20 @@ export default function AuthNavbar(props) {
 
   const brand = (
     <Link href={`${process.env.PUBLIC_URL}/#/`} display="flex" lineHeight="100%" fontWeight="700" justifyContent="center" alignItems="center" color={mainText}>
-      <Box as="img" src="/logistics/brand/kourier-boyz-mark.png" alt="Kourier Boyz" h="34px" w="34px" objectFit="contain" me="10px" />
+      <Box
+        as="img"
+        src="/logistics/brand/kourier-boyz-mark.png"
+        alt="Kourier Boyz"
+        h="34px"
+        w="34px"
+        objectFit="contain"
+        me="10px"
+        bg="#fffefb"
+        border="1px solid"
+        borderColor="gray.200"
+        borderRadius="6px"
+        p="3px"
+      />
       <Text fontSize="sm" mt="1px">
         {logoText || 'Kourier Boyz'}
       </Text>

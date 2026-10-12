@@ -82,9 +82,9 @@ const Login = () => {
         <div className="relative z-10 flex w-full items-center justify-center px-14 py-12">
           <div className="w-full max-w-xl">
             <img
-              src="/brand/kourier-boyz-logo-nav-cropped.png"
+              src="/brand/kourier-boyz-logo-transparent.png"
               alt="Kourier Boyz"
-              className="w-full max-w-[500px] object-contain"
+              className="w-full max-w-[500px] rounded-md border border-white/70 bg-white/95 px-6 py-4 object-contain shadow-[0_16px_42px_rgba(0,0,0,0.18)]"
             />
 
             <div className="mt-14 max-w-lg">
@@ -129,9 +129,9 @@ const Login = () => {
         <div className="w-full max-w-md">
           <div className="mb-8 text-center lg:hidden">
             <img
-              src="/brand/kourier-boyz-logo-nav-cropped.png"
+              src="/brand/kourier-boyz-logo-transparent.png"
               alt="Kourier Boyz"
-              className="mx-auto w-full max-w-[330px] object-contain"
+              className="mx-auto w-full max-w-[330px] rounded-md border border-[#d9dcda] bg-[#fffefb] px-4 py-3 object-contain shadow-sm"
             />
           </div>
 

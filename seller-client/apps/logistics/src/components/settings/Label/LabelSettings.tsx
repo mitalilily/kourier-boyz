@@ -126,7 +126,7 @@ const mockOrder = {
     pincode: '560001',
     phone: '+91 9090909090',
     gst: '29ABCDE1234A1Z5',
-    logoUrl: '/brand/kourier-boyz-logo.png',
+    logoUrl: '/brand/kourier-boyz-logo-transparent.png',
   },
   returnTo: {
     name: 'Shipper Name',
