@@ -28,7 +28,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     return <Navigate to="/login" replace />
   }
 
-  // For sellers, check KYC flow
+  // Marketplace access uses the verification state owned by the courier console.
   if (user?.role === 'seller') {
     // If account is deactivated, log out (this should have been handled by useEffect above)
     if (user.sellerLifecycleStatus === 'DEACTIVATED') {
@@ -36,21 +36,6 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       return <Navigate to="/login" replace />
     }
 
-    // If KYC not submitted, force seller to complete KYC first
-    if (!user.kycSubmitted && location.pathname !== '/submit-kyc') {
-      return <Navigate to="/submit-kyc" replace />
-    }
-
-    // If KYC submitted but account not yet approved, lock down dashboard access.
-    // Allow only waiting-approval screen and KYC page (for updating after rejection).
-    if (
-      user.kycSubmitted &&
-      !user.isApproved &&
-      location.pathname !== '/waiting-approval' &&
-      location.pathname !== '/submit-kyc'
-    ) {
-      return <Navigate to="/waiting-approval" replace />
-    }
   }
 
   return <>{children}</>

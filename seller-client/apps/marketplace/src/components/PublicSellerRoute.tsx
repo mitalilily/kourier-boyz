@@ -6,18 +6,10 @@ type PublicSellerRouteProps = {
   children: ReactNode
 }
 
-/** Keeps authenticated sellers inside their onboarding or workspace flow. */
+/** Keeps authenticated sellers inside their workspace. Courier KYC is handled separately. */
 const PublicSellerRoute = ({ children }: PublicSellerRouteProps) => {
   const token = useAuthStore((state) => state.token)
-  const user = useAuthStore((state) => state.user)
-
   if (!token) return <>{children}</>
-  if (user?.role === 'seller' && !user.kycSubmitted) {
-    return <Navigate to="/submit-kyc" replace />
-  }
-  if (user?.role === 'seller' && !user.isApproved) {
-    return <Navigate to="/waiting-approval" replace />
-  }
   return <Navigate to="/dashboard" replace />
 }
 

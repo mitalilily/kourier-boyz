@@ -13,7 +13,6 @@ import CustomerDetail from './pages/CustomerDetail'
 import Customers from './pages/Customers'
 import Dashboard from './pages/Dashboard'
 import ForgotPassword from './pages/ForgotPassword'
-import { KYCSubmission } from './pages/KYCSubmission'
 import Login from './pages/Login'
 import SellerNotifications from './pages/Notifications'
 import OrderDetail from './pages/Orders/OrderDetail'
@@ -36,11 +35,9 @@ import TcsReport from './pages/TcsReport'
 import TdsReport from './pages/TdsReport'
 import Tickets from './pages/Tickets'
 import VerifyEmail from './pages/VerifyEmail'
-import WaitingApproval from './pages/WaitingApproval'
 import RouteErrorBoundary from './components/RouteErrorBoundary'
 import PublicSellerRoute from './components/PublicSellerRoute'
 import CourierSessionBridge from './components/CourierSessionBridge'
-import MarketplacePublicShell from './components/MarketplacePublicShell'
 
 const AppRoutes = () => {
   return (
@@ -69,29 +66,9 @@ const AppRoutes = () => {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
-        {/* KYC Submission (Protected - must be logged in) */}
-        <Route
-          path="/submit-kyc"
-          element={
-            <ProtectedRoute>
-              <MarketplacePublicShell>
-                <KYCSubmission />
-              </MarketplacePublicShell>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Waiting for Approval */}
-        <Route
-          path="/waiting-approval"
-          element={
-            <ProtectedRoute>
-              <MarketplacePublicShell>
-                <WaitingApproval />
-              </MarketplacePublicShell>
-            </ProtectedRoute>
-          }
-        />
+        {/* Legacy marketplace KYC links now return to the workspace. Courier KYC is canonical. */}
+        <Route path="/submit-kyc" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/waiting-approval" element={<Navigate to="/dashboard" replace />} />
 
         {/* Protected Routes - All pages accessible, but with conditional functionality */}
         <Route

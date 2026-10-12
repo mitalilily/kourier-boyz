@@ -157,9 +157,8 @@ const Register = () => {
 
   useEffect(() => {
     if (registerMutation.isSuccess) {
-      message.success('🎉 Registration successful! Please complete your KYC.')
-      // Auto-login and redirect to KYC page
-      navigate('/submit-kyc', { replace: true })
+      message.success('Seller workspace created. Your courier profile will be used for verification.')
+      navigate('/dashboard', { replace: true })
     }
   }, [registerMutation.isSuccess, navigate, message])
 
@@ -226,8 +225,8 @@ const Register = () => {
               <div>
                 <span>02</span>
                 <div>
-                  <strong>Complete your profile</strong>
-                  <small>KYC, GST, pickup, and payout details</small>
+                  <strong>Connect your operations</strong>
+                  <small>Courier KYC, pickup, and payout details stay in one profile</small>
                 </div>
               </div>
               <div>
@@ -421,10 +420,10 @@ const Register = () => {
               message="What happens after you create your Kourier Boyz account?"
               description={
                 <ul style={{ paddingLeft: 20, margin: 0 }}>
-                  <li>Complete your KYC to verify your identity and business for Kourier Boyz</li>
-                  <li>Add your GST, pickup address and bank account for payouts</li>
-                  <li>Our team will review your Kourier Boyz seller application</li>
-                  <li>You’ll receive an email from Kourier Boyz once your account is approved</li>
+                  <li>Your existing courier KYC is shared securely with the marketplace</li>
+                  <li>Add store details, pickup preferences, and payout information</li>
+                  <li>Build your catalogue while verification is reviewed centrally</li>
+                  <li>Your publishing status updates automatically in the seller workspace</li>
                 </ul>
               }
               type="info"

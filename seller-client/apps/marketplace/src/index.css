@@ -214,6 +214,30 @@ code {
   --color-yellow-hover: #9f7112;
 }
 
+/* Unified seller action palette. Status tags retain semantic colors; interactive controls do not. */
+.ant-btn-primary:not(.ant-btn-dangerous) {
+  border-color: #9f7112 !important;
+  background: linear-gradient(145deg, #d3a63a, #a87310) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 20px rgba(143, 101, 15, 0.18) !important;
+}
+
+.ant-btn-primary:not(.ant-btn-dangerous):hover,
+.ant-btn-primary:not(.ant-btn-dangerous):focus-visible {
+  border-color: #8f650f !important;
+  background: linear-gradient(145deg, #b78115, #8f650f) !important;
+  transform: translateY(-1px);
+}
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector {
+  border-color: #b78115 !important;
+  box-shadow: 0 0 0 3px rgba(183, 129, 21, 0.12) !important;
+}
+
 .kb-store-entry-page {
   min-height: 100vh;
   display: grid;

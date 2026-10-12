@@ -80,7 +80,7 @@ const TrendingProducts: React.FC = () => {
 
   return (
     <div className="py-8">
-      <div className=" mx-auto px-4 md:px-8">
+      <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
         <SectionHeading
           align="left"
           title="Most Loved Products"

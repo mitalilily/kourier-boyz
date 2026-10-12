@@ -186,7 +186,7 @@ const TopCategoriesSection: React.FC = () => {
 
   return (
     <div className="bg-linear-to-b py-12 from-white via-gray-50 to-white ">
-      <div className=" mx-auto px-4 md:px-8">
+      <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
         <SectionHeading
           title="Top"
           align="left"

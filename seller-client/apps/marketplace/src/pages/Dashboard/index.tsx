@@ -159,22 +159,22 @@ const Dashboard = () => {
         </Paragraph>
       </div>
 
-      {/* KYC Status Alerts */}
+      {/* Verification is owned by the courier console and shared with the marketplace. */}
       {!user?.kycSubmitted && (
         <Alert
-          message="Complete Your KYC to Start Selling"
+          message="Complete verification once in your courier profile"
           description={
             <div>
               <Paragraph style={{ marginBottom: 8 }}>
-                Your account is incomplete. Please submit your KYC documents to get verified and
-                start listing products on Kourier Boyz.
+                Your marketplace workspace is ready. KYC and business verification are managed in
+                the Kourier Boyz courier console, so you never need to submit the same documents twice.
               </Paragraph>
               <Button
                 type="primary"
                 icon={<FileTextOutlined />}
-                onClick={() => navigate('/submit-kyc')}
+                onClick={() => window.location.assign('/home')}
               >
-                Submit KYC Now
+                Open courier profile
               </Button>
             </div>
           }
@@ -192,8 +192,8 @@ const Dashboard = () => {
           description={
             <div>
               <Paragraph style={{ marginBottom: 8 }}>
-                Your KYC documents have been submitted and are currently under review by our admin
-                team. You'll receive an email notification once your account is approved.
+                Your courier verification is under review. You can continue preparing your store;
+                publishing and payouts unlock automatically after approval.
               </Paragraph>
               <Space>
                 <Button
@@ -204,8 +204,8 @@ const Dashboard = () => {
                 >
                   Check Status Now
                 </Button>
-                <Button type="default" onClick={() => navigate('/profile')}>
-                  View KYC Details
+                <Button type="default" onClick={() => window.location.assign('/home')}>
+                  Open courier profile
                 </Button>
               </Space>
             </div>
@@ -226,8 +226,8 @@ const Dashboard = () => {
                 <strong>Reason:</strong> {user.rejectionReason}
               </Paragraph>
               <Space>
-                <Button type="primary" danger onClick={() => navigate('/submit-kyc')}>
-                  Resubmit KYC
+                <Button type="primary" danger onClick={() => window.location.assign('/home')}>
+                  Update courier KYC
                 </Button>
                 <Button type="default" onClick={() => navigate('/profile')}>
                   View Details
@@ -405,10 +405,10 @@ const Dashboard = () => {
       {user?.isApproved && <SettlementBlockedAlert data={dashboardOverview?.data} />}
 
       {/* KPI Cards - Key metrics at a glance */}
-      {user?.kycSubmitted && <KPICards data={dashboardOverview?.data} loading={overviewLoading} />}
+      <KPICards data={dashboardOverview?.data} loading={overviewLoading} />
 
       {/* Row 1: Primary Graph and Financial Status */}
-      {user?.kycSubmitted && (
+      {(
         <Row gutter={[20, 20]} style={{ marginBottom: 28 }}>
           <Col xs={24} lg={10}>
             {/* Sales Trend Graph - Primary visualization (momentum) */}
@@ -422,7 +422,7 @@ const Dashboard = () => {
       )}
 
       {/* Row 2: Action Items and Performance */}
-      {user?.kycSubmitted && (
+      {(
         <Row gutter={[20, 20]} style={{ marginBottom: 28 }}>
           <Col xs={24} lg={24}>
             {/* Action Required - Urgent items needing attention */}
@@ -436,7 +436,7 @@ const Dashboard = () => {
       )}
 
       {/* Row 3: Positive Reinforcement and Summary */}
-      {user?.kycSubmitted && (
+      {(
         <Row gutter={[20, 20]} style={{ marginBottom: 28 }}>
           <Col xs={24} lg={24}>
             {/* Top Selling Products - Positive reinforcement */}
@@ -452,7 +452,7 @@ const Dashboard = () => {
       )}
 
       {/* Row 4: Analysis Graphs */}
-      {user?.kycSubmitted && (
+      {(
         <Row gutter={[20, 20]} style={{ marginBottom: 28 }}>
           <Col xs={24} lg={12}>
             {/* Orders vs Returns Trend - Secondary graph (correlation analysis) */}
@@ -466,7 +466,7 @@ const Dashboard = () => {
       )}
 
       {/* Row 5: Operational Insights */}
-      {user?.kycSubmitted && (
+      {(
         <Row gutter={[20, 20]} style={{ marginBottom: 28 }}>
           <Col xs={24}>
             {/* Inventory Velocity - Operational insights */}

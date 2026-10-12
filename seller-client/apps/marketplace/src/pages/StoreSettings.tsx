@@ -11,14 +11,13 @@ import {
   QuestionCircleOutlined,
 } from '@ant-design/icons'
 import type { UploadFile } from 'antd'
-import { Alert, App, Button, Form, Space, Tabs, Typography } from 'antd'
+import { App, Button, Form, Tabs, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useProfile } from '../api/profileQueries'
 import { useSellerReviewStats } from '../api/reviewQueries'
 import type { PackagingStandard, PickupAddress, UpdateStoreData } from '../api/storeQueries'
 import { useUpdateStore } from '../api/storeQueries'
-import { useAuthStore } from '../store/authStore'
 import StoreSettingsTutorial from '../components/StoreSettingsTutorial'
 import ComplianceTab from './StoreSettings/components/ComplianceTab'
 import ContactTab from './StoreSettings/components/ContactTab'
@@ -188,7 +187,6 @@ const StoreSettings = () => {
   const { message } = App.useApp()
   const navigate = useNavigate()
   const location = useLocation()
-  const user = useAuthStore((state) => state.user)
   const { data: profileData } = useProfile()
   const updateStoreMutation = useUpdateStore()
   const { data: reviewStats, isLoading: isLoadingReviewStats } = useSellerReviewStats()
@@ -347,34 +345,6 @@ const StoreSettings = () => {
       }
     }
   }, [profileData, form])
-
-  // Check if user is approved
-  if (!user?.isApproved) {
-    return (
-      <div>
-        <Alert
-          message="Store Settings Unavailable"
-          description={
-            <div>
-              <Paragraph style={{ marginBottom: 12 }}>
-                Your account must be approved before you can configure store settings. Complete your
-                KYC verification to get started.
-              </Paragraph>
-              <Space>
-                <Button type="primary" onClick={() => navigate('/submit-kyc')}>
-                  Complete KYC
-                </Button>
-                <Button onClick={() => navigate('/profile')}>View Profile</Button>
-              </Space>
-            </div>
-          }
-          type="warning"
-          showIcon
-          style={{ marginBottom: 24 }}
-        />
-      </div>
-    )
-  }
 
   const handleSubmit = async (values: StoreSettingsFormValues) => {
     try {

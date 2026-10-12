@@ -1508,6 +1508,28 @@
   letter-spacing: 0;
 }
 
+/* Marketplace controls use the Kourier Boyz metal-and-gold system, never legacy purple CTAs. */
+.kb-store-shell :is(button, a)[class*='bg-purple'],
+.kb-store-shell :is(button, a)[class*='bg-indigo'],
+.kb-store-shell :is(button, a)[class*='from-purple'],
+.kb-store-shell :is(button, a)[class*='from-indigo'] {
+  border-color: #9f7112 !important;
+  background: linear-gradient(145deg, #d3a63a, #a87310) !important;
+  color: #fff !important;
+}
+
+.kb-store-shell :is(button, a)[class*='text-purple'],
+.kb-store-shell :is(button, a)[class*='text-indigo'] {
+  color: #8f650f !important;
+}
+
+.kb-store-shell :is(button, a)[class*='text-purple']:hover,
+.kb-store-shell :is(button, a)[class*='text-indigo']:hover {
+  border-color: #b78115 !important;
+  background-color: #f7f2e5 !important;
+  color: #6f4b08 !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .kb-hero-image,
   .kb-shop-pattern,

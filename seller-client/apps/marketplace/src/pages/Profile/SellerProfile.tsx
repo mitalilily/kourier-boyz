@@ -49,7 +49,6 @@ import {
   Upload,
 } from 'antd'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useResendVerificationEmail } from '../../api/authQueries'
 import { useChangePassword, useProfile, useUpdateProfile } from '../../api/profileQueries'
 import { useUpdateStore } from '../../api/storeQueries'
@@ -62,7 +61,6 @@ const { Panel } = Collapse
 
 const SellerProfile = () => {
   const { message } = App.useApp()
-  const navigate = useNavigate()
   const [form] = Form.useForm()
   const [passwordForm] = Form.useForm()
   const [storeForm] = Form.useForm()
@@ -79,18 +77,12 @@ const SellerProfile = () => {
   const resendVerificationMutation = useResendVerificationEmail()
 
   const handleUpdateKycClick = () => {
-    if (user?.isApproved) {
-      // Show warning modal for approved users
-      setShowKycWarningModal(true)
-    } else {
-      // Directly navigate for non-approved users
-      navigate('/submit-kyc')
-    }
+    window.location.assign('/home')
   }
 
   const handleConfirmKycUpdate = () => {
     setShowKycWarningModal(false)
-    navigate('/submit-kyc')
+    window.location.assign('/home')
   }
 
   const handleUpdateStoreInfo = async (values: { storeDescription: string }) => {
@@ -456,10 +448,10 @@ const SellerProfile = () => {
                   type="primary"
                   danger
                   size="large"
-                  onClick={() => navigate('/submit-kyc')}
+                  onClick={() => window.location.assign('/home')}
                   icon={<EditOutlined />}
                 >
-                  Resubmit KYC Now
+                  Open courier KYC
                 </Button>
               </Space>
             }
@@ -472,20 +464,19 @@ const SellerProfile = () => {
 
         {!user.kycSubmitted && (
           <Alert
-            message="🚀 Complete Your KYC to Start Selling"
+            message="Complete verification in your courier profile"
             description={
               <Space direction="vertical" style={{ width: '100%' }}>
                 <Text>
-                  Complete your KYC verification to unlock all seller features and start listing
-                  products on Kourier Boyz.
+                  KYC is managed once in the courier console and shared with this marketplace.
                 </Text>
                 <Button
                   type="primary"
                   size="large"
-                  onClick={() => navigate('/submit-kyc')}
+                  onClick={() => window.location.assign('/home')}
                   icon={<SafetyCertificateOutlined />}
                 >
-                  Complete KYC Now
+                  Open courier profile
                 </Button>
               </Space>
             }
@@ -498,7 +489,7 @@ const SellerProfile = () => {
         {!user.isApproved && user.kycSubmitted && !user.rejectionReason && (
           <Alert
             message="⏳ Account Under Review"
-            description="Your KYC has been submitted successfully. Our admin team is reviewing your application. You'll receive an email notification once your account is approved."
+            description="Your courier KYC is under review. Marketplace status updates automatically when verification is complete."
             type="warning"
             showIcon
             style={{ borderRadius: 12 }}
@@ -1208,10 +1199,10 @@ const SellerProfile = () => {
                                     type="primary"
                                     danger
                                     size="large"
-                                    onClick={() => navigate('/submit-kyc')}
+                                    onClick={() => window.location.assign('/home')}
                                     icon={<EditOutlined />}
                                   >
-                                    Resubmit KYC Now
+                                    Open courier KYC
                                   </Button>
                                 </Space>
                               }
@@ -1229,7 +1220,7 @@ const SellerProfile = () => {
                           <Space direction="vertical" size="small">
                             <Title level={4}>KYC Not Submitted</Title>
                             <Text type="secondary">
-                              Complete your KYC verification to unlock all seller features
+                              Complete verification once in your courier profile
                             </Text>
                           </Space>
                         }
@@ -1239,9 +1230,9 @@ const SellerProfile = () => {
                           type="primary"
                           size="large"
                           icon={<SafetyCertificateOutlined />}
-                          onClick={() => navigate('/submit-kyc')}
+                          onClick={() => window.location.assign('/home')}
                         >
-                          Submit KYC Now
+                          Open courier profile
                         </Button>
                       </Empty>
                     )}

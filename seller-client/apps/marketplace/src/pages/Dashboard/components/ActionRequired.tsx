@@ -57,7 +57,7 @@ const ActionRequired = ({ data, loading }: ActionRequiredProps) => {
     },
     actions.kycBankIncomplete > 0 && {
       title: 'KYC / Bank Details',
-      description: 'Complete KYC and bank details for settlements',
+      description: 'Complete bank details here; courier KYC is shared automatically',
       count: actions.kycBankIncomplete,
       severity: 'info' as const,
       icon: <InfoCircleOutlined />,

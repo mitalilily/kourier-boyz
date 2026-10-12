@@ -228,7 +228,7 @@ const CategoryHighlights: React.FC = () => {
   }
 
   return (
-    <section className=" mx-auto px-4 md:px-8 my-12">
+    <section className="mx-auto my-12 w-full max-w-[1480px] px-4 md:px-8">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {(discountHighlight || isLoading) && (
           <div className="flex flex-col gap-4 rounded-3xl border border-yellow-100 bg-linear-to-br from-yellow-50 via-white to-orange-50 p-6 shadow-md">

@@ -90,7 +90,7 @@ const NewArrivals: React.FC = () => {
   if (isLoading && !hasProducts) {
     return (
       <div className="py-12 my-4 bg-white">
-        <div className=" mx-auto px-4 md:px-8">
+        <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
           <div className="h-12 bg-gray-200 rounded w-64 mb-8 animate-pulse" />
           <div className="flex gap-4 overflow-hidden">
             {[...Array(6)].map((_, i) => (
@@ -108,7 +108,7 @@ const NewArrivals: React.FC = () => {
 
   return (
     <div className="py-12 my-4 bg-white">
-      <div className=" mx-auto px-4 md:px-8">
+      <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
         <SectionHeading
           align="left"
           title="Fresh Off the Shelf"

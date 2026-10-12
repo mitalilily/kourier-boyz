@@ -27,26 +27,6 @@ const RequirementsAlert = () => {
 
   const missingRequirements: MissingRequirement[] = []
 
-  // Check KYC
-  if (!user.kycSubmitted) {
-    missingRequirements.push({
-      field: 'kyc',
-      label: 'KYC Submission',
-      section: 'Verification',
-      path: '/submit-kyc',
-    })
-  }
-
-  // If KYC is submitted but not approved, don't show other requirements as blockers
-  if (!user.isApproved && user.kycSubmitted) {
-    return null // KYC approval is the main blocker
-  }
-
-  // If not approved, don't check other requirements
-  if (!user.isApproved) {
-    return null
-  }
-
   // Check Store Information
   if (
     !profileData?.storeDescription ||
@@ -204,11 +184,6 @@ const RequirementsAlert = () => {
             >
               Go to Store Settings
             </Button>
-            {missingRequirements.some((r) => r.path.includes('submit-kyc')) && (
-              <Button icon={<ExclamationCircleOutlined />} onClick={() => navigate('/submit-kyc')}>
-                Submit KYC
-              </Button>
-            )}
           </Space>
         </div>
       }

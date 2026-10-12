@@ -31,7 +31,6 @@ import { useState } from 'react'
 import { type Brand, type DocumentType, useBrand, useSellerBrands, useUploadBrandDocument } from '../api/brandQueries'
 import type { BrandDocument } from '../api/brands'
 import BrandRequestModal from '../components/BrandRequestModal'
-import { useAuthStore } from '../store/authStore'
 
 const { Text } = Typography
 
@@ -71,7 +70,6 @@ const documentTypeLabels: Record<DocumentType, string> = {
 }
 
 const Brands = () => {
-  const user = useAuthStore((state) => state.user)
   const { data: brands, isLoading, refetch } = useSellerBrands()
   const [modalOpen, setModalOpen] = useState(false)
   const [viewModalOpen, setViewModalOpen] = useState(false)
@@ -86,10 +84,6 @@ const Brands = () => {
   })
   const uploadBrandDocument = useUploadBrandDocument()
   const { data: viewBrandDetail, isLoading: viewBrandLoading } = useBrand(viewBrand?._id ?? '')
-
-  // Check if KYC is approved
-  const isKycApproved =
-    user?.kycStatus === 'APPROVED' || (user?.isApproved === true && user?.kycSubmitted === true)
 
   const approvedBrandsCount = brands?.filter((b) => b.status === 'APPROVED').length || 0
 
@@ -275,24 +269,6 @@ const Brands = () => {
       ),
     },
   ]
-
-  if (!isKycApproved) {
-    return (
-      <Card>
-        <Alert
-          type="warning"
-          showIcon
-          message="KYC Approval Required"
-          description="Complete KYC to unlock brand approval and product listing."
-          action={
-            <Button type="primary" href="/submit-kyc">
-              Complete KYC
-            </Button>
-          }
-        />
-      </Card>
-    )
-  }
 
   return (
     <>

@@ -8,7 +8,6 @@ import { useProfile } from '../../../api/profileQueries'
 import CertificateRequirementAlert from '../../../components/CertificateRequirementAlert'
 import CertificateUploadModal from '../../../components/CertificateUploadModal'
 import HierarchicalCategorySelect from '../../../components/HierarchicalCategorySelect'
-import { useAuthStore } from '../../../store/authStore'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -226,7 +225,6 @@ interface BasicInfoTabProps {
 const BasicInfoTab = ({ form, categories }: BasicInfoTabProps) => {
   const [isGeneratingSku, setIsGeneratingSku] = useState(false)
   const { data: profile } = useProfile()
-  const user = useAuthStore((state) => state.user)
   const isGstRegistered =
     profile && typeof profile === 'object' && 'gstNumber' in profile
       ? (profile as { gstNumber?: boolean }).gstNumber
@@ -239,9 +237,6 @@ const BasicInfoTab = ({ form, categories }: BasicInfoTabProps) => {
 
   // Brand state
   const { data: approvedBrands, isLoading: brandsLoading } = useApprovedBrands()
-  const isKycApproved =
-    user?.kycStatus === 'APPROVED' || (user?.isApproved === true && user?.kycSubmitted === true)
-
   // Certificate state
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>()
   const [certificateModalOpen, setCertificateModalOpen] = useState(false)
@@ -377,19 +372,7 @@ const BasicInfoTab = ({ form, categories }: BasicInfoTabProps) => {
           </Col>
 
           <Col xs={24} md={12}>
-            {!isKycApproved ? (
-              <Form.Item
-                label={<span style={{ fontSize: '12px' }}>Brand</span>}
-                style={{ marginBottom: 12 }}
-              >
-                <Alert
-                  type="warning"
-                  message="Complete KYC to unlock brand approval and product listing."
-                  showIcon
-                  style={{ fontSize: '12px' }}
-                />
-              </Form.Item>
-            ) : !approvedBrands || approvedBrands.length === 0 ? (
+            {!approvedBrands || approvedBrands.length === 0 ? (
               <Form.Item
                 label={<span style={{ fontSize: '12px' }}>Brand</span>}
                 style={{ marginBottom: 12 }}

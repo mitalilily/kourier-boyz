@@ -13,7 +13,6 @@ import type { UploadFile } from 'antd'
 import type { RadioChangeEvent } from 'antd'
 import { useState } from 'react'
 import { type DocumentType, useCreateBrand } from '../api/brandQueries'
-import { useAuthStore } from '../store/authStore'
 
 // Typography components not used in this component
 
@@ -33,11 +32,6 @@ const BrandRequestModal = ({ open, onClose, onSuccess }: BrandRequestModalProps)
     AUTHORIZATION_LETTER: [],
   })
   const createBrand = useCreateBrand()
-  const user = useAuthStore((state) => state.user)
-
-  // Check if KYC is approved
-  const isKycApproved =
-    user?.kycStatus === 'APPROVED' || (user?.isApproved === true && user?.kycSubmitted === true)
 
   const handleBrandTypeChange = (e: RadioChangeEvent) => {
     setBrandType(e.target.value)
@@ -59,12 +53,6 @@ const BrandRequestModal = ({ open, onClose, onSuccess }: BrandRequestModalProps)
 
   const handleSubmit = async () => {
     try {
-      // Check KYC approval first
-      if (!isKycApproved) {
-        message.error('Please complete KYC verification before requesting brand approval.')
-        return
-      }
-
       const values = await form.validateFields()
 
       // Validate documents based on brand type
@@ -161,26 +149,11 @@ const BrandRequestModal = ({ open, onClose, onSuccess }: BrandRequestModalProps)
           type="primary"
           loading={createBrand.isPending}
           onClick={handleSubmit}
-          disabled={!isKycApproved}
         >
           Submit Request
         </Button>,
       ]}
     >
-      {!isKycApproved && (
-        <Alert
-          type="warning"
-          showIcon
-          message="KYC Approval Required"
-          description="Please complete your KYC verification before requesting brand approval."
-          style={{ marginBottom: 16 }}
-          action={
-            <Button size="small" type="link" href="/submit-kyc">
-              Complete KYC
-            </Button>
-          }
-        />
-      )}
       <Form form={form} layout="vertical">
         <Form.Item
           name="brand_name"

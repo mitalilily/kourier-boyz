@@ -5,12 +5,12 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-2xl text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none cursor-pointer disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b78115]/25 focus-visible:ring-offset-2 disabled:pointer-events-none cursor-pointer disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
   {
     variants: {
       variant: {
         default:
-          'bg-primary border-yellow-400 border-1 text-primary-foreground shadow hover:bg-primary/90',
+          'border border-[#9f7112] bg-[#b78115] text-white shadow-sm hover:-translate-y-0.5 hover:bg-[#8f650f] hover:shadow-md',
         destructive:
           'bg-destructive text-gray-500 border border-gray-300 shadow-sm hover:bg-destructive/90',
         outline:
@@ -20,7 +20,7 @@ const buttonVariants = cva(
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
         primary:
-          'bg-gradient-to-br from-primary to-primary-dark text-black hover:from-primary-dark hover:to-primary-hover border border-primary-border shadow-md hover:shadow-lg transition-all duration-200',
+          'border border-[#9f7112] bg-linear-to-br from-[#d3a63a] to-[#a87310] text-white shadow-md hover:-translate-y-0.5 hover:from-[#b78115] hover:to-[#8f650f] hover:shadow-lg',
         blue: 'bg-linear-to-br from-[#1253a3] via-[#0f4790] to-[#0b3976] text-white shadow-md hover:from-[#0f4790] hover:via-[#0d417f] hover:to-[#0a356e] border border-[#0d3f77]/60 hover:shadow-lg transition-all duration-200',
       },
       size: {

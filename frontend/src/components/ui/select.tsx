@@ -17,7 +17,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex h-10 w-full items-center justify-between rounded-2xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm transition-colors ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 focus:ring-purple-500/20 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
+      'flex h-10 w-full items-center justify-between rounded-lg border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm transition-colors ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-[#b78115] focus:ring-[#b78115]/20 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1',
       className,
     )}
     {...props}
@@ -115,14 +115,14 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex w-full cursor-pointer select-none items-center rounded-lg py-2.5 pl-8 pr-2 text-sm text-gray-900 outline-none transition-colors hover:bg-purple-50 hover:text-purple-700 focus:bg-purple-50 focus:text-purple-700 data-[highlighted]:bg-purple-50 data-[highlighted]:text-purple-700 data-[state=checked]:bg-purple-100 data-[state=checked]:text-purple-700 data-[state=checked]:font-medium data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex w-full cursor-pointer select-none items-center rounded-lg py-2.5 pl-8 pr-2 text-sm text-gray-900 outline-none transition-colors hover:bg-[#f7f2e5] hover:text-[#6f4b08] focus:bg-[#f7f2e5] focus:text-[#6f4b08] data-[highlighted]:bg-[#f7f2e5] data-[highlighted]:text-[#6f4b08] data-[state=checked]:bg-[#efe3c2] data-[state=checked]:text-[#6f4b08] data-[state=checked]:font-medium data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className,
     )}
     {...props}
   >
     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4 text-purple-600" />
+        <Check className="h-4 w-4 text-[#b78115]" />
       </SelectPrimitive.ItemIndicator>
     </span>
 

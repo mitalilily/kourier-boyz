@@ -16,7 +16,6 @@ import {
   Collapse,
   Form,
   Modal,
-  Result,
   Space,
   Spin,
   Tabs,
@@ -32,7 +31,6 @@ import {
 } from "../../api/productQueries";
 import { useProfile } from "../../api/profileQueries";
 import RequirementsAlert from "../../components/RequirementsAlert";
-import { useAuthStore } from "../../store/authStore";
 import BasicInfoTab from "./components/BasicInfoTab";
 import type { FilterMetadataEntry } from "./components/filterMetadataUtils";
 import MediaTab from "./components/MediaTab";
@@ -55,10 +53,8 @@ const ProductForm = () => {
   const navigate = useNavigate();
   const { message } = App.useApp();
   const [form] = Form.useForm();
-  const user = useAuthStore((state) => state.user);
-
   const isEdit = !!id;
-  const canManageProducts = user?.isApproved || false;
+  const canManageProducts = true;
 
   // State
   const categories = useProductCategories();
@@ -188,21 +184,6 @@ const ProductForm = () => {
     navigate,
     message,
   });
-
-  if (!canManageProducts) {
-    return (
-      <Result
-        status="warning"
-        title="KYC Verification Required"
-        subTitle="Please complete your KYC verification to add products."
-        extra={
-          <Button type="primary" onClick={() => navigate("/profile")}>
-            Complete KYC
-          </Button>
-        }
-      />
-    );
-  }
 
   if (productLoading) {
     return (

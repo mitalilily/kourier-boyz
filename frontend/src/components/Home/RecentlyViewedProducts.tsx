@@ -97,7 +97,7 @@ const RecentlyViewedProducts: React.FC<{ fromOrdersPage?: boolean }> = ({
   if (isLoading && !hasProducts) {
     return (
       <div className="my-4 bg-gray-50/60">
-        <div className=" mx-auto px-4 md:px-8">
+        <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
           <div className="h-12 bg-gray-200 rounded w-64 mb-8 animate-pulse" />
           <div className="flex gap-4 overflow-hidden">
             {[...Array(6)].map((_, i) => (
@@ -117,7 +117,7 @@ const RecentlyViewedProducts: React.FC<{ fromOrdersPage?: boolean }> = ({
     <div className="flex flex-col ">
       {fromOrdersPage ? <Separator className="my-8" /> : null}
       <div className="bg-gray-50/60 py-8">
-        <div className=" mx-auto px-4 md:px-8">
+        <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
           <SectionHeading
             align="left"
             title="Continue Browsing"

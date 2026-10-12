@@ -178,7 +178,7 @@ const QuickLinks: React.FC = () => {
   if (isLoading) {
     return (
       <div className="py-12 my-4 bg-white">
-        <div className=" mx-auto px-4 md:px-8">
+        <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
           <SectionHeading
             title="Shop by"
             italicPart="Category"
@@ -200,7 +200,7 @@ const QuickLinks: React.FC = () => {
 
   return (
     <div className="py-12 my-4 bg-white">
-      <div className=" mx-auto px-4 md:px-8">
+      <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
         <SectionHeading
           title="Shop by"
           italicPart="Category"

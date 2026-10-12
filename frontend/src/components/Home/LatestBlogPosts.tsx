@@ -61,7 +61,7 @@ const LatestBlogPosts: React.FC = () => {
   if (isLoading) {
     return (
       <div className="py-12 my-4 bg-white">
-        <div className=" mx-auto px-4 md:px-8">
+        <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
           <div className="h-12 bg-gray-200 rounded w-64 mb-8 animate-pulse" />
           <div className="flex gap-4 overflow-hidden">
             {[...Array(3)].map((_, i) => (
@@ -79,7 +79,7 @@ const LatestBlogPosts: React.FC = () => {
 
   return (
     <div className="py-12 my-4 bg-white">
-      <div className=" mx-auto px-4 md:px-8">
+      <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
         <div className="flex items-center justify-between mb-8">
           <SectionHeading
             align="left"

@@ -68,12 +68,12 @@ const Login = () => {
 
   return (
     <main className="min-h-screen flex bg-[#f5f6f4]">
-      <section className="hidden lg:flex lg:w-[52%] relative overflow-hidden bg-[#202321] text-white">
+      <section className="hidden lg:flex lg:w-[52%] relative overflow-hidden border-r border-[#d9dcda] bg-[#eef0ed] text-[#202321]">
         <div
           className="absolute inset-0 opacity-70"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(207,211,209,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(207,211,209,0.08) 1px, transparent 1px), repeating-linear-gradient(135deg, transparent 0 52px, rgba(223,183,67,0.08) 52px 54px)',
+              'linear-gradient(rgba(101,109,105,0.09) 1px, transparent 1px), linear-gradient(90deg, rgba(101,109,105,0.09) 1px, transparent 1px), repeating-linear-gradient(135deg, transparent 0 52px, rgba(183,129,21,0.11) 52px 54px)',
             backgroundSize: '44px 44px, 44px 44px, 120px 120px',
           }}
         />
@@ -84,34 +84,34 @@ const Login = () => {
             <img
               src="/brand/kourier-boyz-logo-transparent.png"
               alt="Kourier Boyz"
-              className="w-full max-w-[500px] rounded-md border border-white/70 bg-white/95 px-6 py-4 object-contain shadow-[0_16px_42px_rgba(0,0,0,0.18)]"
+              className="w-full max-w-[500px] rounded-md border border-[#d1d5d2] bg-white px-6 py-4 object-contain shadow-[0_16px_42px_rgba(32,35,33,0.12)]"
             />
 
             <div className="mt-14 max-w-lg">
               <p className="text-sm font-semibold uppercase text-[#dfb743]">
                 Unified operations
               </p>
-              <h1 className="mt-3 text-4xl font-bold leading-tight text-white">
+              <h1 className="mt-3 text-4xl font-bold leading-tight text-[#202321]">
                 Every order, seller and shipment in one command center.
               </h1>
-              <p className="mt-5 max-w-md text-base leading-7 text-[#ced2d0]">
+              <p className="mt-5 max-w-md text-base leading-7 text-[#626966]">
                 Manage marketplace growth and courier performance with one secure Kourier Boyz
                 workspace.
               </p>
             </div>
 
-            <div className="mt-12 grid grid-cols-3 border-y border-white/15">
+            <div className="mt-12 grid grid-cols-3 border-y border-[#cfd3d0]">
               <div className="py-5 pr-4">
                 <ShopOutlined className="text-xl text-[#dfb743]" />
-                <p className="mt-2 text-sm font-medium text-white">Marketplace</p>
+                <p className="mt-2 text-sm font-medium text-[#303532]">Marketplace</p>
               </div>
-              <div className="border-x border-white/15 px-5 py-5">
+              <div className="border-x border-[#cfd3d0] px-5 py-5">
                 <TruckOutlined className="text-xl text-[#dfb743]" />
-                <p className="mt-2 text-sm font-medium text-white">Logistics</p>
+                <p className="mt-2 text-sm font-medium text-[#303532]">Logistics</p>
               </div>
               <div className="py-5 pl-5">
                 <BarChartOutlined className="text-xl text-[#dfb743]" />
-                <p className="mt-2 text-sm font-medium text-white">Performance</p>
+                <p className="mt-2 text-sm font-medium text-[#303532]">Performance</p>
               </div>
             </div>
           </div>

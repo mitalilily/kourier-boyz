@@ -597,7 +597,7 @@ const Login = () => {
                               className={`pl-9 h-9 rounded-xl transition-colors text-sm ${
                                 fieldState.invalid
                                   ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                                  : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                                  : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                               }`}
                               placeholder="you@example.com"
                               aria-invalid={fieldState.invalid}
@@ -636,7 +636,7 @@ const Login = () => {
                               className={`pl-9 pr-9 h-9 rounded-xl transition-colors text-sm ${
                                 fieldState.invalid
                                   ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                                  : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                                  : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                               }`}
                               placeholder="••••••••"
                               aria-invalid={fieldState.invalid}
@@ -755,7 +755,7 @@ const Login = () => {
                     <button
                       type="button"
                       onClick={() => setForgotPasswordMode(true)}
-                      className="text-xs text-purple-600 hover:text-purple-700 font-medium cursor-pointer"
+                      className="text-xs text-[#8f650f] hover:text-[#6f4b08] font-semibold cursor-pointer"
                     >
                       Forgot your password?
                     </button>
@@ -777,7 +777,7 @@ const Login = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        className="group flex-1 h-9 rounded-xl border border-slate-200/80 bg-white text-slate-700 font-medium shadow-sm hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/20 focus-visible:ring-offset-2 focus-visible:border-purple-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm disabled:hover:bg-white disabled:hover:border-slate-200/80 transition-all duration-200 text-sm"
+                        className="group flex-1 h-9 rounded-lg border border-slate-200/80 bg-white text-slate-700 font-medium shadow-sm hover:bg-[#f7f2e5] hover:border-[#d4b66a] hover:text-slate-900 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b78115]/20 focus-visible:ring-offset-2 focus-visible:border-[#b78115] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm disabled:hover:bg-white disabled:hover:border-slate-200/80 transition-all duration-200 text-sm"
                         onClick={handlePasskeyLogin}
                         disabled={passkeyLoginMutation.isPending}
                         aria-label="Sign in with Touch ID"
@@ -799,7 +799,7 @@ const Login = () => {
                     <Button
                       type="button"
                       variant="outline"
-                      className="group flex-1 h-9 rounded-xl border border-slate-200/80 bg-white text-slate-700 font-medium shadow-sm hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/20 focus-visible:ring-offset-2 focus-visible:border-purple-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm disabled:hover:bg-white disabled:hover:border-slate-200/80 transition-all duration-200 text-sm"
+                      className="group flex-1 h-9 rounded-lg border border-slate-200/80 bg-white text-slate-700 font-medium shadow-sm hover:bg-[#f7f2e5] hover:border-[#d4b66a] hover:text-slate-900 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b78115]/20 focus-visible:ring-offset-2 focus-visible:border-[#b78115] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm disabled:hover:bg-white disabled:hover:border-slate-200/80 transition-all duration-200 text-sm"
                       onClick={handleGoogleLogin}
                       disabled={googleOAuthMutation.isPending}
                       aria-label="Sign in with Google"
@@ -1303,7 +1303,7 @@ const Login = () => {
               </Link>
               <span className="text-slate-500">
                 Don't have an account?{' '}
-                <Link to="/register" className="text-purple-600 hover:text-purple-700 font-bold">
+                <Link to="/register" className="text-[#8f650f] hover:text-[#6f4b08] font-bold">
                   Sign up
                 </Link>
               </span>

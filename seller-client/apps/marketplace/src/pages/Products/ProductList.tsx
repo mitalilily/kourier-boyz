@@ -4,7 +4,6 @@ import {
   EditOutlined,
   ExclamationCircleOutlined,
   EyeOutlined,
-  LockOutlined,
   PlusOutlined,
   SearchOutlined,
   ToolOutlined,
@@ -47,7 +46,6 @@ import {
 } from '../../api/productQueries'
 import type { Product } from '../../api/products'
 import RequirementsAlert from '../../components/RequirementsAlert'
-import { useAuthStore } from '../../store/authStore'
 import { getCategoryPath } from '../../utils/categoryUtils'
 
 const { Title, Text } = Typography
@@ -58,7 +56,6 @@ const ProductList = () => {
   const isLowStockView = searchParams.get('lowStock') === 'true'
 
   const { message } = App.useApp()
-  const user = useAuthStore((state) => state?.user)
   const adjustMutation = useAdjustProductStock()
   const [adjustOpen, setAdjustOpen] = useState(false)
   const [adjustingProduct, setAdjustingProduct] = useState<{
@@ -120,9 +117,8 @@ const ProductList = () => {
   const [importOpen, setImportOpen] = useState(false)
   const [importFile, setImportFile] = useState<File | null>(null)
 
-  // Check if user is approved
-  const isApproved = (user && user?.isApproved) || false
-  const canManageProducts = isApproved
+  // Sellers can build and maintain their catalogue while courier KYC is reviewed.
+  const canManageProducts = true
 
   const products = productsData?.products || []
   const total = productsData?.pagination?.total || 0
@@ -516,46 +512,6 @@ const ProductList = () => {
                 newParams.delete('lowStock')
                 navigate(`/products?${newParams.toString()}`)
               }}
-              style={{ marginBottom: 16 }}
-            />
-          )}
-
-          {/* KYC Approval Required Alert */}
-          {!canManageProducts && (
-            <Alert
-              message="Product Management Locked"
-              description={
-                <div>
-                  {!user?.kycSubmitted ? (
-                    <>
-                      <p>
-                        Your KYC is not submitted. Please complete your KYC verification to add and
-                        manage products.
-                      </p>
-                      <Button
-                        type="primary"
-                        icon={<WarningOutlined />}
-                        onClick={() => navigate('/submit-kyc')}
-                      >
-                        Submit KYC Now
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <p>
-                        Your KYC is under admin review. You can view your products but cannot add,
-                        edit, or delete products until your account is approved.
-                      </p>
-                      <Button type="default" onClick={() => navigate('/profile')}>
-                        View KYC Status
-                      </Button>
-                    </>
-                  )}
-                </div>
-              }
-              type="warning"
-              showIcon
-              icon={<LockOutlined />}
               style={{ marginBottom: 16 }}
             />
           )}

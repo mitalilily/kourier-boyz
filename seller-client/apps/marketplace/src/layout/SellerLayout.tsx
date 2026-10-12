@@ -34,11 +34,9 @@ const SellerLayout = () => {
     if (!user || user.role !== 'seller') return 100
 
     let completed = 0
-    const total = 4
+    const total = 2
 
     if (user.isEmailVerified) completed++
-    if (user.kycSubmitted) completed++
-    if (user.isApproved) completed++
     if (user.phone) completed++
 
     return Math.round((completed / total) * 100)
@@ -107,7 +105,8 @@ const SellerLayout = () => {
       >
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           <Paragraph type="secondary">
-            Complete your seller profile and KYC details to publish products and receive payouts.
+            Complete your contact details here. Identity and business verification are managed once
+            in your Kourier Boyz courier profile.
           </Paragraph>
           <div>
             <Text strong>Profile completion</Text>
@@ -118,8 +117,6 @@ const SellerLayout = () => {
           </div>
           <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
             {!user?.isEmailVerified && <li>Verify your email address</li>}
-            {!user?.kycSubmitted && <li>Submit your KYC information</li>}
-            {user?.kycSubmitted && !user?.isApproved && <li>Wait for KYC approval by admin</li>}
             {!user?.phone && <li>Add a valid phone number in your profile</li>}
           </ul>
         </Space>

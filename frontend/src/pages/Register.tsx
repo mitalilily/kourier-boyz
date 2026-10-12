@@ -189,7 +189,7 @@ const Register = () => {
                           className={`pl-9 h-9 rounded-xl transition-colors text-sm ${
                             fieldState.invalid
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                              : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                              : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                           }`}
                           placeholder="John Doe"
                           aria-invalid={fieldState.invalid}
@@ -228,7 +228,7 @@ const Register = () => {
                           className={`pl-9 h-9 rounded-xl transition-colors text-sm ${
                             fieldState.invalid
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                              : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                              : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                           }`}
                           placeholder="you@example.com"
                           aria-invalid={fieldState.invalid}
@@ -270,7 +270,7 @@ const Register = () => {
                           className={`pl-14 h-9 rounded-xl transition-colors text-sm ${
                             fieldState.invalid
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                              : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                              : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                           }`}
                           placeholder="9876543210"
                           aria-invalid={fieldState.invalid}
@@ -322,7 +322,7 @@ const Register = () => {
                           className={`pl-9 pr-9 h-9 rounded-xl transition-colors text-sm ${
                             fieldState.invalid
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                              : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                              : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                           }`}
                           placeholder="••••••••"
                           aria-invalid={fieldState.invalid}
@@ -369,7 +369,7 @@ const Register = () => {
                           className={`pl-9 pr-9 h-9 rounded-xl transition-colors text-sm ${
                             fieldState.invalid
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                              : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                              : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                           }`}
                           placeholder="••••••••"
                           aria-invalid={fieldState.invalid}
@@ -411,7 +411,7 @@ const Register = () => {
               <Button
                 type="submit"
                 form="register-form"
-                variant="blue"
+                variant="primary"
                 disabled={registerMutation.isPending || form.formState.isSubmitting}
                 className="w-full h-9 rounded-xl font-semibold shadow-md transition-all duration-200 transform hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none cursor-pointer mt-3 text-sm"
                 size="lg"
@@ -440,7 +440,7 @@ const Register = () => {
               <Button
                 type="button"
                 variant="outline"
-                className="group relative w-full mt-3 h-9 rounded-xl border border-slate-200/80 bg-white text-slate-700 font-medium shadow-sm hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/20 focus-visible:ring-offset-2 focus-visible:border-purple-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm disabled:hover:bg-white disabled:hover:border-slate-200/80 transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] text-sm"
+                className="group relative w-full mt-3 h-9 rounded-lg border border-slate-200/80 bg-white text-slate-700 font-medium shadow-sm hover:bg-[#f7f2e5] hover:border-[#d4b66a] hover:text-slate-900 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b78115]/20 focus-visible:ring-offset-2 focus-visible:border-[#b78115] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm disabled:hover:bg-white disabled:hover:border-slate-200/80 transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99] text-sm"
                 onClick={handleGoogleSignUp}
                 disabled={googleOAuthMutation.isPending}
                 aria-label="Sign up with Google"

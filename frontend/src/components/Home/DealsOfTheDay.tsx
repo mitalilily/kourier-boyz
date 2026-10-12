@@ -289,7 +289,7 @@ const DealsOfTheDay: React.FC = () => {
   return (
     <div className="">
       <AuroraBackground className={auroraClassName} style={auroraStyle}>
-        <div className="relative z-10  mx-auto w-full px-4 md:px-8 py-8 md:py-10">
+        <div className="relative z-10 mx-auto w-full max-w-[1480px] px-4 py-8 md:px-8 md:py-10">
           {/* Header */}
           <div className="flex flex-col gap-4 mb-6 md:gap-3">
             <div className="flex items-center justify-between md:justify-start md:gap-4">

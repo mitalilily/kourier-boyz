@@ -180,7 +180,7 @@ const FashionSection: React.FC = () => {
 
   if (isLoading)
     return (
-      <div className="py-12  mx-auto px-4">
+      <div className="mx-auto w-full max-w-[1480px] px-4 py-12">
         <SectionHeading title="Fashion" italicPart="Hub" subtitle="Discover the latest trends" />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-8">
           {[...Array(8)].map((_, i) => (
@@ -194,7 +194,7 @@ const FashionSection: React.FC = () => {
 
   return (
     <div className="bg-linear-to-b py-12 from-white via-gray-50 to-white">
-      <div className=" mx-auto px-4 md:px-8">
+      <div className="mx-auto w-full max-w-[1480px] px-4 md:px-8">
         <SectionHeading
           title="Fashion"
           italicPart="Hub"
