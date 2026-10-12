@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: kourier-boyz-postgres
+    restart: unless-stopped
+    env_file:
+      - /opt/apps/kourier-boyz/shared/database.env
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - kourier-boyz-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  kourier-boyz-postgres-data:
+    name: kourier-boyz-postgres-data
