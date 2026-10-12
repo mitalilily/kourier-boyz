@@ -128,7 +128,9 @@ API.interceptors.response.use(
             return API(originalRequest)
           }
         } catch (refreshError) {
-          console.error('Token refresh failed:', refreshError)
+          if (import.meta.env.DEV) {
+            console.warn('Token refresh failed:', refreshError)
+          }
           isRefreshing = false
           // Clear pending queue
           pendingQueue.forEach((cb) => cb(undefined))
