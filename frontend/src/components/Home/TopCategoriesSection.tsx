@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import { useTopCategories } from '../../api/categories'
 import type { Category } from '../../types/category'
 import SectionHeading from '../ui/SectionHeading'
-import { demoCategories } from './demoStoreData'
 
 const TopCategoriesSection: React.FC = () => {
   const navigate = useNavigate()
@@ -15,11 +14,7 @@ const TopCategoriesSection: React.FC = () => {
   const [canScrollRight, setCanScrollRight] = useState(false)
   const [isCompactLayout, setIsCompactLayout] = useState(false)
 
-  const apiCategories = data?.categories || []
-  const categories = useMemo(
-    () => (apiCategories.length > 0 ? apiCategories : demoCategories),
-    [apiCategories],
-  )
+  const categories = useMemo(() => data?.categories || [], [data?.categories])
 
   const flatCategories: typeof categories = []
   const seenIds = new Set<string>()

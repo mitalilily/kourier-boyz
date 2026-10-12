@@ -80,7 +80,6 @@ export default function PhoneForm() {
   const [step, setStep] = useState<number>(0)
   const [preferredLoginMethod, setPreferredLoginMethod] = useState<'phone' | 'password'>('phone')
   const [email, setEmail] = useState('')
-  const [demoOtp, setDemoOtp] = useState<string | null>(null)
   const [termsChecked, setTermsChecked] = useState(false)
   const [openTerms, setOpenTerms] = useState(false)
 
@@ -88,7 +87,6 @@ export default function PhoneForm() {
 
   const handleEmailChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value.trim())
-    setDemoOtp(null)
   }, [])
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -111,8 +109,7 @@ export default function PhoneForm() {
       sessionStorage.setItem('preferredMethod', 'phone')
 
       sendOtpRequest(email.toLowerCase().trim(), {
-        onSuccess: (response) => {
-          setDemoOtp(response.demoOtp ?? null)
+        onSuccess: () => {
           setStep(1)
         },
         onError: (err: any) => {
@@ -278,9 +275,7 @@ export default function PhoneForm() {
     ) : (
       <OtpForm
         email={email}
-        demoOtp={demoOtp}
         onEditEmail={() => {
-          setDemoOtp(null)
           setStep(0)
         }}
       />
@@ -324,7 +319,6 @@ export default function PhoneForm() {
             onChange={(_, value) => {
               if (!value) return
               setPreferredLoginMethod(value)
-              setDemoOtp(null)
               setStep(0)
             }}
             fullWidth

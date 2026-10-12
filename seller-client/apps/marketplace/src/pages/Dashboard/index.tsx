@@ -80,13 +80,13 @@ const Dashboard = () => {
     enabled: !isDemo,
     initialData: isDemo
       ? {
-          totalProducts: 148,
-          activeProducts: 126,
-          draftProducts: 22,
-          lowStockProducts: 4,
-          totalSales: 486320,
-          totalOrders: 352,
-          totalViews: 18460,
+          totalProducts: 0,
+          activeProducts: 0,
+          draftProducts: 0,
+          lowStockProducts: 0,
+          totalSales: 0,
+          totalOrders: 0,
+          totalViews: 0,
         }
       : undefined,
   })

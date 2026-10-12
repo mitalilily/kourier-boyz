@@ -1,6 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import API from '../lib/axios'
-import { getDemoPagination, queryDemoProducts } from '../lib/demoCatalog'
 
 export type SearchSort = 'relevance' | 'price_asc' | 'price_desc' | 'newest'
 
@@ -70,21 +69,6 @@ export const useSearchInfinite = (params: {
   filters?: SearchFilters
 }) => {
   const limit = params.limit ?? 24
-  const demoProducts = queryDemoProducts({
-    q: params.q,
-    categoryId: params.categoryId || (typeof params.filters?.category === 'string' ? params.filters.category : undefined),
-    sort: params.sort,
-    brand: params.filters?.brand,
-    tag: params.filters?.tag,
-    minPrice: params.filters?.minPrice,
-    maxPrice: params.filters?.maxPrice,
-    minRating: params.filters?.minRating,
-    includeOutOfStock: params.filters?.includeOutOfStock,
-  })
-  const demoResponse: SearchResponse = {
-    products: demoProducts,
-    pagination: getDemoPagination(demoProducts.length, 1, limit),
-  }
   return useInfiniteQuery<SearchResponse>({
     queryKey: ['search', 'infinite', params],
     initialPageParam: 1,
@@ -103,9 +87,12 @@ export const useSearchInfinite = (params: {
       if (params.filters) searchParams.set('filters', JSON.stringify(params.filters))
       try {
         const { data } = await API.get<SearchResponse>(`/search?${searchParams.toString()}`)
-        return data.products?.length || demoProducts.length === 0 ? data : demoResponse
+        return data
       } catch {
-        return page === 1 ? demoResponse : { products: [], pagination: getDemoPagination(demoProducts.length, page, limit) }
+        return {
+          products: [],
+          pagination: { total: 0, page, limit, pages: 0, hasMore: false },
+        }
       }
     },
     getNextPageParam: (lastPage) => {
@@ -114,10 +101,6 @@ export const useSearchInfinite = (params: {
       return undefined
     },
     enabled: !!params.q || !!params.categoryId,
-    initialData: {
-      pages: [demoResponse],
-      pageParams: [1],
-    },
   })
 }
 

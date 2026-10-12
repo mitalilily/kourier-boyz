@@ -6,18 +6,11 @@ import { useTrendingProducts } from '../../api/products'
 import ProductCard from '../ui/ProductCard'
 import SectionHeading from '../ui/SectionHeading'
 import { getProductDisplayInfo } from '@/utils/productDisplay'
-import { demoProducts } from './demoStoreData'
 
 const TrendingProducts: React.FC = () => {
   const { data } = useTrendingProducts(20) // Fetch more products for scrolling
   const apiProducts = useMemo(() => data?.products || [], [data?.products])
-  const trendingProducts = useMemo(
-    () =>
-      apiProducts.length > 0
-        ? apiProducts
-        : demoProducts.slice().sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)),
-    [apiProducts],
-  )
+  const trendingProducts = apiProducts
   const displayProducts = useMemo(() => {
     return trendingProducts.map((product) => {
       const display = getProductDisplayInfo(product)

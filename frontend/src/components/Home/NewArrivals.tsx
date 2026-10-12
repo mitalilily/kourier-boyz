@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom'
 import { useNewArrivalsProducts } from '../../api/products'
 import ProductCard from '../ui/ProductCard'
 import SectionHeading from '../ui/SectionHeading'
-import { demoProducts } from './demoStoreData'
 
 const NewArrivals: React.FC = () => {
   const navigate = useNavigate()
@@ -22,7 +21,7 @@ const NewArrivals: React.FC = () => {
   }
 
   const apiProducts = useMemo(() => data?.products ?? [], [data])
-  const products = useMemo(() => (apiProducts.length > 0 ? apiProducts : demoProducts), [apiProducts])
+  const products = apiProducts
 
   const cardData = useMemo(() => {
     return products.map((product) => {

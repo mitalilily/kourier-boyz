@@ -49,13 +49,6 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import API from "../lib/axios";
-import { demoProducts } from "../components/Home/demoStoreData";
-import {
-  getDemoFilters,
-  getDemoPagination,
-  getDemoProduct,
-  queryDemoProducts,
-} from "../lib/demoCatalog";
 
 export interface Product {
   _id: string;
@@ -320,9 +313,6 @@ export const useDealsProductsInfinite = (options?: DealsInfiniteOptions) => {
   const take = options?.take ?? DEFAULT_DEALS_LIMIT;
   const scope = options?.scope ?? "today";
   const sort = options?.sort ?? "relevance";
-  const fallbackProducts = queryDemoProducts({ sort }).filter(
-    (product) => (product.discountPercent || 0) > 0,
-  );
 
   return useInfiniteQuery<{ products: Product[] }>({
     queryKey: ["products", "deals", "infinite", scope, take, sort],
@@ -345,21 +335,17 @@ export const useDealsProductsInfinite = (options?: DealsInfiniteOptions) => {
 
       try {
         const { data } = await API.get<{ products: Product[] }>(url);
-        if (data && typeof data === "object" && "products" in data && data.products.length) return data;
-        if (Array.isArray(data) && data.length) return { products: data };
+        if (data && typeof data === "object" && "products" in data) return data;
+        if (Array.isArray(data)) return { products: data };
       } catch {
-        // The demo catalogue keeps storefront routes usable without the API.
+        return { products: [] };
       }
-      return { products: skip === 0 ? fallbackProducts.slice(0, take) : [] };
+      return { products: [] };
     },
     getNextPageParam: (lastPage, allPages) => {
       if (!lastPage || !Array.isArray(lastPage.products)) return undefined;
       if (lastPage.products.length < take) return undefined;
       return allPages.length * take;
-    },
-    initialData: {
-      pages: [{ products: fallbackProducts.slice(0, take) }],
-      pageParams: [0],
     },
   });
 };
@@ -415,20 +401,23 @@ export type ProductFiltersParams = {
   includeOutOfStock?: boolean;
 };
 
+const EMPTY_PRODUCT_FILTERS: ProductFiltersResponse = {
+  meta: {
+    total: 0,
+    price: { min: null, max: null },
+    discount: { min: null, max: null },
+    rating: { min: null, max: null, average: null },
+  },
+  categories: [],
+  brands: [],
+  sellers: [],
+  tags: [],
+  attributes: [],
+  availability: { inStock: 0, outOfStock: 0 },
+  ratingBuckets: [],
+};
+
 export const useProductFilters = (params?: ProductFiltersParams) => {
-  const fallbackProducts = queryDemoProducts({
-    q: params?.search,
-    categoryId:
-      params?.categoryId ||
-      (typeof params?.category === "string" ? params.category : undefined),
-    brand: params?.brand,
-    tag: params?.tag,
-    minPrice: params?.minPrice,
-    maxPrice: params?.maxPrice,
-    minRating: params?.minRating,
-    includeOutOfStock: params?.includeOutOfStock,
-  });
-  const fallbackFilters = getDemoFilters(fallbackProducts);
   return useQuery<ProductFiltersResponse>({
     queryKey: ["products", "filters", params],
     queryFn: async () => {
@@ -453,10 +442,10 @@ export const useProductFilters = (params?: ProductFiltersParams) => {
         const response = await API.get(url);
         return response.data;
       } catch {
-        return fallbackFilters;
+        return EMPTY_PRODUCT_FILTERS;
       }
     },
-    placeholderData: fallbackFilters,
+    placeholderData: EMPTY_PRODUCT_FILTERS,
   });
 };
 
@@ -487,8 +476,6 @@ export const useBestSellersProductsInfinite = (params?: {
   const limit = params?.limit ?? 24;
   const sort = params?.sort ?? "relevance";
   const minRating = params?.minRating ?? 4;
-  const fallbackProducts = queryDemoProducts({ sort, minRating });
-  const fallbackPagination = getDemoPagination(fallbackProducts.length, 1, limit);
 
   return useInfiniteQuery<{
     products: Product[];
@@ -506,26 +493,19 @@ export const useBestSellersProductsInfinite = (params?: {
       if (sort) {
         queryParams.set("sort", sort);
       }
-      // Use the dedicated best-sellers endpoint
       try {
         const response = await API.get<{
           products: Product[];
           pagination?: ProductsResponse["pagination"];
         }>(`/products/best-sellers?${queryParams.toString()}`);
-        if (response.data.products?.length || fallbackProducts.length === 0) {
-          return {
-            products: response.data.products || [],
-            pagination: response.data.pagination,
-          };
-        }
         return {
-          products: fallbackProducts.slice(0, limit),
-          pagination: fallbackPagination,
+          products: response.data.products || [],
+          pagination: response.data.pagination,
         };
       } catch {
         return {
-          products: page === 1 ? fallbackProducts.slice(0, limit) : [],
-          pagination: { ...fallbackPagination, page },
+          products: [],
+          pagination: { total: 0, page, limit, pages: 0, hasMore: false },
         };
       }
     },
@@ -536,10 +516,6 @@ export const useBestSellersProductsInfinite = (params?: {
         return hasMore ? page + 1 : undefined;
       }
       return page < pages ? page + 1 : undefined;
-    },
-    initialData: {
-      pages: [{ products: fallbackProducts.slice(0, limit), pagination: fallbackPagination }],
-      pageParams: [1],
     },
   });
 };
@@ -699,9 +675,6 @@ export const useAlsoBoughtProducts = (
   },
 ) => {
   const { limit = 16, enabled = true } = params || {};
-  const fallbackProducts = demoProducts
-    .filter((product) => product._id !== productId && product.slug !== productId)
-    .slice(0, limit);
   return useQuery<{ products: Product[] }>({
     queryKey: ["products", productId, "also-bought", limit],
     queryFn: async () => {
@@ -710,30 +683,22 @@ export const useAlsoBoughtProducts = (
         const response = await API.get<{ products: Product[] }>(url);
         return response.data;
       } catch {
-        return { products: fallbackProducts };
+        return { products: [] };
       }
     },
     enabled: enabled && !!productId,
-    placeholderData: { products: fallbackProducts },
   });
 };
 
 // Fetch single product
 export const useProduct = (id: string) => {
-  const fallbackProduct = getDemoProduct(id);
   return useQuery<Product>({
     queryKey: ["product", id],
     queryFn: async () => {
-      try {
-        const response = await API.get(`/products/${id}`);
-        return response.data;
-      } catch {
-        if (fallbackProduct) return fallbackProduct;
-        throw new Error("Product not found");
-      }
+      const response = await API.get(`/products/${id}`);
+      return response.data;
     },
     enabled: !!id,
-    placeholderData: fallbackProduct,
   });
 };
 

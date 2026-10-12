@@ -161,8 +161,7 @@ const sendEmail = async (
 ) => {
   const transporter = createTransporter()
   if (!transporter) {
-    console.warn('Email transporter not configured. Email not sent.')
-    return
+    throw new Error('Email transporter is not configured')
   }
 
   const mailOptions: any = {

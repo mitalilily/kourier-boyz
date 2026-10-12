@@ -1,13 +1,7 @@
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
-import { isDemoOtpEnabled } from '../utils/demoAuth'
 import { resolveTokenSecrets } from '../utils/tokenSecrets'
-
-assert.equal(isDemoOtpEnabled(undefined), false)
-assert.equal(isDemoOtpEnabled('false'), false)
-assert.equal(isDemoOtpEnabled('true'), true)
-assert.equal(isDemoOtpEnabled(' TRUE '), true)
 
 assert.throws(() => resolveTokenSecrets({}), /required/)
 assert.throws(
@@ -50,14 +44,19 @@ const phoneFormSource = fs.readFileSync(
   path.join(repositoryRoot, 'seller-client/apps/logistics/src/components/auth/PhoneForm.tsx'),
   'utf8',
 )
+const emailSenderSource = fs.readFileSync(
+  path.join(repositoryRoot, 'backend/logistics/src/utils/emailSender.ts'),
+  'utf8',
+)
 
 assert.doesNotMatch(authControllerSource, /console\.(?:log|info|warn|error)\([^\n]*demo otp/i)
 assert.doesNotMatch(otpFormSource, /console\.(?:log|info|warn|error)\([^\n]*demo otp/i)
 assert.doesNotMatch(phoneFormSource, /console\.(?:log|info|warn|error)\([^\n]*demo otp/i)
-assert.match(authControllerSource, /const demoOtpEnabled = true/)
-assert.match(authControllerSource, /demoOtpEnabled && user && user\.role !== 'customer'/)
-assert.match(otpFormSource, /Demo access code/)
-assert.match(otpFormSource, /demoOtp/)
+assert.doesNotMatch(authControllerSource, /demoOtp|DEMO_OTP_ENABLED/i)
+assert.doesNotMatch(otpFormSource, /demoOtp|Demo access code/i)
+assert.doesNotMatch(phoneFormSource, /demoOtp|Demo access code/i)
+assert.match(authControllerSource, /await sendVerificationEmail\(normalizedEmail, otp\)/)
+assert.match(emailSenderSource, /throw new Error\('Email transporter is not configured'\)/)
 assert.doesNotMatch(phoneFormSource, /Console OTP/)
 
 console.log('Authentication configuration safety checks passed')

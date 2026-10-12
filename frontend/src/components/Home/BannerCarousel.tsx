@@ -1,14 +1,12 @@
 import { useBanners } from '@/api/banners'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight, PackagePlus, Store } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { demoBanners } from './demoStoreData'
 
 const BannerCarousel: React.FC = () => {
   const { data } = useBanners('hero')
-  const apiBanners = data?.banners || []
-  const banners = apiBanners.length > 0 ? apiBanners : demoBanners
+  const banners = data?.banners || []
   const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
@@ -19,6 +17,27 @@ const BannerCarousel: React.FC = () => {
     )
     return () => window.clearInterval(interval)
   }, [banners.length])
+
+  if (banners.length === 0) {
+    return (
+      <section className="kb-store-hero relative flex min-h-[430px] w-full items-center overflow-hidden bg-[#1d1d1c] px-5 pt-20 text-white md:min-h-[540px] sm:px-8 lg:px-10">
+        <div className="absolute inset-0 opacity-50 [background-image:linear-gradient(115deg,transparent_0%,transparent_48%,rgba(223,183,67,0.2)_48%,rgba(223,183,67,0.2)_49%,transparent_49%),radial-gradient(circle_at_82%_25%,rgba(255,255,255,0.15),transparent_26%)]" />
+        <div className="relative mx-auto w-full max-w-7xl">
+          <span className="kb-kicker text-[#dfb743]">Kourier Boyz Marketplace</span>
+          <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+            A fresh marketplace is taking shape.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-white/75">
+            Products published by approved sellers will appear here. Sellers can start building their catalogue today.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/become-a-seller" className="kb-button kb-button-gold"><PackagePlus className="h-5 w-5" /> Open your store</Link>
+            <Link to="/" className="kb-button border border-white/30 bg-white/5 text-white"><Store className="h-5 w-5" /> Kourier Boyz home <ArrowRight className="h-4 w-4" /></Link>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   const currentBanner = banners[currentIndex]
 

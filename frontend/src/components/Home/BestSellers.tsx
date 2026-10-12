@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom'
 import { useBestSellersProductsInfinite } from '../../api/products'
 import ProductCard from '../ui/ProductCard'
 import SectionHeading from '../ui/SectionHeading'
-import { demoProducts } from './demoStoreData'
 
 const BestSellers: React.FC = () => {
   const navigate = useNavigate()
@@ -19,14 +18,7 @@ const BestSellers: React.FC = () => {
   const products = useMemo(() => {
     const apiProducts =
       data?.pages && data.pages.length > 0 ? data.pages[0].products || [] : []
-    if (apiProducts.length > 0) {
-      return apiProducts
-    }
-
-    return demoProducts
-      .slice()
-      .sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0))
-
+    return apiProducts
   }, [data?.pages])
 
   const cardData = useMemo(() => {

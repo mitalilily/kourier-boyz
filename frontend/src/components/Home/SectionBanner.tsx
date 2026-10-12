@@ -2,7 +2,6 @@ import { useBanners } from '@/api/banners'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { BannerLayer, ParallaxBanner } from 'react-scroll-parallax'
-import { demoSectionBanners } from './demoStoreData'
 
 interface SectionBannerProps {
   position: 'deals' | 'fashion' | 'trending' | 'featured' | 'newsletter'
@@ -11,8 +10,7 @@ interface SectionBannerProps {
 
 const SectionBanner: React.FC<SectionBannerProps> = ({ position, className }) => {
   const { data } = useBanners(position)
-  const apiBanners = data?.banners || []
-  const banners = apiBanners.length > 0 ? apiBanners : demoSectionBanners[position]
+  const banners = data?.banners || []
   const [currentIndex, setCurrentIndex] = useState(0)
 
   // Auto-rotate banners if multiple exist

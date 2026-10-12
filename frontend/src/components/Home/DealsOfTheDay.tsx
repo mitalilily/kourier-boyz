@@ -15,7 +15,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Product } from '../../api/products'
 import { useDealsProducts } from '../../api/products'
-import { demoProducts } from './demoStoreData'
 
 // Countdown Timer Component
 const CountdownTimer: React.FC<{ endDate?: string }> = ({ endDate }) => {
@@ -208,10 +207,7 @@ const DealsOfTheDay: React.FC = () => {
   const navigate = useNavigate()
   const { data } = useDealsProducts({ take: 12, scope: 'today' })
   const apiDeals = useMemo(() => data?.products || [], [data])
-  const deals = useMemo(
-    () => (apiDeals.length > 0 ? apiDeals : demoProducts.filter((product) => product.discountPercent)),
-    [apiDeals],
-  )
+  const deals = apiDeals
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)

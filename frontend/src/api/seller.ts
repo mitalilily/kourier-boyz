@@ -1,7 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import API from '../lib/axios'
-import { demoProducts } from '../components/Home/demoStoreData'
-import { demoSeller, demoSellerCategories, queryDemoProducts } from '../lib/demoCatalog'
 
 export interface StoreBanner {
   imageUrl: string
@@ -96,35 +94,15 @@ export interface SellerProductsResponse {
   }
 }
 
-const asSellerProducts = (products: typeof demoProducts): SellerProduct[] =>
-  products.map((product) => ({
-    _id: product._id,
-    slug: product.slug,
-    name: product.name,
-    description: product.description,
-    shortDescription: product.shortDescription,
-    mainImage: product.mainImage,
-    images: product.images,
-    sellingPrice: product.effectivePrice ?? product.price,
-    originalPrice: product.comparePrice ?? product.price,
-    hasVariants: false,
-  }))
-
 // Fetch seller by slug
 export const useSellerBySlug = (slug: string) => {
   return useQuery<Seller>({
     queryKey: ['seller', slug],
     queryFn: async () => {
-      try {
-        const response = await API.get(`/seller/${slug}`)
-        return response.data
-      } catch {
-        if (slug === demoSeller.storeSlug) return demoSeller
-        throw new Error('Seller not found')
-      }
+      const response = await API.get(`/seller/${slug}`)
+      return response.data
     },
     enabled: !!slug,
-    placeholderData: slug === demoSeller.storeSlug ? demoSeller : undefined,
   })
 }
 
@@ -183,35 +161,10 @@ export const useSellerProductsBySlug = (
       const url = queryParams.toString()
         ? `/seller/${slug}/products?${queryParams}`
         : `/seller/${slug}/products`
-      try {
-        const response = await API.get(url)
-        if (response.data?.products?.length || slug !== demoSeller.storeSlug) {
-          return response.data
-        }
-      } catch {
-        if (slug !== demoSeller.storeSlug) throw new Error('Seller products not found')
-      }
-      let products = queryDemoProducts({
-        q: params?.search,
-        categoryId: params?.category,
-        minPrice: params?.minPrice,
-        maxPrice: params?.maxPrice,
-      })
-      if (params?.featured) products = products.filter((product) => product.isFeatured)
-      return {
-        products: asSellerProducts(products),
-        pagination: { total: products.length, page: 1, limit: params?.limit || products.length, pages: 1 },
-      }
+      const response = await API.get(url)
+      return response.data
     },
     enabled: !!slug,
-    placeholderData: slug === demoSeller.storeSlug
-      ? {
-          products: asSellerProducts(
-            params?.featured ? demoProducts.filter((product) => product.isFeatured) : demoProducts,
-          ),
-          pagination: { total: demoProducts.length, page: 1, limit: params?.limit || demoProducts.length, pages: 1 },
-        }
-      : undefined,
   })
 }
 
@@ -220,18 +173,9 @@ export const useSellerCategoriesBySlug = (slug: string) => {
   return useQuery<SellerCategoriesResponse>({
     queryKey: ['seller-categories', slug],
     queryFn: async () => {
-      try {
-        const response = await API.get(`/seller/${slug}/categories`)
-        if (response.data?.categories?.length || slug !== demoSeller.storeSlug) {
-          return response.data
-        }
-      } catch {
-        if (slug === demoSeller.storeSlug) return { categories: demoSellerCategories }
-        throw new Error('Seller categories not found')
-      }
-      return { categories: demoSellerCategories }
+      const response = await API.get(`/seller/${slug}/categories`)
+      return response.data
     },
     enabled: !!slug,
-    placeholderData: slug === demoSeller.storeSlug ? { categories: demoSellerCategories } : undefined,
   })
 }

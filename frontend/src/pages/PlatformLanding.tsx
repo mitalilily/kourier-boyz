@@ -26,12 +26,7 @@ import {
 } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-
-const products = [
-  { name: 'PulseFit Smart Watch', price: 'Rs. 2,999', image: '/products/watch.webp', slug: 'smart-watch-series-5', badge: 'Trending', rating: '4.8' },
-  { name: 'Modern Accent Chair', price: 'Rs. 5,799', image: '/products/chair.jpg', slug: 'modern-accent-chair', badge: 'New arrival', rating: '4.7' },
-  { name: 'Everyday Cotton Tee', price: 'Rs. 499', image: '/products/tshirt.jpg', slug: 'classic-everyday-cotton-t-shirt', badge: 'Everyday pick', rating: '4.9' },
-]
+import { useProducts } from '@/api/products'
 
 const capabilities = [
   [Truck, 'Courier choice', 'Compare service, price, and delivery speed before every booking.'],
@@ -80,6 +75,13 @@ const PlatformLanding = () => {
   const navigate = useNavigate()
   const [trackingNumber, setTrackingNumber] = useState('')
   const [activeJourney, setActiveJourney] = useState<'buyer' | 'shipper' | 'seller'>('buyer')
+  const { data: catalogueData, isLoading: isCatalogueLoading } = useProducts({
+    page: 1,
+    limit: 3,
+    sortBy: 'createdAt',
+    order: 'desc',
+  })
+  const previewProducts = catalogueData?.products || []
 
   const submitTracking = (event: FormEvent) => {
     event.preventDefault()
@@ -217,36 +219,47 @@ const PlatformLanding = () => {
                     View marketplace <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
-                <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-5">
-                  {products.map((product, index) => (
+                {isCatalogueLoading ? (
+                  <div className="mt-7 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    {[0, 1, 2].map((item) => <div key={item} className="aspect-[4/5] animate-pulse bg-[#ecece8]" />)}
+                  </div>
+                ) : previewProducts.length > 0 ? (
+                  <div className="mt-7 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-5">
+                  {previewProducts.map((product, index) => (
                     <Link
-                      key={product.name}
-                      to={`/product/${product.slug}`}
+                      key={product._id}
+                      to={`/product/${product.slug || product._id}`}
                       className={`kb-store-preview-product group ${index === 2 ? 'col-span-2 sm:col-span-1' : ''}`}
                     >
                       <div className="relative aspect-[4/5] overflow-hidden bg-[#efefeb]">
                         <img
-                          src={product.image}
+                          src={product.mainImage || product.images?.[0] || '/image-placeholder.svg'}
                           alt={product.name}
                           className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.035]"
                         />
                         <span className="absolute left-3 top-3 bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase text-[#5d450f] shadow-sm backdrop-blur-md">
-                          {product.badge}
+                          {product.brand || 'New listing'}
                         </span>
                       </div>
                       <div className="pt-4">
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#806014]">
-                          <Star className="h-3.5 w-3.5 fill-[#d8af3d] text-[#b78115]" /> {product.rating}
-                        </span>
+                        {Boolean(product.rating) && <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#806014]"><Star className="h-3.5 w-3.5 fill-[#d8af3d] text-[#b78115]" /> {product.rating?.toFixed(1)}</span>}
                         <p className="text-sm font-semibold leading-5 sm:text-base">{product.name}</p>
                         <div className="mt-2 flex items-center justify-between gap-2">
-                          <span className="font-semibold">{product.price}</span>
+                          <span className="font-semibold">₹{(product.effectivePrice ?? product.price ?? 0).toLocaleString('en-IN')}</span>
                           <ArrowRight className="h-4 w-4 text-[#a9730c] transition-transform group-hover:translate-x-1" />
                         </div>
                       </div>
                     </Link>
                   ))}
-                </div>
+                  </div>
+                ) : (
+                  <div className="mt-7 flex min-h-[320px] flex-col items-center justify-center border border-dashed border-black/20 bg-[#f6f6f2] px-6 text-center">
+                    <span className="kb-silver-icon flex h-14 w-14 items-center justify-center text-[#8a620d]"><PackagePlus className="h-6 w-6" /></span>
+                    <h4 className="mt-5 text-xl font-semibold">The first collection starts with our sellers.</h4>
+                    <p className="mt-2 max-w-md text-sm leading-6 text-[#686864]">Approved products will appear here as soon as they are published. Open your store and be part of the launch catalogue.</p>
+                    <Link to="/become-a-seller" className="kb-button kb-button-gold mt-6">Open your store <ArrowRight className="h-4 w-4" /></Link>
+                  </div>
+                )}
                 <Link to="/shop" className="kb-button kb-shop-preview-button mt-7 w-full sm:hidden">
                   View marketplace <ArrowRight className="h-4 w-4" />
                 </Link>
