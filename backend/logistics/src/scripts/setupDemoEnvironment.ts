@@ -280,7 +280,7 @@ async function main() {
   const invoiceId = await ensureDemoInvoice(merchantId)
 
   console.log('Demo setup complete.')
-  console.log(`Admin login: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`)
+  console.log(`Admin login created: ${ADMIN_EMAIL}`)
   console.log(`Merchant OTP login: ${MERCHANT_EMAIL}`)
   console.log(`Merchant invoice id: ${invoiceId}`)
   console.log(`Admin user id: ${adminId}`)
