@@ -67,7 +67,10 @@ const buildObjectKey = ({
 }
 
 const getPublicStorageBaseUrl = (bucket: string) => {
-  const endpoint = (process.env.R2_PUBLIC_URL || process.env.R2_ENDPOINT || '').replace(/\/+$/, '')
+  // A private R2 S3 endpoint is not a browser-readable public URL. When no
+  // explicit public domain exists, callers store the object key and request a
+  // short-lived download URL through the authenticated API.
+  const endpoint = (process.env.R2_PUBLIC_URL || '').replace(/\/+$/, '')
   if (!endpoint) return ''
 
   try {

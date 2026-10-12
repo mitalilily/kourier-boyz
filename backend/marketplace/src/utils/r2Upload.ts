@@ -1,6 +1,104 @@
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import crypto from 'crypto'
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadObjectCommand,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { r2Client, R2_CONFIG } from '../config/r2.config'
+
+const normalizePath = (value: string) =>
+  value
+    .replace(/\\/g, '/')
+    .split('/')
+    .map((part) => part.trim())
+    .filter((part) => part && part !== '.' && part !== '..')
+    .join('/')
+
+const normalizePrefix = (value: string) =>
+  normalizePath(value)
+    .split('/')
+    .map((part) =>
+      part
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^[-_.]+|[-_.]+$/g, ''),
+    )
+    .filter(Boolean)
+    .join('/')
+
+const getMarketplacePrefix = () =>
+  [normalizePrefix(R2_CONFIG.projectPrefix), normalizePrefix(R2_CONFIG.marketplacePrefix)]
+    .filter(Boolean)
+    .join('/')
+
+const withMarketplacePrefix = (key: string) => {
+  const normalizedKey = normalizePath(key).replace(/^\/+/, '')
+  const prefix = getMarketplacePrefix()
+  if (!prefix || normalizedKey === prefix || normalizedKey.startsWith(`${prefix}/`)) {
+    return normalizedKey
+  }
+  return `${prefix}/${normalizedKey}`
+}
+
+const assertR2Configuration = () => {
+  if (!process.env.R2_ENDPOINT || !process.env.R2_ACCESS_KEY_ID || !process.env.R2_SECRET_ACCESS_KEY) {
+    throw new Error('R2 storage credentials are not configured')
+  }
+  if (!R2_CONFIG.bucketName) throw new Error('R2 bucket name is not configured')
+}
+
+const getDeliveryConfiguration = () => {
+  const baseUrl = (R2_CONFIG.deliveryBaseUrl || '').replace(/\/+$/, '')
+  const secret = R2_CONFIG.urlSigningSecret || ''
+  if (!/^https?:\/\//i.test(baseUrl) || secret.length < 32) {
+    throw new Error(
+      'R2_DELIVERY_BASE_URL and an R2_URL_SIGNING_SECRET of at least 32 characters are required',
+    )
+  }
+  return { baseUrl, secret }
+}
+
+const signDeliveryPayload = (payload: string, secret: string) =>
+  crypto.createHmac('sha256', secret).update(payload).digest('base64url')
+
+export const buildR2DeliveryUrl = (key: string) => {
+  const { baseUrl, secret } = getDeliveryConfiguration()
+  const payload = Buffer.from(withMarketplacePrefix(key), 'utf8').toString('base64url')
+  const signature = signDeliveryPayload(payload, secret)
+  return `${baseUrl}/${payload}.${signature}`
+}
+
+export const decodeR2DeliveryToken = (token: string) => {
+  const { secret } = getDeliveryConfiguration()
+  const [payload, signature, ...extra] = token.split('.')
+  if (!payload || !signature || extra.length) throw new Error('Invalid R2 delivery token')
+
+  const expected = signDeliveryPayload(payload, secret)
+  const actualBuffer = Buffer.from(signature)
+  const expectedBuffer = Buffer.from(expected)
+  if (
+    actualBuffer.length !== expectedBuffer.length ||
+    !crypto.timingSafeEqual(actualBuffer, expectedBuffer)
+  ) {
+    throw new Error('Invalid R2 delivery token')
+  }
+
+  const key = Buffer.from(payload, 'base64url').toString('utf8')
+  if (!key || key.includes('..') || !key.startsWith(`${getMarketplacePrefix()}/`)) {
+    throw new Error('Invalid R2 object key')
+  }
+  return key
+}
+
+export const isPrivateR2Object = (key: string) => {
+  const relativeKey = key.replace(new RegExp(`^${getMarketplacePrefix()}/?`), '')
+  return /^(kyc|certificates|agreements|invoices|labels|settlements|tickets|returns)(\/|$)/i.test(
+    relativeKey,
+  )
+}
 
 /**
  * Sanitize a filename by removing emojis, special characters, and spaces
@@ -45,6 +143,7 @@ export const uploadToR2 = async (
   mimeType: string,
   folder: string = 'categories',
 ): Promise<string> => {
+  assertR2Configuration()
   // If fileName already includes a path (contains '/'), sanitize just the filename part
   // Otherwise, sanitize the entire fileName
   let sanitizedFileName: string
@@ -59,28 +158,29 @@ export const uploadToR2 = async (
 
   // If fileName already includes a path (contains '/'), use it directly
   // Otherwise, prepend folder and timestamp
-  const key = sanitizedFileName.includes('/') 
+  const relativeKey = sanitizedFileName.includes('/')
     ? sanitizedFileName 
     : `${folder}/${Date.now()}-${sanitizedFileName}`
+  const key = withMarketplacePrefix(relativeKey)
 
   const command = new PutObjectCommand({
     Bucket: R2_CONFIG.bucketName,
     Key: key,
     Body: fileBuffer,
     ContentType: mimeType,
+    CacheControl: isPrivateR2Object(key) ? 'private, no-store' : 'public, max-age=86400',
   })
 
   await r2Client.send(command)
 
-  // Build public URL: ensure publicUrl is set and has no trailing slash to avoid double slash
-  const baseUrl = (R2_CONFIG.publicUrl || '').replace(/\/+$/, '')
-  if (!baseUrl || !baseUrl.startsWith('http')) {
-    throw new Error(
-      'R2_PUBLIC_URL must be set and must be a valid HTTP(S) URL (e.g. https://your-bucket.r2.dev or custom domain) for invoice/file links to work.',
-    )
+  if (R2_CONFIG.deliveryBaseUrl && R2_CONFIG.urlSigningSecret) {
+    return buildR2DeliveryUrl(key)
   }
-  const fullUrl = `${baseUrl}/${key}`
-  return fullUrl
+
+  const publicBaseUrl = (R2_CONFIG.publicUrl || '').replace(/\/+$/, '')
+  if (/^https?:\/\//i.test(publicBaseUrl)) return `${publicBaseUrl}/${key}`
+
+  throw new Error('R2 delivery is not configured')
 }
 
 /**
@@ -94,9 +194,11 @@ export const getPresignedUploadUrl = async (
   mimeType: string,
   expiresIn: number = 900,
 ): Promise<string> => {
+  assertR2Configuration()
+  const storageKey = withMarketplacePrefix(key)
   const command = new PutObjectCommand({
     Bucket: R2_CONFIG.bucketName,
-    Key: key,
+    Key: storageKey,
     ContentType: mimeType,
   })
 
@@ -107,17 +209,44 @@ export const getPresignedUploadUrl = async (
  * Delete a file from Cloudflare R2
  * @param fileUrl - The full URL of the file to delete
  */
-const getKeyFromUrl = (fileUrl: string): string => {
+export const getKeyFromR2Reference = (fileUrl: string): string => {
+  if (!fileUrl || typeof fileUrl !== 'string') throw new Error('R2 file reference is required')
+
+  if (fileUrl.startsWith('r2://')) {
+    const withoutScheme = fileUrl.slice('r2://'.length)
+    const slashIndex = withoutScheme.indexOf('/')
+    if (slashIndex === -1) throw new Error('Invalid R2 file reference')
+    const bucket = withoutScheme.slice(0, slashIndex)
+    if (bucket !== R2_CONFIG.bucketName) throw new Error('R2 bucket does not match configuration')
+    return normalizePath(withoutScheme.slice(slashIndex + 1))
+  }
+
+  const deliveryBase = (R2_CONFIG.deliveryBaseUrl || '').replace(/\/+$/, '')
+  if (deliveryBase && fileUrl.startsWith(`${deliveryBase}/`)) {
+    const token = fileUrl.slice(deliveryBase.length + 1).split(/[?#]/, 1)[0]
+    return decodeR2DeliveryToken(decodeURIComponent(token))
+  }
+
   const baseUrl = (R2_CONFIG.publicUrl || '').replace(/\/+$/, '')
-  if (!baseUrl) return fileUrl
-  const escapedBase = baseUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  let key = fileUrl.replace(new RegExp(`^${escapedBase}/?`), '')
-  return key.replace(/^\/+/, '') // R2 keys must not have leading slash
+  if (baseUrl && fileUrl.startsWith(`${baseUrl}/`)) {
+    return normalizePath(fileUrl.slice(baseUrl.length + 1).split(/[?#]/, 1)[0])
+  }
+
+  if (/^https?:\/\//i.test(fileUrl)) {
+    const parsed = new URL(fileUrl)
+    const parts = parsed.pathname.split('/').filter(Boolean)
+    if (parts[0] === R2_CONFIG.bucketName) parts.shift()
+    if (!parts.length) throw new Error('Invalid R2 object URL')
+    return normalizePath(parts.join('/'))
+  }
+
+  return normalizePath(fileUrl).replace(/^\/+/, '')
 }
 
 export const deleteFromR2 = async (fileUrl: string): Promise<void> => {
   try {
-    const key = getKeyFromUrl(fileUrl)
+    assertR2Configuration()
+    const key = getKeyFromR2Reference(fileUrl)
 
     const command = new DeleteObjectCommand({
       Bucket: R2_CONFIG.bucketName,
@@ -153,7 +282,8 @@ export const downloadFromR2 = async (
   fileUrl: string,
 ): Promise<{ buffer: Buffer; contentType: string; fileName: string }> => {
   try {
-    const key = getKeyFromUrl(fileUrl)
+    assertR2Configuration()
+    const key = getKeyFromR2Reference(fileUrl)
 
     const command = new GetObjectCommand({
       Bucket: R2_CONFIG.bucketName,
@@ -191,7 +321,8 @@ export const getSignedUrlFromR2 = async (
   expiresIn: number = 3600,
 ): Promise<string> => {
   try {
-    const key = getKeyFromUrl(fileUrl)
+    assertR2Configuration()
+    const key = getKeyFromR2Reference(fileUrl)
 
     const command = new GetObjectCommand({
       Bucket: R2_CONFIG.bucketName,
@@ -223,9 +354,10 @@ export const getFileMetadataFromR2 = async (
   exists: boolean
 }> => {
   try {
-    const key = getKeyFromUrl(fileUrl)
+    assertR2Configuration()
+    const key = getKeyFromR2Reference(fileUrl)
 
-    const command = new GetObjectCommand({
+    const command = new HeadObjectCommand({
       Bucket: R2_CONFIG.bucketName,
       Key: key,
     })
@@ -239,7 +371,11 @@ export const getFileMetadataFromR2 = async (
       exists: true,
     }
   } catch (error: any) {
-    if (error.name === 'NoSuchKey') {
+    if (
+      error.name === 'NoSuchKey' ||
+      error.name === 'NotFound' ||
+      error.$metadata?.httpStatusCode === 404
+    ) {
       return { exists: false }
     }
     console.error('Error getting file metadata from R2:', error)
@@ -256,6 +392,9 @@ export const getFileMetadataFromR2 = async (
  * @returns Preview URL
  */
 export const getPreviewUrl = async (fileUrl: string, isPrivate: boolean = false): Promise<string> => {
+  const deliveryBase = (R2_CONFIG.deliveryBaseUrl || '').replace(/\/+$/, '')
+  if (deliveryBase && fileUrl.startsWith(`${deliveryBase}/`)) return fileUrl
+
   if (isPrivate) {
     // For private files, generate a signed URL (expires in 1 hour)
     return await getSignedUrlFromR2(fileUrl, 3600)
@@ -263,6 +402,20 @@ export const getPreviewUrl = async (fileUrl: string, isPrivate: boolean = false)
   
   // For public files, return the public URL directly
   return fileUrl
+}
+
+export const getR2ObjectStream = async (fileReference: string, range?: string) => {
+  assertR2Configuration()
+  const key = getKeyFromR2Reference(fileReference)
+  const response = await r2Client.send(
+    new GetObjectCommand({
+      Bucket: R2_CONFIG.bucketName,
+      Key: key,
+      Range: range,
+    }),
+  )
+
+  return { key, response }
 }
 
 /**

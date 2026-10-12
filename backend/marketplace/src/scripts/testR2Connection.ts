@@ -1,121 +1,67 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3'
-import dotenv from 'dotenv'
+import {
+  DeleteObjectCommand,
+  GetObjectCommand,
+  HeadBucketCommand,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3'
 import { r2Client, R2_CONFIG } from '../config/r2.config'
+import { buildR2DeliveryUrl, getKeyFromR2Reference } from '../utils/r2Upload'
 
-dotenv.config()
+const requiredEnvironment = [
+  'R2_ENDPOINT',
+  'R2_ACCESS_KEY_ID',
+  'R2_SECRET_ACCESS_KEY',
+  'R2_BUCKET_NAME',
+  'R2_DELIVERY_BASE_URL',
+  'R2_URL_SIGNING_SECRET',
+]
 
-/**
- * Test script to verify R2 connection and configuration
- * Run: npx ts-node src/scripts/testR2Connection.ts
- */
-async function testR2Connection() {
-  console.log('\n🧪 Testing Cloudflare R2 Connection...\n')
+const assertEnvironment = () => {
+  const missing = requiredEnvironment.filter((key) => !process.env[key])
+  if (missing.length) throw new Error(`Missing R2 environment variables: ${missing.join(', ')}`)
+}
 
-  // Step 1: Check environment variables
-  console.log('📋 Configuration Check:')
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-  console.log(`Endpoint:      ${process.env.R2_ENDPOINT || '❌ NOT SET'}`)
-  console.log(`Bucket Name:   ${R2_CONFIG.bucketName || '❌ NOT SET'}`)
-  console.log(`Public URL:    ${R2_CONFIG.publicUrl || '❌ NOT SET'}`)
-  console.log(`Access Key ID: ${process.env.R2_ACCESS_KEY_ID ? '✅ Set' : '❌ NOT SET'}`)
-  console.log(
-    `Secret Key:    ${process.env.R2_SECRET_ACCESS_KEY ? '✅ Set' : '❌ NOT SET'}`,
-  )
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
+const testR2Connection = async () => {
+  assertEnvironment()
+  await r2Client.send(new HeadBucketCommand({ Bucket: R2_CONFIG.bucketName }))
 
-  // Check if all required variables are set
-  if (
-    !process.env.R2_ENDPOINT ||
-    !process.env.R2_ACCESS_KEY_ID ||
-    !process.env.R2_SECRET_ACCESS_KEY ||
-    !R2_CONFIG.bucketName
-  ) {
-    console.error('❌ Error: Missing required environment variables!')
-    console.log('\n📝 Please add these to your .env file:')
-    console.log('R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com')
-    console.log('R2_ACCESS_KEY_ID=your_access_key_id')
-    console.log('R2_SECRET_ACCESS_KEY=your_secret_access_key')
-    console.log('R2_BUCKET_NAME=kourier-boyz-uploads-dev')
-    console.log('R2_PUBLIC_URL=https://pub-xxxxx.r2.dev')
-    console.log('\n📖 See LOCAL_DEVELOPMENT_SETUP.md for detailed instructions\n')
-    process.exit(1)
-  }
+  const body = Buffer.from(`Kourier Boyz R2 check ${new Date().toISOString()}`)
+  const deliveryUrl = buildR2DeliveryUrl(`healthchecks/marketplace-${Date.now()}.txt`)
+  const key = getKeyFromR2Reference(deliveryUrl)
 
-  // Step 2: Test upload
-  console.log('📤 Testing file upload...')
   try {
-    const testContent = Buffer.from(
-      `Hello from Kourier Boyz! Test performed at ${new Date().toISOString()}`,
+    await r2Client.send(
+      new PutObjectCommand({
+        Bucket: R2_CONFIG.bucketName,
+        Key: key,
+        Body: body,
+        ContentType: 'text/plain',
+        CacheControl: 'private, no-store',
+      }),
     )
-    const testKey = `test/connection-test-${Date.now()}.txt`
 
-    const command = new PutObjectCommand({
-      Bucket: R2_CONFIG.bucketName,
-      Key: testKey,
-      Body: testContent,
-      ContentType: 'text/plain',
-    })
+    const response = await r2Client.send(
+      new GetObjectCommand({ Bucket: R2_CONFIG.bucketName, Key: key }),
+    )
+    const downloaded = Buffer.from(await response.Body!.transformToByteArray())
+    if (!downloaded.equals(body)) throw new Error('R2 read-back content did not match the upload')
 
-    await r2Client.send(command)
-
-    console.log('✅ Upload successful!\n')
-    console.log('📂 File Details:')
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.log(`Key:        ${testKey}`)
-    console.log(`Public URL: ${R2_CONFIG.publicUrl}/${testKey}`)
-    console.log(`Size:       ${testContent.length} bytes`)
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
-
-    console.log('🎉 Success! Your R2 configuration is working correctly.\n')
-    console.log('💡 Next steps:')
-    console.log('   1. Start your server: npm run dev')
-    console.log('   2. Open admin panel and try uploading a category image')
-    console.log('   3. Check your R2 bucket dashboard to see uploaded files\n')
-
-    console.log(`🔗 View your file: ${R2_CONFIG.publicUrl}/${testKey}`)
-    console.log('   (If public access is enabled)\n')
-
-    console.log('🗑️  You can delete the test file from your R2 bucket dashboard\n')
-  } catch (error: any) {
-    console.error('❌ Upload failed!\n')
-    console.error('Error details:')
-    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    console.error(`Name:    ${error.name}`)
-    console.error(`Message: ${error.message}`)
-    console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n')
-
-    console.log('🔍 Common issues:\n')
-
-    if (error.name === 'CredentialsProviderError' || error.message.includes('credentials')) {
-      console.log('   ⚠️  Invalid credentials')
-      console.log('   → Check R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY in .env')
-      console.log('   → Generate new API token in Cloudflare Dashboard\n')
-    } else if (error.name === 'NoSuchBucket') {
-      console.log('   ⚠️  Bucket not found')
-      console.log('   → Check R2_BUCKET_NAME matches your bucket name exactly')
-      console.log('   → Create bucket in Cloudflare R2 Dashboard\n')
-    } else if (error.message.includes('ENOTFOUND') || error.message.includes('network')) {
-      console.log('   ⚠️  Network/DNS error')
-      console.log('   → Check your internet connection')
-      console.log('   → Verify R2_ENDPOINT format is correct')
-      console.log('   → Should be: https://<account-id>.r2.cloudflarestorage.com\n')
-    } else {
-      console.log('   → Check your R2 configuration in .env file')
-      console.log('   → See LOCAL_DEVELOPMENT_SETUP.md for help\n')
-    }
-
-    process.exit(1)
+    console.log(
+      JSON.stringify({
+        bucket: R2_CONFIG.bucketName,
+        keyPrefix: key.split('/').slice(0, 2).join('/'),
+        head: true,
+        put: true,
+        get: true,
+        deliveryReference: true,
+      }),
+    )
+  } finally {
+    await r2Client.send(new DeleteObjectCommand({ Bucket: R2_CONFIG.bucketName, Key: key }))
   }
 }
 
-// Run the test
-testR2Connection()
-  .then(() => {
-    console.log('✨ Test completed successfully!\n')
-    process.exit(0)
-  })
-  .catch((error) => {
-    console.error('\n💥 Unexpected error:', error)
-    process.exit(1)
-  })
-
+testR2Connection().catch((error) => {
+  console.error('R2 connection check failed:', error?.message || error)
+  process.exit(1)
+})

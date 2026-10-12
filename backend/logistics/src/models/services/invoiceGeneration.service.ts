@@ -965,27 +965,47 @@ export const generateInvoiceForUser = async (
     stream.on('error', (err) => reject(err))
   })
 
-  // Upload to R2
-  const pdfUpload = await presignUpload({
-    filename: `${invoiceNo}.pdf`,
-    contentType: 'application/pdf',
-    userId,
-    folderKey: 'invoices',
-  })
-  const csvUpload = await presignUpload({
-    filename: `${invoiceNo}.csv`,
-    contentType: 'text/csv',
-    userId,
-    folderKey: 'invoices',
-  })
+  const [pdfUpload, csvUpload] = await (async () => {
+    try {
+      const pdfUploadResult = await presignUpload({
+        filename: `${invoiceNo}.pdf`,
+        contentType: 'application/pdf',
+        userId,
+        folderKey: 'invoices',
+      })
+      const csvUploadResult = await presignUpload({
+        filename: `${invoiceNo}.csv`,
+        contentType: 'text/csv',
+        userId,
+        folderKey: 'invoices',
+      })
 
-  const pdfBuffer = fs.readFileSync(pdfPath)
-  const csvBuffer = fs.readFileSync(csvPath)
+      const [pdfResponse, csvResponse] = await Promise.all([
+        fetch(pdfUploadResult.uploadUrl, {
+          method: 'PUT',
+          body: fs.readFileSync(pdfPath),
+          headers: { 'Content-Type': 'application/pdf' },
+        }),
+        fetch(csvUploadResult.uploadUrl, {
+          method: 'PUT',
+          body: fs.readFileSync(csvPath),
+          headers: { 'Content-Type': 'text/csv' },
+        }),
+      ])
 
-  await Promise.all([
-    fetch(pdfUpload.uploadUrl, { method: 'PUT', body: pdfBuffer }),
-    fetch(csvUpload.uploadUrl, { method: 'PUT', body: csvBuffer }),
-  ])
+      if (!pdfResponse.ok || !csvResponse.ok) {
+        throw new Error(
+          `R2 invoice upload failed (PDF ${pdfResponse.status}, CSV ${csvResponse.status})`,
+        )
+      }
+
+      return [pdfUploadResult, csvUploadResult] as const
+    } finally {
+      for (const temporaryPath of [pdfPath, csvPath]) {
+        if (fs.existsSync(temporaryPath)) fs.unlinkSync(temporaryPath)
+      }
+    }
+  })()
 
   // Extract order numbers from all orders
   const orderNumbers = allOrders.map((o) => o.order_number || o.order_id || '').filter(Boolean)

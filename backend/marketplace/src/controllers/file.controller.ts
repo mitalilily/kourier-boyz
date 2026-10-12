@@ -1,10 +1,60 @@
 import { Request, Response } from 'express'
 import {
+  decodeR2DeliveryToken,
   downloadFromR2,
   getFileMetadataFromR2,
   getPreviewUrl,
+  getR2ObjectStream,
   getSignedUrlFromR2,
+  isPrivateR2Object,
 } from '../utils/r2Upload'
+
+export const streamDeliveryObject = async (req: Request, res: Response) => {
+  try {
+    const token = req.params.token
+    if (!token) return res.status(400).json({ error: 'File token is required' })
+
+    const key = decodeR2DeliveryToken(token)
+    const range = typeof req.headers.range === 'string' ? req.headers.range : undefined
+    const { response } = await getR2ObjectStream(key, range)
+    const body = response.Body as any
+
+    res.status(response.ContentRange ? 206 : 200)
+    res.setHeader('Content-Type', response.ContentType || 'application/octet-stream')
+    res.setHeader('Content-Disposition', response.ContentDisposition || 'inline')
+    res.setHeader('Accept-Ranges', response.AcceptRanges || 'bytes')
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    res.setHeader(
+      'Cache-Control',
+      isPrivateR2Object(key) ? 'private, no-store' : response.CacheControl || 'public, max-age=86400',
+    )
+    if (response.ContentLength !== undefined) {
+      res.setHeader('Content-Length', String(response.ContentLength))
+    }
+    if (response.ContentRange) res.setHeader('Content-Range', response.ContentRange)
+    if (response.ETag) res.setHeader('ETag', response.ETag)
+
+    if (body && typeof body.pipe === 'function') {
+      body.on('error', (error: Error) => {
+        console.error('R2 delivery stream failed:', error)
+        if (!res.headersSent) res.status(500).end()
+        else res.destroy(error)
+      })
+      body.pipe(res)
+      return
+    }
+
+    const bytes = body ? await body.transformToByteArray() : new Uint8Array()
+    res.send(Buffer.from(bytes))
+  } catch (error: any) {
+    const notFound =
+      error?.name === 'NoSuchKey' ||
+      error?.name === 'NotFound' ||
+      error?.$metadata?.httpStatusCode === 404
+    if (!notFound) console.error('Error streaming R2 delivery object:', error)
+    res.status(notFound ? 404 : 403).json({ error: notFound ? 'File not found' : 'Invalid file link' })
+  }
+}
 
 /**
  * Download a file from R2

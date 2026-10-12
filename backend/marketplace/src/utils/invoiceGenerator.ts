@@ -2573,13 +2573,13 @@ export const generateInvoice = async (
     doc.end()
     const pdfBuffer = await pdfPromise
 
-    // Upload to R2 (uploadToR2 throws if R2_PUBLIC_URL is not set)
+    // Upload to the private R2 bucket and return an application-signed delivery URL.
     const fileName = `invoices/${invoiceId}.pdf`
     const invoiceUrl = await uploadToR2(pdfBuffer, fileName, 'application/pdf', 'invoices')
 
     if (!invoiceUrl || !invoiceUrl.startsWith('http')) {
       throw new Error(
-        `Invoice upload failed: invalid URL returned (R2_PUBLIC_URL may be missing). Got: ${invoiceUrl}`,
+        `Invoice upload failed: invalid delivery URL returned. Got: ${invoiceUrl}`,
       )
     }
 

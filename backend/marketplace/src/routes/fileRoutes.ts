@@ -4,10 +4,14 @@ import {
   getFileMetadata,
   getPreview,
   getSignedUrl,
+  streamDeliveryObject,
   streamFile,
 } from '../controllers/file.controller'
 
 const router = Router()
+
+// Stable application-signed delivery URLs keep the R2 bucket private.
+router.get('/object/:token', streamDeliveryObject)
 
 // Download file
 router.get('/download', downloadFile)
