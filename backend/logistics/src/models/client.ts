@@ -16,9 +16,23 @@ if (!process.env.DATABASE_URL) {
   throw new Error('❌ DATABASE_URL is missing')
 }
 
+const databaseHostname = (() => {
+  try {
+    return new URL(process.env.DATABASE_URL!).hostname.toLowerCase()
+  } catch {
+    return ''
+  }
+})()
+
+const localDatabaseHosts = new Set(['localhost', '127.0.0.1', '::1'])
+const configuredSsl = process.env.PG_SSL?.trim().toLowerCase()
+const useDatabaseSsl = configuredSsl
+  ? ['1', 'true', 'require', 'required'].includes(configuredSsl)
+  : env === 'production' && !localDatabaseHosts.has(databaseHostname)
+
 const poolConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: env === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: useDatabaseSsl ? { rejectUnauthorized: false } : false,
   max: Number(process.env.PG_POOL_MAX || 10),
   idleTimeoutMillis: Number(process.env.PG_IDLE_TIMEOUT_MS || 30000),
   connectionTimeoutMillis: Number(process.env.PG_CONNECTION_TIMEOUT_MS || 10000),
