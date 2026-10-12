@@ -5,6 +5,9 @@ const path = require('node:path')
 
 const deployRoot = process.env.KB_DEPLOY_ROOT || '/opt/apps/kourier-boyz/current'
 const sharedRoot = process.env.KB_SHARED_ROOT || '/opt/apps/kourier-boyz/shared'
+const runtimeRoot = process.env.KB_RUNTIME_ROOT || '/opt/apps/kourier-boyz/runtime'
+const nodeInterpreter =
+  process.env.KB_NODE_INTERPRETER || path.join(runtimeRoot, 'node', 'bin', 'node')
 
 const readEnvFile = (filePath) => {
   if (!fs.existsSync(filePath)) return {}
@@ -36,6 +39,7 @@ const staticApp = (name, port, staticRoot, fallbacks) => ({
   cwd: deployRoot,
   instances: 1,
   exec_mode: 'fork',
+  interpreter: nodeInterpreter,
   autorestart: true,
   max_memory_restart: '300M',
   env: {
@@ -55,6 +59,7 @@ module.exports = {
       cwd: path.join(deployRoot, 'backend'),
       instances: 1,
       exec_mode: 'fork',
+      interpreter: nodeInterpreter,
       autorestart: true,
       max_memory_restart: '1500M',
       kill_timeout: 15000,
