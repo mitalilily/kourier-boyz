@@ -44,6 +44,18 @@ const phoneFormSource = fs.readFileSync(
   path.join(repositoryRoot, 'seller-client/apps/logistics/src/components/auth/PhoneForm.tsx'),
   'utf8',
 )
+const marketplaceLoginSource = fs.readFileSync(
+  path.join(repositoryRoot, 'seller-client/apps/marketplace/src/pages/Login.tsx'),
+  'utf8',
+)
+const marketplaceAuthStoreSource = fs.readFileSync(
+  path.join(repositoryRoot, 'seller-client/apps/marketplace/src/store/authStore.ts'),
+  'utf8',
+)
+const marketplaceStoreEntrySource = fs.readFileSync(
+  path.join(repositoryRoot, 'seller-client/apps/marketplace/src/pages/StoreEntry.tsx'),
+  'utf8',
+)
 const emailSenderSource = fs.readFileSync(
   path.join(repositoryRoot, 'backend/logistics/src/utils/emailSender.ts'),
   'utf8',
@@ -58,5 +70,9 @@ assert.doesNotMatch(phoneFormSource, /demoOtp|Demo access code/i)
 assert.match(authControllerSource, /await sendVerificationEmail\(normalizedEmail, otp\)/)
 assert.match(emailSenderSource, /throw new Error\('Email transporter is not configured'\)/)
 assert.doesNotMatch(phoneFormSource, /Console OTP/)
+assert.doesNotMatch(phoneFormSource, /Enter demo console|startDemo/)
+assert.doesNotMatch(marketplaceLoginSource, /Enter demo|DEMO_SELLER|startDemo/)
+assert.doesNotMatch(marketplaceAuthStoreSource, /startDemo|DEMO_SELLER_PASSWORD/)
+assert.doesNotMatch(marketplaceStoreEntrySource, /Preview seller workspace|startDemo/)
 
 console.log('Authentication configuration safety checks passed')

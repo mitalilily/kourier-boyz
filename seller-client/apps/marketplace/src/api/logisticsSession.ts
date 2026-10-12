@@ -3,7 +3,6 @@ import type { User } from '../store/authStore'
 import { logisticsApiUrl, marketplaceSellerApiUrl } from './runtime'
 
 export const MARKETPLACE_REGISTRATION_PROFILE_KEY = 'kb_marketplace_registration_profile'
-const DEMO_LOGISTICS_SESSION_KEY = 'kourier_boyz_demo_logistics'
 
 export type LogisticsRegistrationProfile = {
   userId: string
@@ -58,9 +57,6 @@ const requestLinkedSession = async (accessToken: string) => {
   )
   return data as Exclude<LogisticsMarketplaceSession, { status: 'unavailable' }>
 }
-
-export const isDemoCourierSession = () =>
-  localStorage.getItem(DEMO_LOGISTICS_SESSION_KEY) === '1'
 
 export const resumeMarketplaceFromCourier = async (): Promise<LogisticsMarketplaceSession> => {
   let accessToken = localStorage.getItem('cc_access')

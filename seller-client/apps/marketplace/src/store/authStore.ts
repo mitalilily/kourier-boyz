@@ -103,68 +103,20 @@ interface AuthState {
   user: User | null
   setAuth: (token: string, user: User) => void
   setUser: (user: User) => void
-  startDemo: () => void
   logout: () => void
 }
 
-export const DEMO_SELLER_TOKEN = 'kourier-boyz-demo-seller'
-export const DEMO_SELLER_EMAIL = 'demo.seller@kourierboyz.com'
-export const DEMO_SELLER_PASSWORD = 'Demo@123'
-
-export const isDemoSellerSession = () =>
-  typeof window !== 'undefined' && localStorage.getItem('seller_token') === DEMO_SELLER_TOKEN
-
-const DEMO_SELLER: User = {
-  id: 'demo-seller-001',
-  name: 'Aarav Mehta',
-  email: DEMO_SELLER_EMAIL,
-  phone: '9876543210',
-  role: 'seller',
-  businessName: 'Northstar Living',
-  businessType: 'Proprietorship',
-  storeDescription: 'Considered home, travel, and everyday essentials.',
-  storeLogo: '/store/brand/kourier-boyz-mark.png',
-  shippingPolicy: 'Orders are packed within one business day and dispatched with tracking.',
-  returnPolicy: 'Unused products may be returned within seven days of delivery.',
-  storeEmail: DEMO_SELLER_EMAIL,
-  storePhone: '9876543210',
-  supportEmail: 'support@kourierboyz.com',
-  sellerAgreementSigned: true,
-  returnRefundPolicyAccepted: true,
-  addressLine1: '21 Market Street',
-  city: 'New Delhi',
-  state: 'Delhi',
-  postalCode: '110001',
-  country: 'India',
-  isApproved: true,
-  kycSubmitted: true,
-  kycStatus: 'APPROVED',
-  isEmailVerified: true,
-  isPhoneVerified: true,
-  sellerLifecycleStatus: 'ACTIVE',
-  storeStatus: 'active',
-  onboardingTourCompletedAt: new Date().toISOString(),
-  isDemo: true,
-  defaultShippingRate: 69,
-  pickupAddresses: [
-    {
-      _id: 'demo-warehouse-001',
-      warehouseName: 'Northstar Delhi Hub',
-      addressLine1: '21 Market Street',
-      city: 'New Delhi',
-      state: 'Delhi',
-      postalCode: '110001',
-      country: 'India',
-      contactName: 'Aarav Mehta',
-      contactPhone: '9876543210',
-      isDefault: true,
-    },
-  ],
-}
+const LEGACY_DEMO_SELLER_TOKEN = 'kourier-boyz-demo-seller'
 
 const getStoredToken = (): string | null => {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem('seller_token')
+  const token = localStorage.getItem('seller_token')
+  if (token === LEGACY_DEMO_SELLER_TOKEN) {
+    localStorage.removeItem('seller_token')
+    localStorage.removeItem('seller_data')
+    return null
+  }
+  return token
 }
 
 // Helper function to safely parse stored user data
@@ -175,7 +127,13 @@ const getStoredUser = (): User | null => {
     if (!storedData || storedData === 'undefined' || storedData === 'null') {
       return null
     }
-    return JSON.parse(storedData)
+    const user = JSON.parse(storedData) as User
+    if (user.isDemo) {
+      localStorage.removeItem('seller_token')
+      localStorage.removeItem('seller_data')
+      return null
+    }
+    return user
   } catch (error) {
     console.error('Error parsing stored user data:', error)
     localStorage.removeItem('seller_data')
@@ -187,7 +145,6 @@ const API_BASE_URL = marketplaceSellerApiUrl
 
 const sendLogoutRequest = async (): Promise<void> => {
   if (typeof window === 'undefined') return
-  if (isDemoSellerSession()) return
   try {
     const token = localStorage.getItem('seller_token')
     await axios.post(
@@ -218,13 +175,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.setItem('seller_data', JSON.stringify(user))
     }
     set({ user })
-  },
-  startDemo: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('seller_token', DEMO_SELLER_TOKEN)
-      localStorage.setItem('seller_data', JSON.stringify(DEMO_SELLER))
-    }
-    set({ token: DEMO_SELLER_TOKEN, user: DEMO_SELLER })
   },
   logout: () => {
     if (typeof window !== 'undefined') {

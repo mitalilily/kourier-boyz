@@ -4,18 +4,12 @@ import {
   LockOutlined,
   MailOutlined,
   StopOutlined,
-  UserOutlined,
 } from '@ant-design/icons'
 import { Alert, App, Button, Card, Checkbox, Divider, Form, Input, Spin, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLogin } from '../api/authQueries'
 import MarketplacePublicShell from '../components/MarketplacePublicShell'
-import {
-  DEMO_SELLER_EMAIL,
-  DEMO_SELLER_PASSWORD,
-  useAuthStore,
-} from '../store/authStore'
 
 const { Title, Text, Paragraph } = Typography
 
@@ -25,7 +19,6 @@ const REMEMBER_CHECKED_KEY = 'seller_remember_checked'
 const Login = () => {
   const { message } = App.useApp()
   const navigate = useNavigate()
-  const startDemo = useAuthStore((state) => state.startDemo)
   const loginMutation = useLogin()
   const googleOAuthMutation = { isPending: false }
   const [form] = Form.useForm()
@@ -55,7 +48,7 @@ const Login = () => {
   }, [loginMutation.isSuccess, navigate, message])
 
   const handleGoogleLogin = () => {
-    message.info('Use email and password to access the demo seller panel.')
+    message.info('Google sign-in is not available. Use your seller email and password.')
   }
 
   // Keep error state when mutation resets (don't clear on success)
@@ -114,13 +107,6 @@ const Login = () => {
     }
 
     try {
-      if (values.email.trim().toLowerCase() === DEMO_SELLER_EMAIL && values.password === DEMO_SELLER_PASSWORD) {
-        startDemo()
-        message.success('Welcome to the demo seller workspace')
-        navigate('/dashboard', { replace: true })
-        return
-      }
-
       await loginMutation.mutateAsync(loginData)
     } catch (error: unknown) {
       // Error is handled by useEffect, but we also handle it here for immediate feedback
@@ -158,12 +144,6 @@ const Login = () => {
         message.error(errorMessage || 'Login failed')
       }
     }
-  }
-
-  const handleDemoLogin = () => {
-    startDemo()
-    message.success('Welcome to the demo seller workspace')
-    navigate('/dashboard', { replace: true })
   }
 
   return (
@@ -339,20 +319,6 @@ const Login = () => {
                 }}
               />
             )}
-
-            <div className="kb-demo-login-panel">
-              <div className="kb-demo-login-icon">
-                <UserOutlined />
-              </div>
-              <div className="kb-demo-login-copy">
-                <strong>Demo seller account</strong>
-                <span>Sample catalogue, orders, analytics, and settings are ready to explore.</span>
-                <code>{DEMO_SELLER_EMAIL} · {DEMO_SELLER_PASSWORD}</code>
-              </div>
-              <Button type="default" onClick={handleDemoLogin}>
-                Enter demo
-              </Button>
-            </div>
 
             {/* Form */}
             <Form

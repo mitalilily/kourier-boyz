@@ -2,7 +2,6 @@ import { LoadingOutlined } from '@ant-design/icons'
 import { Spin } from 'antd'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
-  isDemoCourierSession,
   resumeMarketplaceFromCourier,
   saveRegistrationProfile,
 } from '../api/logisticsSession'
@@ -13,7 +12,6 @@ type CourierSessionBridgeProps = { children: ReactNode }
 const CourierSessionBridge = ({ children }: CourierSessionBridgeProps) => {
   const token = useAuthStore((state) => state.token)
   const setAuth = useAuthStore((state) => state.setAuth)
-  const startDemo = useAuthStore((state) => state.startDemo)
   const [checking, setChecking] = useState(!token)
   const attempted = useRef(false)
 
@@ -24,12 +22,6 @@ const CourierSessionBridge = ({ children }: CourierSessionBridgeProps) => {
     }
 
     attempted.current = true
-    if (isDemoCourierSession()) {
-      startDemo()
-      setChecking(false)
-      return
-    }
-
     void resumeMarketplaceFromCourier()
       .then((session) => {
         if (session.status === 'linked') {
@@ -43,7 +35,7 @@ const CourierSessionBridge = ({ children }: CourierSessionBridgeProps) => {
         console.error('Courier marketplace session bridge failed:', error)
       })
       .finally(() => setChecking(false))
-  }, [setAuth, startDemo, token])
+  }, [setAuth, token])
 
   if (!checking) return <>{children}</>
 

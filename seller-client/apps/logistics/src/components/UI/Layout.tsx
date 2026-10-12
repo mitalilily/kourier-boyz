@@ -12,7 +12,7 @@ export default function Layout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [mobileOpen, setMobileOpen] = useState(false)
   const [sidebarPinned, setSidebarPinned] = useState(false)
-  const { user, isDemo } = useAuth()
+  const { user } = useAuth()
   const isAdminWorkspace =
     user.role === 'admin' || user.role === 'employee' || Boolean(user.employeeId)
   const isOrderCreatePage = location.pathname === '/orders/create'
@@ -84,24 +84,6 @@ export default function Layout() {
           pinned={sidebarPinned}
           onPinChange={setSidebarPinned}
         />
-
-        {isDemo && (
-          <Box
-            sx={{
-              px: { xs: 1.4, md: 2.2 },
-              py: 0.85,
-              color: '#43320E',
-              fontSize: '0.78rem',
-              fontWeight: 800,
-              borderBottom: '1px solid rgba(183,129,21,0.24)',
-              background:
-                'linear-gradient(90deg, rgba(255,247,214,0.98), rgba(255,255,255,0.98), rgba(235,244,255,0.98))',
-              boxShadow: '0 6px 18px rgba(113,83,19,0.06)',
-            }}
-          >
-            Demo seller workspace · approved account · onboarding complete · changes stay in this browser
-          </Box>
-        )}
 
         <Box
           component="main"

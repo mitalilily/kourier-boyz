@@ -1,6 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getDemoProducts } from '../demo/marketplaceData'
-import { isDemoSellerSession } from '../store/authStore'
 import {
   adjustProductStock,
   bulkDeleteProducts,
@@ -35,12 +33,10 @@ export const useProducts = (params?: {
   order?: string
   enabled?: boolean
 }) => {
-  const isDemo = isDemoSellerSession()
   return useQuery({
     queryKey: ['products', params],
     queryFn: () => getProducts(params),
-    enabled: !isDemo && params?.enabled !== false,
-    initialData: isDemo ? getDemoProducts(params) : undefined,
+    enabled: params?.enabled !== false,
   })
 }
 
@@ -50,20 +46,10 @@ export const useLowStockProducts = (params?: {
   threshold?: number
   enabled?: boolean
 }) => {
-  const isDemo = isDemoSellerSession()
-  const demoData = getDemoProducts({ page: params?.page, limit: params?.limit })
-  demoData.products = demoData.products.filter((product) => {
-    const stock = product.hasVariants ? product.totalStock || 0 : product.stock || 0
-    return stock <= (product.lowStockThreshold ?? params?.threshold ?? 5)
-  })
-  demoData.pagination.total = demoData.products.length
-  demoData.pagination.pages = demoData.products.length ? 1 : 0
-
   return useQuery({
     queryKey: ['products', 'low-stock', params],
     queryFn: () => getLowStockProducts(params),
-    enabled: !isDemo && params?.enabled !== false,
-    initialData: isDemo ? demoData : undefined,
+    enabled: params?.enabled !== false,
   })
 }
 

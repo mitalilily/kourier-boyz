@@ -1,13 +1,11 @@
 import {
   ArrowRightOutlined,
   CheckCircleFilled,
-  EyeOutlined,
   ShopOutlined,
 } from '@ant-design/icons'
 import { Button } from 'antd'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import MarketplacePublicShell from '../components/MarketplacePublicShell'
-import { useAuthStore } from '../store/authStore'
 
 const benefits = [
   'List products and control inventory',
@@ -16,14 +14,6 @@ const benefits = [
 ]
 
 const StoreEntry = () => {
-  const navigate = useNavigate()
-  const startDemo = useAuthStore((state) => state.startDemo)
-
-  const handleDemo = () => {
-    startDemo()
-    navigate('/dashboard')
-  }
-
   return (
     <MarketplacePublicShell>
       <main className="kb-store-entry-page">
@@ -66,9 +56,6 @@ const StoreEntry = () => {
                 Open your store <ArrowRightOutlined />
               </Button>
             </Link>
-            <Button size="large" icon={<EyeOutlined />} onClick={handleDemo}>
-              Preview seller workspace
-            </Button>
             <Link to="/login" className="kb-store-entry-inline-link">
               Already sell here? Sign in
             </Link>

@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   FormControlLabel,
   Link,
   Stack,
@@ -9,9 +8,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
-import { FiMail, FiUser } from 'react-icons/fi'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/auth/AuthContext'
+import { FiMail } from 'react-icons/fi'
 import { useRequestOtp } from '../../hooks/useOTP'
 import { TERMS_AND_CONDITIONS } from '../../utils/constants'
 import CustomIconLoadingButton from '../UI/button/CustomLoadingButton'
@@ -24,7 +21,6 @@ import PasswordLoginForm from './PasswordLoginForm'
 
 const BRAND_ORANGE = '#B78115'
 const BRAND_BLUE = '#8F650F'
-const DEMO_SELLER_EMAIL = 'merchant@kourier-boyz.local'
 
 const primaryButtonStyles = {
   width: '100%',
@@ -74,8 +70,6 @@ const authInputSx = {
 }
 
 export default function PhoneForm() {
-  const navigate = useNavigate()
-  const { startDemo } = useAuth()
   const activeEmail = sessionStorage.getItem('activeEmail')
   const [step, setStep] = useState<number>(0)
   const [preferredLoginMethod, setPreferredLoginMethod] = useState<'phone' | 'password'>('phone')
@@ -188,49 +182,6 @@ export default function PhoneForm() {
             topMargin={false}
             sx={authInputSx}
           />
-
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: { xs: 'flex-start', sm: 'center' },
-              justifyContent: 'space-between',
-              flexDirection: { xs: 'column', sm: 'row' },
-              gap: 1.2,
-              px: 1.5,
-              py: 1.25,
-              border: '1px solid #DED7C7',
-              borderRadius: 1.5,
-              backgroundColor: '#FBFAF7',
-            }}
-          >
-            <Box>
-              <Typography sx={{ color: '#202321', fontSize: '0.82rem', fontWeight: 800 }}>
-                Demo seller
-              </Typography>
-              <Typography sx={{ color: '#626966', fontSize: '0.76rem' }}>
-                {DEMO_SELLER_EMAIL} · onboarding complete
-              </Typography>
-            </Box>
-            <Button
-              type="button"
-              size="small"
-              startIcon={<FiUser size={14} />}
-              onClick={() => {
-                startDemo()
-                navigate('/home', { replace: true })
-              }}
-              sx={{
-                color: BRAND_BLUE,
-                borderColor: '#CDB56E',
-                fontWeight: 800,
-                textTransform: 'none',
-                whiteSpace: 'nowrap',
-              }}
-              variant="outlined"
-            >
-              Enter demo console
-            </Button>
-          </Box>
 
           <FormControlLabel
             sx={{
