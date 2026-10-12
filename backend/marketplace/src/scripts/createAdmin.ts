@@ -6,27 +6,31 @@ import User from '../models/User'
 
 dotenv.config()
 
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@kourierboyz.com'
+const ADMIN_PASSWORD =
+  process.env.SEED_ADMIN_PASSWORD ||
+  (process.env.NODE_ENV === 'production' ? '' : 'KourierBoyz2026!')
+
 const createAdmin = async () => {
   try {
     if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL not defined in .env')
+    if (!ADMIN_PASSWORD) throw new Error('SEED_ADMIN_PASSWORD is required in production')
     await mongoose.connect(process.env.DATABASE_URL)
     console.log('Connected to PostgreSQL')
 
-    // Check if admin already exists (check both possible emails for backward compatibility)
-    const existingAdmin =
-      (await User.findOne({ email: 'admin@kourierboyz.com' }))
+    const existingAdmin = await User.findOne({ email: ADMIN_EMAIL })
     if (existingAdmin) {
       console.log('Admin user already exists:', existingAdmin.email)
       process.exit(0)
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash('Admin@123!', 10)
+    const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 10)
 
     // Create admin user
     const adminUser = await User.create({
       name: 'Super Admin',
-      email: 'admin@kourierboyz.com',
+      email: ADMIN_EMAIL,
       password: hashedPassword,
       role: 'super-admin',
       isEmailVerified: true, // Auto-verify admin users

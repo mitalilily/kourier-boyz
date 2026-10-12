@@ -64,10 +64,18 @@ export const seedAdmin = async ({
   return newUser as User
 }
 
+const productionPassword = process.env.SEED_ADMIN_PASSWORD
+const adminPassword =
+  productionPassword || (process.env.NODE_ENV === 'production' ? '' : 'KourierBoyz2026!')
+
+if (!adminPassword) {
+  throw new Error('SEED_ADMIN_PASSWORD is required in production')
+}
+
 seedAdmin({
-  phone: '+916283315911', // valid Indian phone format
-  email: 'admin@kourierboyz.com',
-  password: 'KourierBoyz2026!',
+  phone: process.env.SEED_ADMIN_PHONE || '+916283315911',
+  email: process.env.SEED_ADMIN_EMAIL || 'admin@kourierboyz.com',
+  password: adminPassword,
   role: 'admin',
 })
   .then((user) => {

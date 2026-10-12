@@ -14,9 +14,11 @@ import { ensurePlanSplitSetup } from '../models/services/plan.service'
 const env = process.env.NODE_ENV || 'development'
 dotenv.config({ path: path.resolve(__dirname, `../../.env.${env}`) })
 
-const ADMIN_EMAIL = 'admin@kourier-boyz.local'
+const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL || 'admin@kourier-boyz.local'
 const LEGACY_ADMIN_EMAIL = 'admin@kourier-boyz.local'
-const ADMIN_PASSWORD = 'KourierBoyz2026!'
+const ADMIN_PASSWORD =
+  process.env.SEED_ADMIN_PASSWORD ||
+  (process.env.NODE_ENV === 'production' ? '' : 'KourierBoyz2026!')
 const MERCHANT_EMAIL = 'merchant@kourier-boyz.local'
 const MERCHANT_PHONE = '+919876543210'
 
@@ -267,6 +269,7 @@ const ensureDemoInvoice = async (sellerId: string) => {
 }
 
 async function main() {
+  if (!ADMIN_PASSWORD) throw new Error('SEED_ADMIN_PASSWORD is required in production')
   console.log('Setting up demo auth and invoice data...')
   await ensureBasicPlan('b2c', 'Default B2C plan assigned to demo users')
   await ensureBasicPlan('b2b', 'Default B2B plan assigned to demo users')
