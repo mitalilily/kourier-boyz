@@ -90,7 +90,7 @@ const LatestBlogPosts: React.FC = () => {
           <Button
             onClick={() => navigate('/blog')}
             variant="outline"
-            className="hidden sm:flex items-center gap-2 rounded-full border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-700 transition-all duration-300"
+            className="hidden sm:flex items-center gap-2 rounded-full border-2 border-[#B78115] text-[#8F650F] hover:bg-[#FFF8E8] hover:border-[#8F650F] transition-all duration-300"
           >
             View All
             <ChevronRight className="w-4 h-4" />
@@ -210,7 +210,7 @@ const LatestBlogPosts: React.FC = () => {
           <Button
             onClick={() => navigate('/blog')}
             variant="outline"
-            className="flex items-center gap-2 rounded-full border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-700 transition-all duration-300"
+            className="flex items-center gap-2 rounded-full border-2 border-[#B78115] text-[#8F650F] hover:bg-[#FFF8E8] hover:border-[#8F650F] transition-all duration-300"
           >
             View All Blog Posts
             <ChevronRight className="w-4 h-4" />

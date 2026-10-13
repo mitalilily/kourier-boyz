@@ -608,7 +608,7 @@ const DealsPage: React.FC = () => {
                   onClick={() => setSort(value)}
                   className={`rounded-full border px-3 py-1 transition ${
                     sort === value
-                      ? "border-indigo-500 bg-indigo-50 text-indigo-600"
+                      ? "border-[#B78115] bg-[#FFF8E8] text-[#8F650F]"
                       : "border-slate-200 text-slate-600 hover:border-slate-300"
                   }`}
                 >
@@ -619,7 +619,7 @@ const DealsPage: React.FC = () => {
                 <SheetTrigger asChild>
                   <Button
                     variant="secondary"
-                    className="flex w-full justify-center rounded-full border border-slate-200 bg-white/60 text-indigo-600 shadow-sm hover:border-indigo-300 hover:bg-white lg:hidden"
+                    className="flex w-full justify-center rounded-full border border-slate-200 bg-white/60 text-[#8F650F] shadow-sm hover:border-[#D9B95F] hover:bg-white lg:hidden"
                     aria-label="Open filters"
                   >
                     <Filter className="mr-2 h-4 w-4" />
@@ -705,7 +705,7 @@ const DealsPage: React.FC = () => {
                       </div>
                       <Button
                         variant="secondary"
-                        className="rounded-full md:hidden flex border border-slate-200 bg-white text-indigo-600 hover:bg-indigo-50"
+                        className="rounded-full md:hidden flex border border-slate-200 bg-white text-[#8F650F] hover:bg-[#FFF8E8]"
                         onClick={() => setIsFiltersOpen(true)}
                       >
                         Review filters

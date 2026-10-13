@@ -444,14 +444,14 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
                                     }
                                     className={`flex items-center gap-2 rounded-full border px-2 py-1 text-xs transition-all ${
                                       isSelected
-                                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
+                                        ? 'border-[#B78115] bg-[#FFF8E8] text-[#8F650F]'
                                         : 'border-slate-200 bg-white text-slate-600'
                                     }`}
                                     title={value.value}
                                   >
                                     <span
                                       className={`h-4 w-4 rounded-full border ${
-                                        isSelected ? 'border-indigo-500' : 'border-slate-200'
+                                        isSelected ? 'border-[#B78115]' : 'border-slate-200'
                                       }`}
                                       style={{
                                         backgroundColor:

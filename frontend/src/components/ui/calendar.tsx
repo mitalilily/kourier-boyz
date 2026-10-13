@@ -60,7 +60,7 @@ function Calendar({
           defaultClassNames.dropdowns,
         ),
         dropdown_root: cn(
-          'has-focus:border-purple-500 border-slate-200 shadow-sm has-focus:ring-purple-500/20 has-focus:ring-2 relative rounded-xl bg-white text-gray-900 min-w-[90px] px-4 py-2 text-sm font-medium hover:bg-purple-50 hover:border-purple-300 transition-colors',
+          'has-focus:border-[#B78115] border-slate-200 shadow-sm has-focus:ring-[#B78115]/20 has-focus:ring-2 relative rounded-xl bg-white text-gray-900 min-w-[90px] px-4 py-2 text-sm font-medium hover:bg-[#FFF8E8] hover:border-[#D9B95F] transition-colors',
           defaultClassNames.dropdown_root,
         ),
         dropdown: cn('bg-popover absolute inset-0 opacity-0', defaultClassNames.dropdown),
@@ -91,7 +91,7 @@ function Calendar({
         range_middle: cn('rounded-none', defaultClassNames.range_middle),
         range_end: cn('bg-accent rounded-r-md', defaultClassNames.range_end),
         today: cn(
-          'bg-purple-50 text-purple-700 rounded-xl font-semibold data-[selected=true]:rounded-xl data-[selected=true]:bg-purple-600 data-[selected=true]:text-white',
+          'bg-[#FFF8E8] text-[#8F650F] rounded-xl font-semibold data-[selected=true]:rounded-xl data-[selected=true]:bg-[#B78115] data-[selected=true]:text-white',
           defaultClassNames.today,
         ),
         outside: cn(
@@ -163,7 +163,7 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        'data-[selected-single=true]:bg-purple-600 data-[selected-single=true]:text-white data-[range-middle=true]:bg-purple-100 data-[range-middle=true]:text-purple-700 data-[range-start=true]:bg-purple-600 data-[range-start=true]:text-white data-[range-end=true]:bg-purple-600 data-[range-end=true]:text-white group-data-[focused=true]/day:border-purple-500 group-data-[focused=true]/day:ring-purple-500/20 flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-medium leading-none rounded-xl hover:bg-purple-50 hover:text-purple-700 transition-colors data-[range-end=true]:rounded-xl data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-xl group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-2 [&>span]:text-sm [&>span]:font-medium',
+        'data-[selected-single=true]:bg-[#B78115] data-[selected-single=true]:text-white data-[range-middle=true]:bg-[#F7EAC8] data-[range-middle=true]:text-[#725009] data-[range-start=true]:bg-[#B78115] data-[range-start=true]:text-white data-[range-end=true]:bg-[#B78115] data-[range-end=true]:text-white group-data-[focused=true]/day:border-[#B78115] group-data-[focused=true]/day:ring-[#B78115]/20 flex aspect-square h-auto w-full min-w-[--cell-size] flex-col gap-1 font-medium leading-none rounded-xl hover:bg-[#FFF8E8] hover:text-[#8F650F] transition-colors data-[range-end=true]:rounded-xl data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-xl group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-2 [&>span]:text-sm [&>span]:font-medium',
         defaultClassNames.day,
         className,
       )}

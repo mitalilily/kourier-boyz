@@ -502,7 +502,7 @@ const Couriers = () => {
                 <Button
                   flex={1}
                   size="md"
-                  colorScheme={formData?.businessType?.includes('b2b') ? 'purple' : 'gray'}
+                  colorScheme={formData?.businessType?.includes('b2b') ? 'brand' : 'gray'}
                   variant={formData?.businessType?.includes('b2b') ? 'solid' : 'outline'}
                   onClick={() => {
                     const currentTypes = formData?.businessType || ['b2c', 'b2b']

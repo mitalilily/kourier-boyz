@@ -518,17 +518,17 @@ const Dashboard = () => {
                 </Tooltip>
                 <Tooltip title="Click to view">
                   <div
-                    className="p-3 border rounded-lg hover:border-purple-400 transition-colors cursor-pointer hover:shadow-md"
+                    className="p-3 border rounded-lg hover:border-[#D9B95F] transition-colors cursor-pointer hover:shadow-md"
                     onClick={() => navigate('/reports/tickets')}
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="text-sm text-gray-600">Avg Resolution</div>
-                        <div className="text-xl font-bold text-purple-600">
+                        <div className="text-xl font-bold text-[#8F650F]">
                           {ticketMetrics.avgResolutionTime} hrs
                         </div>
                       </div>
-                      <LineChartOutlined className="text-xl text-purple-500" />
+                      <LineChartOutlined className="text-xl text-[#B78115]" />
                     </div>
                   </div>
                 </Tooltip>

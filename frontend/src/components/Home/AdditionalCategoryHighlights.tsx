@@ -215,7 +215,7 @@ const AdditionalCategoryHighlights: React.FC = () => {
             <Button
               variant="outline"
               size="icon"
-              className="absolute left-0 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-lg hover:bg-purple-50 hover:text-purple-600 lg:inline-flex"
+              className="absolute left-0 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-lg hover:bg-[#FFF8E8] hover:text-[#8F650F] lg:inline-flex"
               onClick={() => handleScroll(topRatedRef, 'left')}
               aria-label="Scroll left"
             >
@@ -226,7 +226,7 @@ const AdditionalCategoryHighlights: React.FC = () => {
             <Button
               variant="outline"
               size="icon"
-              className="absolute right-0 top-1/2 hidden translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-lg hover:bg-purple-50 hover:text-purple-600 lg:inline-flex"
+              className="absolute right-0 top-1/2 hidden translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-lg hover:bg-[#FFF8E8] hover:text-[#8F650F] lg:inline-flex"
               onClick={() => handleScroll(topRatedRef, 'right')}
               aria-label="Scroll right"
             >
@@ -320,7 +320,7 @@ const AdditionalCategoryHighlights: React.FC = () => {
               </div>
               <Button
                 variant="ghost"
-                className="hidden items-center gap-2 text-purple-600 hover:text-purple-700 lg:flex"
+                className="hidden items-center gap-2 text-[#8F650F] hover:text-[#725009] lg:flex"
                 onClick={() =>
                   handleNavigateToCategory(topRatedHighlight?.category?.slug, {
                     deal: 'top-rated',
@@ -342,7 +342,7 @@ const AdditionalCategoryHighlights: React.FC = () => {
 
             <Button
               variant="outline"
-              className="flex w-full justify-center gap-2 border-purple-200 text-purple-600 hover:text-purple-700 lg:hidden"
+              className="flex w-full justify-center gap-2 border-[#E4CF9C] text-[#8F650F] hover:bg-[#FFF8E8] hover:text-[#725009] lg:hidden"
               onClick={() =>
                 handleNavigateToCategory(topRatedHighlight?.category?.slug, {
                   deal: 'top-rated',

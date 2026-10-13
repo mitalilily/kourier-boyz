@@ -224,9 +224,9 @@ export const ShareButton = ({
             <Button
               variant="outline"
               onClick={() => handleShare('native')}
-              className="w-full flex items-center justify-center gap-2 p-2.5 h-auto hover:bg-purple-50 hover:border-purple-300 transition-colors rounded-lg"
+              className="w-full flex items-center justify-center gap-2 p-2.5 h-auto hover:bg-[#FFF8E8] hover:border-[#D9B95F] transition-colors rounded-lg"
             >
-              <Share2 className="w-4 h-4 text-purple-600" />
+              <Share2 className="w-4 h-4 text-[#8F650F]" />
               <span className="text-sm font-medium">More Options</span>
             </Button>
           )}

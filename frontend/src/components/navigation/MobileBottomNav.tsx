@@ -234,7 +234,7 @@ const MobileBottomNav = () => {
                       const Icon = link.icon
                       const iconTone =
                         link.labelKey === 'navigation.profile'
-                          ? 'text-purple-500'
+                          ? 'text-[#B78115]'
                           : 'text-slate-500'
                       return (
                         <Button

@@ -493,7 +493,7 @@ const Security = () => {
                     href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-indigo-600 hover:text-indigo-700"
+                    className="text-[#B78115] hover:text-[#725009]"
                   >
                     Android
                   </a>
@@ -502,7 +502,7 @@ const Security = () => {
                     href="https://apps.apple.com/app/google-authenticator/id388497605"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-indigo-600 hover:text-indigo-700"
+                    className="text-[#B78115] hover:text-[#725009]"
                   >
                     iOS
                   </a>
@@ -514,7 +514,7 @@ const Security = () => {
                     href="https://play.google.com/store/apps/details?id=com.azure.authenticator"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-indigo-600 hover:text-indigo-700"
+                    className="text-[#B78115] hover:text-[#725009]"
                   >
                     Android
                   </a>
@@ -523,7 +523,7 @@ const Security = () => {
                     href="https://apps.apple.com/app/microsoft-authenticator/id983156458"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-indigo-600 hover:text-indigo-700"
+                    className="text-[#B78115] hover:text-[#725009]"
                   >
                     iOS
                   </a>
@@ -535,7 +535,7 @@ const Security = () => {
                     href="https://play.google.com/store/apps/details?id=com.authy.authy"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-indigo-600 hover:text-indigo-700"
+                    className="text-[#B78115] hover:text-[#725009]"
                   >
                     Android
                   </a>
@@ -544,7 +544,7 @@ const Security = () => {
                     href="https://apps.apple.com/app/authy/id494168017"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-indigo-600 hover:text-indigo-700"
+                    className="text-[#B78115] hover:text-[#725009]"
                   >
                     iOS
                   </a>

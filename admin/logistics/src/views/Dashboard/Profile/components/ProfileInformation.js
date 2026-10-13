@@ -324,7 +324,7 @@ const ProfileInformation = ({ user }) => {
                     key={type}
                     size="sm"
                     variant={isActive ? 'solid' : 'outline'}
-                    colorScheme={type === 'b2b' ? 'purple' : type === 'b2c' ? 'blue' : 'orange'}
+                    colorScheme={isActive ? 'brand' : 'gray'}
                     onClick={() => toggleBusinessType(type)}
                   >
                     {type.toUpperCase()}
@@ -337,7 +337,7 @@ const ProfileInformation = ({ user }) => {
                 {(selectedBusinessTypes || []).map((type) => (
                   <Badge
                     key={type}
-                    colorScheme={type === 'b2b' ? 'purple' : type === 'b2c' ? 'blue' : 'orange'}
+                    colorScheme="brand"
                     px={2}
                     py={1}
                     borderRadius="md"

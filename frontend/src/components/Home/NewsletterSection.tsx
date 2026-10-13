@@ -88,7 +88,7 @@ const NewsletterSection: React.FC = () => {
               <>
                 <Button
                   onClick={() => handleSubscribe()}
-                  className="py-6 px-8 bg-white text-purple-600 rounded-full font-bold text-lg hover:bg-gray-100 shadow-lg whitespace-nowrap"
+                  className="py-6 px-8 bg-white text-[#8F650F] rounded-full font-bold text-lg hover:bg-[#FFF8E8] shadow-lg whitespace-nowrap"
                   disabled={updatePreferencesMutation.isPending}
                 >
                   {updatePreferencesMutation.isPending
@@ -110,7 +110,7 @@ const NewsletterSection: React.FC = () => {
               <div className="text-center">
                 <p className="text-white/90 mb-4">Please log in to subscribe to our newsletter</p>
                 <Link to="/login">
-                  <Button className="py-6 px-8 bg-white text-purple-600 rounded-full font-bold text-lg hover:bg-gray-100 shadow-lg">
+                  <Button className="py-6 px-8 bg-white text-[#8F650F] rounded-full font-bold text-lg hover:bg-[#FFF8E8] shadow-lg">
                     Log In to Subscribe
                   </Button>
                 </Link>

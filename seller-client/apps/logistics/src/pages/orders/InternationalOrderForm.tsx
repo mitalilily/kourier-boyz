@@ -19,7 +19,7 @@ import { createInternationalShipment, fetchInternationalRateCards } from '../../
 import { toast } from '../../components/UI/Toast'
 import { usePickupAddresses } from '../../hooks/Pickup/usePickupAddresses'
 
-const BRAND_PURPLE = '#7357FF'
+const BRAND_GOLD = '#B78115'
 const PAGE_BG = '#F4F5F9'
 const BORDER = '#DEE4F0'
 const TEXT = '#202321'
@@ -55,7 +55,7 @@ const fieldSx = {
       borderColor: '#B9C3DA',
     },
     '&.Mui-focused fieldset': {
-      borderColor: BRAND_PURPLE,
+      borderColor: BRAND_GOLD,
       borderWidth: 1,
     },
   },
@@ -376,7 +376,7 @@ export default function InternationalOrderForm() {
                 minWidth: 40,
                 height: 34,
                 borderRadius: '4px',
-                backgroundColor: BRAND_PURPLE,
+                backgroundColor: BRAND_GOLD,
                 px: 0,
               }}
             >
@@ -410,7 +410,7 @@ export default function InternationalOrderForm() {
                   width: { md: 260 },
                   minHeight: 34,
                   borderRadius: '4px',
-                  backgroundColor: BRAND_PURPLE,
+                  backgroundColor: BRAND_GOLD,
                   textTransform: 'none',
                 }}
               >
@@ -598,7 +598,7 @@ export default function InternationalOrderForm() {
                     { id: Date.now(), productName: '', sku: '', unitPrice: '', quantity: '' },
                   ])
                 }
-                sx={{ borderRadius: '4px', backgroundColor: BRAND_PURPLE, textTransform: 'none' }}
+                sx={{ borderRadius: '4px', backgroundColor: BRAND_GOLD, textTransform: 'none' }}
               >
                 Add New
               </Button>
@@ -761,7 +761,7 @@ export default function InternationalOrderForm() {
                     { id: Date.now(), length: '', breadth: '', height: '', physicalWeight: '', count: '1' },
                   ])
                 }
-                sx={{ borderRadius: '4px', backgroundColor: BRAND_PURPLE, textTransform: 'none' }}
+                sx={{ borderRadius: '4px', backgroundColor: BRAND_GOLD, textTransform: 'none' }}
               >
                 Add New
               </Button>
@@ -841,7 +841,7 @@ export default function InternationalOrderForm() {
             sx={{
               minWidth: 98,
               borderRadius: '4px',
-              backgroundColor: BRAND_PURPLE,
+              backgroundColor: BRAND_GOLD,
               textTransform: 'none',
             }}
           >

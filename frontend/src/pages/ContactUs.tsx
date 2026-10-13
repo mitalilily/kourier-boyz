@@ -193,7 +193,7 @@ const ContactUs = () => {
                   <Link to="/contact/history" className="flex-1 sm:flex-initial">
                     <Button
                       variant="default"
-                      className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl transition-all"
+                      className="w-full sm:w-auto bg-[#B78115] hover:bg-[#8F650F] text-white shadow-lg hover:shadow-xl transition-all"
                       size="lg"
                     >
                       <MessageSquare className="mr-2 h-4 w-4" />
@@ -340,7 +340,7 @@ const ContactUs = () => {
                             className={`pl-10 h-11 transition-colors ${
                               fieldState.invalid
                                 ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                                : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                                : 'border-slate-200 focus:border-[#B78115] focus:ring-[#D9B95F]/20'
                             }`}
                             placeholder="Your full name"
                             aria-invalid={fieldState.invalid}
@@ -383,7 +383,7 @@ const ContactUs = () => {
                             className={`pl-10 h-11 transition-colors ${
                               fieldState.invalid
                                 ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                                : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                                : 'border-slate-200 focus:border-[#B78115] focus:ring-[#D9B95F]/20'
                             }`}
                             placeholder="your.email@example.com"
                             aria-invalid={fieldState.invalid}
@@ -416,7 +416,7 @@ const ContactUs = () => {
                           className={`pl-10 h-11 transition-colors ${
                             fieldState.invalid
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                              : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                              : 'border-slate-200 focus:border-[#B78115] focus:ring-[#D9B95F]/20'
                           }`}
                           placeholder="+91 9876543210"
                           aria-invalid={fieldState.invalid}
@@ -449,7 +449,7 @@ const ContactUs = () => {
                         className={`h-11 transition-colors ${
                           fieldState.invalid
                             ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                            : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                            : 'border-slate-200 focus:border-[#B78115] focus:ring-[#D9B95F]/20'
                         }`}
                         placeholder="What is this regarding?"
                         aria-invalid={fieldState.invalid}
@@ -469,7 +469,7 @@ const ContactUs = () => {
                       <Select value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger
                           id="contact-category"
-                          className="h-11 border-slate-200 focus:border-purple-500 focus:ring-purple-500/20"
+                          className="h-11 border-slate-200 focus:border-[#B78115] focus:ring-[#D9B95F]/20"
                         >
                           <SelectValue placeholder="Select inquiry type" />
                         </SelectTrigger>
@@ -508,7 +508,7 @@ const ContactUs = () => {
                         className={`transition-colors ${
                           fieldState.invalid
                             ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                            : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                            : 'border-slate-200 focus:border-[#B78115] focus:ring-[#D9B95F]/20'
                         }`}
                         placeholder="Please provide details about your inquiry..."
                         aria-invalid={fieldState.invalid}
@@ -563,7 +563,7 @@ const ContactUs = () => {
                 <Link to="/help">
                   <Button
                     variant="link"
-                    className="text-purple-600 hover:text-purple-700 font-medium"
+                    className="text-[#8F650F] hover:text-[#725009] font-medium"
                   >
                     Browse Help Center →
                   </Button>
@@ -571,7 +571,7 @@ const ContactUs = () => {
                 {/* <Link to="/chat">
                   <Button
                     variant="link"
-                    className="text-purple-600 hover:text-purple-700 font-medium"
+                    className="text-[#8F650F] hover:text-[#725009] font-medium"
                   >
                     Start Live Chat →
                   </Button>

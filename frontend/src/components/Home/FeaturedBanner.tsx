@@ -89,14 +89,14 @@ const FeaturedBanner: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="group relative px-8 py-4 bg-white text-purple-600 rounded-full font-bold text-lg overflow-hidden shadow-2xl"
+              className="group relative px-8 py-4 bg-white text-[#8F650F] rounded-full font-bold text-lg overflow-hidden shadow-2xl"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Shop Now
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
               </span>
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-purple-100 to-pink-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                className="absolute inset-0 bg-gradient-to-r from-[#FFF8E8] to-[#F8E9BC] opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 initial={false}
               />
             </motion.button>

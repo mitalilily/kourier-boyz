@@ -542,7 +542,7 @@ const CourierRateForm = ({ courier, existing, zones, planId }) => {
           <Button
             size="xs"
             variant="outline"
-            colorScheme="purple"
+            colorScheme="brand"
             leftIcon={<AddIcon />}
             onClick={() =>
               setState((current) => ({
@@ -558,14 +558,14 @@ const CourierRateForm = ({ courier, existing, zones, planId }) => {
             filename="b2c-rto-slab-format.csv"
             buttonText="RTO CSV Format"
             size="xs"
-            colorScheme="purple"
+            colorScheme="brand"
             tooltip="Download the CSV format for importing RTO slab rates."
             buttonProps={{ variant: "outline" }}
           />
           <Button
             size="xs"
             variant="outline"
-            colorScheme="purple"
+            colorScheme="brand"
             onClick={exportRtoCsv}
           >
             Export RTO
@@ -573,7 +573,7 @@ const CourierRateForm = ({ courier, existing, zones, planId }) => {
           <Button
             size="xs"
             variant="outline"
-            colorScheme="purple"
+            colorScheme="brand"
             onClick={() => rtoFileRef.current?.click()}
           >
             Import RTO

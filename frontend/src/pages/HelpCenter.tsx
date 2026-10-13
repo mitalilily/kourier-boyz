@@ -43,7 +43,7 @@ const HelpCenter = () => {
         {/* Background effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-700" />
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#D9B95F]/20 rounded-full blur-3xl animate-pulse delay-700" />
         </div>
 
         <div className="relative z-10  mx-auto text-center">
@@ -100,7 +100,7 @@ const HelpCenter = () => {
           >
             <Link to="/help/tickets/new">
               <Card
-                className="group cursor-pointer hover:shadow-2xl transition-all duration-500 border-2 border-purple-200 bg-gradient-to-br from-purple-50 via-white to-pink-50 overflow-hidden relative"
+                className="group cursor-pointer hover:shadow-2xl transition-all duration-500 border-2 border-[#E4CF9C] bg-gradient-to-br from-[#FFF8E8] via-white to-[#F8E9BC] overflow-hidden relative"
               >
                 {/* Decorative gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -111,13 +111,13 @@ const HelpCenter = () => {
                       <Ticket className="w-10 h-10 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-[#8F650F] transition-colors">
                         Create Support Ticket
                       </h3>
                       <p className="text-gray-700 text-lg mb-4 leading-relaxed">
                         Have any issue regarding product, return, or something else?
                       </p>
-                      <div className="flex items-center gap-2 text-purple-600 font-semibold group-hover:gap-3 transition-all">
+                      <div className="flex items-center gap-2 text-[#8F650F] font-semibold group-hover:gap-3 transition-all">
                         <span>Create Ticket</span>
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                       </div>
@@ -193,7 +193,7 @@ const HelpCenter = () => {
                 {/* Liquid Glass Card - matching QuickLinks style */}
                 <div
                   className={`relative h-32 rounded-3xl overflow-hidden transition-all duration-300 ${
-                    isSelected ? 'ring-2 ring-purple-500 shadow-xl' : ''
+                    isSelected ? 'ring-2 ring-[#B78115] shadow-xl' : ''
                   }`}
                   style={{
                     background:

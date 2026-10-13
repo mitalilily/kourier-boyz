@@ -430,8 +430,8 @@ const LiveChat = () => {
                             }}
                             className={`w-full text-left p-3 rounded-lg border transition-all ${
                               selectedChatId === chat._id
-                                ? 'border-purple-500 bg-purple-100 shadow-md'
-                                : 'border-slate-200 bg-white hover:border-purple-300 hover:bg-purple-50/50'
+                                ? 'border-[#B78115] bg-[#FFF8E8] shadow-md'
+                                : 'border-slate-200 bg-white hover:border-[#D9B95F] hover:bg-[#FFF8E8]'
                             }`}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
@@ -453,7 +453,7 @@ const LiveChat = () => {
                               </div>
                               <MessageCircle
                                 className={`h-4 w-4 mt-1 flex-shrink-0 ${
-                                  selectedChatId === chat._id ? 'text-purple-600' : 'text-slate-400'
+                                  selectedChatId === chat._id ? 'text-[#B78115]' : 'text-slate-400'
                                 }`}
                               />
                             </div>
@@ -494,7 +494,7 @@ const LiveChat = () => {
                                       handleIssueTypeChange(value)
                                     }}
                                   >
-                                    <SelectTrigger className="h-12 border-slate-200 focus:border-purple-500 focus:ring-purple-500/20">
+                                    <SelectTrigger className="h-12 border-slate-200 focus:border-[#B78115] focus:ring-[#D9B95F]/20">
                                       <SelectValue placeholder="Select your issue type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -559,7 +559,7 @@ const LiveChat = () => {
                           <Button
                             onClick={() => handleResolutionHelpful(false)}
                             variant="outline"
-                            className="flex-1 border-purple-300 text-purple-700 hover:bg-purple-50 h-11"
+                            className="flex-1 border-[#D9B95F] text-[#8F650F] hover:bg-[#FFF8E8] h-11"
                             size="lg"
                           >
                             <XCircle className="mr-2 h-4 w-4" />
@@ -590,7 +590,7 @@ const LiveChat = () => {
                                 setShowChatInterface(true)
                                 setShowResolutions(false)
                               }}
-                              className="w-full text-left p-2 rounded border border-slate-200 bg-white hover:border-purple-300 hover:bg-purple-50/50 text-xs"
+                              className="w-full text-left p-2 rounded border border-slate-200 bg-white hover:border-[#D9B95F] hover:bg-[#FFF8E8] text-xs"
                               whileHover={{ scale: 1.01 }}
                               whileTap={{ scale: 0.99 }}
                             >
@@ -725,7 +725,7 @@ const LiveChat = () => {
                             e.key === 'Enter' && !e.shiftKey && handleSendMessage()
                           }
                           placeholder="Type a message..."
-                          className="flex-1 h-11 border-slate-200 focus:border-purple-500 focus:ring-purple-500/20"
+                          className="flex-1 h-11 border-slate-200 focus:border-[#B78115] focus:ring-[#D9B95F]/20"
                           disabled={(chatData.chat.status as string) === 'closed'}
                         />
                         <Button
@@ -771,7 +771,7 @@ const LiveChat = () => {
                             className={`h-11 ${
                               fieldState.invalid
                                 ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                                : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                                : 'border-slate-200 focus:border-[#B78115] focus:ring-[#D9B95F]/20'
                             }`}
                           />
                           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -815,14 +815,14 @@ const LiveChat = () => {
                 <Button
                   variant="link"
                   onClick={() => navigate('/help')}
-                  className="text-purple-600 hover:text-purple-700 font-medium"
+                  className="text-[#8F650F] hover:text-[#725009] font-medium"
                 >
                   Browse Help Center →
                 </Button>
                 <Button
                   variant="link"
                   onClick={() => navigate('/contact')}
-                  className="text-purple-600 hover:text-purple-700 font-medium"
+                  className="text-[#8F650F] hover:text-[#725009] font-medium"
                 >
                   Contact Us →
                 </Button>

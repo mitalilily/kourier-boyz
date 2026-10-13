@@ -893,7 +893,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, isOpen, onClose 
                       className={cn(
                         'h-16 w-16 overflow-hidden rounded-md border transition',
                         displayImage === image
-                          ? 'border-indigo-500 ring-2 ring-indigo-200'
+                          ? 'border-[#B78115] ring-2 ring-[#E4CF9C]'
                           : 'border-transparent hover:border-gray-300',
                       )}
                     >
@@ -926,7 +926,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, isOpen, onClose 
                       className={cn(
                         'relative h-10 w-10 rounded-full border-2 transition-all duration-200',
                         selectedColorIndex === index
-                          ? 'border-indigo-500 ring-2 ring-indigo-200 ring-offset-1'
+                          ? 'border-[#B78115] ring-2 ring-[#E4CF9C] ring-offset-1'
                           : 'border-gray-200 hover:border-gray-300',
                       )}
                       style={{ backgroundColor: option.color }}
@@ -952,7 +952,7 @@ const ProductDrawer: React.FC<ProductDrawerProps> = ({ product, isOpen, onClose 
                             className={cn(
                               'rounded-full border px-3 py-1 text-xs font-medium transition',
                               selectedAttributes[attribute.name] === value
-                                ? 'border-indigo-500 bg-indigo-500/10 text-indigo-600'
+                                ? 'border-[#B78115] bg-[#FFF8E8] text-[#8F650F]'
                                 : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300',
                             )}
                           >

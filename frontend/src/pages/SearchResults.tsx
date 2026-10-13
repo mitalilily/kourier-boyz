@@ -404,7 +404,7 @@ const SearchResults: React.FC = () => {
               <div className="text-xs text-slate-600">
                 Show results for{' '}
                 <button
-                  className="font-semibold text-indigo-600 underline-offset-2 hover:underline"
+                  className="font-semibold text-[#8F650F] underline-offset-2 hover:underline"
                   onClick={() => navigate(`/products/search?q=${encodeURIComponent(didYouMean)}`)}
                 >
                   {didYouMean}
@@ -419,7 +419,7 @@ const SearchResults: React.FC = () => {
                   Sort by
                 </span>
                 <Select value={sort} onValueChange={(value) => setSort(value as SearchSort)}>
-                  <SelectTrigger className="h-9 w-full min-w-[180px] border-slate-200 text-xs font-medium text-slate-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500/20">
+                  <SelectTrigger className="h-9 w-full min-w-[180px] border-slate-200 text-xs font-medium text-slate-700 shadow-sm focus:border-[#B78115] focus:ring-[#D9B95F]/20">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -451,7 +451,7 @@ const SearchResults: React.FC = () => {
                     onClick={() => setSort(value)}
                     className={`rounded-full border px-3 py-1 transition ${
                       sort === value
-                        ? 'border-indigo-500 bg-indigo-50 text-indigo-600'
+                        ? 'border-[#B78115] bg-[#FFF8E8] text-[#8F650F]'
                         : 'border-slate-200 text-slate-600 hover:border-slate-300'
                     }`}
                   >
@@ -510,7 +510,7 @@ const SearchResults: React.FC = () => {
                       </p>
                       <Button
                         variant="secondary"
-                        className="rounded-full md:hidden flex border border-slate-200 bg-white text-indigo-600 hover:bg-indigo-50"
+                        className="rounded-full md:hidden flex border border-slate-200 bg-white text-[#8F650F] hover:bg-[#FFF8E8]"
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                       >
                         Review filters

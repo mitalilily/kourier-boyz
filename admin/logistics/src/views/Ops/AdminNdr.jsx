@@ -314,7 +314,7 @@ export default function AdminNdr() {
                       size="sm"
                       variant="ghost"
                       isDisabled={isNSL}
-                      colorScheme={isNSL ? undefined : 'purple'}
+                      colorScheme={isNSL ? undefined : 'brand'}
                       onClick={() => {
                         setActiveRow(row)
                         setForm((f) => ({

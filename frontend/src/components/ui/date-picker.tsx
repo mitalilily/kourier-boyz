@@ -33,7 +33,7 @@ export function DatePicker({
           variant="outline"
           disabled={disabled}
           className={cn(
-            'w-full h-10 rounded-2xl border border-slate-200 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors justify-between font-normal hover:bg-gray-50 focus-visible:outline-none focus-visible:border-purple-500 focus-visible:ring-purple-500/20 disabled:cursor-not-allowed disabled:opacity-50',
+            'w-full h-10 rounded-2xl border border-slate-200 bg-transparent px-3 py-1 text-sm shadow-sm transition-colors justify-between font-normal hover:bg-[#FFF8E8] focus-visible:outline-none focus-visible:border-[#B78115] focus-visible:ring-[#B78115]/20 disabled:cursor-not-allowed disabled:opacity-50',
             !date && 'text-gray-500',
             className,
           )}

@@ -185,7 +185,7 @@ const CategoryItem = memo(({ category, isHovered, onMouseEnter }: CategoryItemPr
       onMouseEnter={onMouseEnter}
       className={`group relative w-full text-left transition-all duration-200 ${
         isHovered
-          ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-900 shadow-sm'
+          ? 'bg-gradient-to-r from-[#FFF8E8] to-[#F8E9BC] text-gray-900 shadow-sm'
           : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50/80'
       }`}
     >
@@ -223,7 +223,7 @@ const CategoryItem = memo(({ category, isHovered, onMouseEnter }: CategoryItemPr
       {isHovered && (
         <motion.div
           layoutId="activeIndicator"
-          className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-r-full"
+          className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#D3A63A] to-[#8F650F] rounded-r-full"
           initial={false}
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         />

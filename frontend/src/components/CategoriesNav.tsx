@@ -98,9 +98,9 @@ const CategoriesNav = () => {
           className={cn(
             'block transition-all duration-200 cursor-pointer',
             isMobile
-              ? 'px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-purple-600 rounded-lg'
+              ? 'px-4 py-2.5 text-sm text-gray-700 hover:bg-[#FFF8E8] hover:text-[#8F650F] rounded-lg'
               : level === 0
-              ? 'text-sm font-semibold text-gray-900 mb-3 hover:text-purple-600 py-1'
+              ? 'text-sm font-semibold text-gray-900 mb-3 hover:text-[#8F650F] py-1'
               : 'text-xs text-gray-600 hover:text-gray-900 py-1.5',
           )}
           onClick={(e) => {
@@ -188,7 +188,7 @@ const CategoriesNav = () => {
                       to={`/products/search?categoryId=${
                         category._id || category.slug
                       }&sort=relevance`}
-                      className="flex-1 px-4 py-3 text-base font-medium text-gray-900 hover:text-purple-600 transition-colors rounded-lg hover:bg-gray-50 active:bg-gray-100"
+                      className="flex-1 px-4 py-3 text-base font-medium text-gray-900 hover:text-[#8F650F] transition-colors rounded-lg hover:bg-[#FFF8E8] active:bg-[#F8E9BC]"
                       onClick={() => !hasSubcategories && setShowMobileMenu(false)}
                     >
                       {category.name}
@@ -278,7 +278,7 @@ const CategoriesNav = () => {
                       )
                       setHoveredCategory(null)
                     }}
-                    className="block text-sm font-semibold text-gray-900 hover:text-purple-600 transition-colors mb-2 cursor-pointer relative z-10"
+                    className="block text-sm font-semibold text-gray-900 hover:text-[#8F650F] transition-colors mb-2 cursor-pointer relative z-10"
                   >
                     {subcat.name}
                   </div>
@@ -355,7 +355,7 @@ const CategoriesNav = () => {
                       to={`/products/search?categoryId=${
                         category._id || category.slug
                       }&sort=relevance`}
-                      className="shrink-0 px-3 py-2 text-sm font-medium text-gray-700 hover:text-purple-600 whitespace-nowrap transition-colors rounded-lg hover:bg-gray-50"
+                      className="shrink-0 px-3 py-2 text-sm font-medium text-gray-700 hover:text-[#8F650F] whitespace-nowrap transition-colors rounded-lg hover:bg-[#FFF8E8]"
                     >
                       {category.name}
                     </Link>
@@ -416,8 +416,8 @@ const CategoriesNav = () => {
                           }&sort=relevance`}
                           className={cn(
                             'flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition-all duration-200 relative',
-                            'text-gray-700 hover:text-purple-600',
-                            isHovered && 'text-purple-600',
+                            'text-gray-700 hover:text-[#8F650F]',
+                            isHovered && 'text-[#8F650F]',
                           )}
                         >
                           <span>{category.name}</span>
@@ -430,7 +430,7 @@ const CategoriesNav = () => {
                             />
                           )}
                           {isHovered && (
-                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600 transition-all duration-300" />
+                            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#B78115] transition-all duration-300" />
                           )}
                         </Link>
                       </div>
@@ -463,8 +463,8 @@ const CategoriesNav = () => {
                       <button
                         className={cn(
                           'flex items-center gap-1.5 px-4 py-3 text-sm font-medium transition-all duration-200',
-                          'text-gray-700 hover:text-purple-600',
-                          hoveredCategory === 'more' && 'text-purple-600',
+                          'text-gray-700 hover:text-[#8F650F]',
+                          hoveredCategory === 'more' && 'text-[#8F650F]',
                         )}
                       >
                         <span>More</span>
@@ -487,7 +487,7 @@ const CategoriesNav = () => {
                                     to={`/products/search?categoryId=${
                                       category._id || category.slug
                                     }&sort=relevance`}
-                                    className="block px-3 py-2 text-sm text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-lg transition-colors"
+                                    className="block px-3 py-2 text-sm text-gray-700 hover:text-[#8F650F] hover:bg-[#FFF8E8] rounded-lg transition-colors"
                                   >
                                     {category.name}
                                   </Link>

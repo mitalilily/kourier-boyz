@@ -153,7 +153,7 @@ export const LocationPopover: React.FC<LocationPopoverProps> = ({
                     {addressLocationPairs.length > 3 && (
                       <button
                         onClick={onToggleShowAllAddresses}
-                        className="w-full text-xs font-semibold text-purple-600 hover:text-purple-700"
+                        className="w-full text-xs font-semibold text-[#8F650F] hover:text-[#725009]"
                       >
                         {showAllAddresses
                           ? "Collapse addresses"
@@ -166,7 +166,7 @@ export const LocationPopover: React.FC<LocationPopoverProps> = ({
                     You have no saved addresses yet. Add one from your{" "}
                     <Link
                       to="/profile/addresses"
-                      className="font-semibold text-purple-600 hover:text-purple-700"
+                      className="font-semibold text-[#8F650F] hover:text-[#725009]"
                       onClick={() => onOpenChange(false)}
                     >
                       address book

@@ -207,7 +207,7 @@ export const AddressForm = ({
           <input
             type="checkbox"
             id="isDefault"
-            className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+            className="h-4 w-4 rounded border-gray-300 text-[#B78115] focus:ring-[#D9B95F]"
             checked={form.watch("isDefault")}
             onChange={(e) => form.setValue("isDefault", e.target.checked)}
           />
