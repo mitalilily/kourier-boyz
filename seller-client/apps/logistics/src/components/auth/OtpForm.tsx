@@ -249,7 +249,7 @@ export default function OtpForm({ email, onEditEmail }: Props) {
                   borderColor: '#DFB743',
                 },
                 '&.Mui-focused': {
-                  boxShadow: '0 0 0 3px rgba(49,2,118,0.12)',
+                  boxShadow: '0 0 0 3px rgba(183,129,21,0.14)',
                 },
                 '&.Mui-focused fieldset': {
                   borderColor: BRAND_BLUE,

@@ -156,7 +156,9 @@ const SellerCategories = () => {
             data-tour="request-category-btn"
             onClick={() => {
               if (!user?.isApproved) {
-                message.warning('Your KYC must be approved before requesting new categories.')
+                message.warning(
+                  'Complete courier verification before requesting new marketplace categories.',
+                )
                 return
               }
               setRequestModalOpen(true)

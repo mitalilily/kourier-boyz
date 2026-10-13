@@ -302,7 +302,7 @@ const ResetPassword = () => {
                             className={`pl-10 h-11 rounded-2xl transition-colors text-center text-lg tracking-widest font-mono ${
                               fieldState.invalid
                                 ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                                : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                                : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                             }`}
                             placeholder="000000"
                             aria-invalid={fieldState.invalid}
@@ -323,7 +323,7 @@ const ResetPassword = () => {
                             type="button"
                             onClick={handleResendOtp}
                             disabled={resendCooldown > 0 || resendOtpMutation.isPending}
-                            className="text-xs text-purple-600 hover:text-purple-700 font-medium disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
+                            className="text-xs text-[#9b7119] hover:text-[#74520d] font-semibold disabled:text-slate-400 disabled:cursor-not-allowed transition-colors"
                           >
                             {resendOtpMutation.isPending ? (
                               <>
@@ -369,7 +369,7 @@ const ResetPassword = () => {
                           className={`pl-10 pr-10 h-11 rounded-2xl transition-colors ${
                             fieldState.invalid
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                              : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                              : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                           }`}
                           placeholder="Enter new password"
                           aria-invalid={fieldState.invalid}
@@ -419,7 +419,7 @@ const ResetPassword = () => {
                           className={`pl-10 pr-10 h-11 rounded-2xl transition-colors ${
                             fieldState.invalid
                               ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                              : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                              : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                           }`}
                           placeholder="Confirm new password"
                           aria-invalid={fieldState.invalid}

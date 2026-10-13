@@ -188,7 +188,7 @@ const Dashboard = () => {
 
       {user?.kycSubmitted && !user?.isApproved && (
         <Alert
-          message="KYC Under Review"
+          message="Courier verification under review"
           description={
             <div>
               <Paragraph style={{ marginBottom: 8 }}>
@@ -219,7 +219,7 @@ const Dashboard = () => {
 
       {user?.rejectionReason && (
         <Alert
-          message="KYC Rejected - Action Required"
+          message="Courier verification needs attention"
           description={
             <div>
               <Paragraph style={{ marginBottom: 8 }}>
@@ -227,7 +227,7 @@ const Dashboard = () => {
               </Paragraph>
               <Space>
                 <Button type="primary" danger onClick={() => window.location.assign('/home')}>
-                  Update courier KYC
+                  Open courier verification
                 </Button>
                 <Button type="default" onClick={() => navigate('/profile')}>
                   View Details

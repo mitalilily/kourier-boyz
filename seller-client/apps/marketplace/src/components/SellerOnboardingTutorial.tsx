@@ -102,7 +102,7 @@ const TOUR_STEPS: TourStepWithNav[] = [
     popover: {
       title: 'Profile & Store Settings',
       description:
-        'Complete business details, KYC, bank info, and store policies—required to publish products.',
+        'Add your store policies and catalogue details. Identity verification stays in the courier console.',
       side: 'right',
       align: 'start',
       showButtons: ['previous', 'next'],

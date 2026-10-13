@@ -20,9 +20,9 @@ const BannerCarousel: React.FC = () => {
 
   if (banners.length === 0) {
     return (
-      <section className="kb-store-hero relative flex min-h-[430px] w-full items-center overflow-hidden bg-[#1d1d1c] px-5 pt-20 text-white md:min-h-[540px] sm:px-8 lg:px-10">
+      <section className="kb-store-hero relative flex min-h-[430px] w-full items-center overflow-hidden bg-[#1d1d1c] pt-20 text-white md:min-h-[540px]">
         <div className="absolute inset-0 opacity-50 [background-image:linear-gradient(115deg,transparent_0%,transparent_48%,rgba(223,183,67,0.2)_48%,rgba(223,183,67,0.2)_49%,transparent_49%),radial-gradient(circle_at_82%_25%,rgba(255,255,255,0.15),transparent_26%)]" />
-        <div className="relative mx-auto w-full max-w-7xl">
+        <div className="kb-store-container relative">
           <span className="kb-kicker text-[#dfb743]">Kourier Boyz Marketplace</span>
           <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
             A fresh marketplace is taking shape.
@@ -54,12 +54,12 @@ const BannerCarousel: React.FC = () => {
         >
           <img src={currentBanner.image} alt="" className="h-full w-full object-cover object-center" />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(24,24,23,0.92)_0%,rgba(24,24,23,0.75)_42%,rgba(24,24,23,0.12)_80%)]" />
-          <div className="absolute inset-0 mx-auto flex max-w-7xl items-center px-5 pt-20 sm:px-8 lg:px-10">
+          <div className="kb-store-container absolute inset-x-0 top-0 flex h-full items-center pt-20">
             <div className="max-w-2xl text-white">
               <span className="kb-kicker text-[#dfb743]">Kourier Boyz Marketplace</span>
               {currentBanner.title && <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">{currentBanner.title}</h1>}
               {currentBanner.subtitle && <p className="mt-5 max-w-xl text-lg leading-8 text-white/75">{currentBanner.subtitle}</p>}
-              {currentBanner.link && <Link to={currentBanner.link} className="kb-button kb-button-gold mt-7">{currentBanner.linkText || 'Shop now'} <span aria-hidden="true">→</span></Link>}
+              {currentBanner.link && <Link to={currentBanner.link} className="kb-button kb-button-gold mt-7">{currentBanner.linkText || 'Shop now'} <ArrowRight className="h-4 w-4" /></Link>}
             </div>
           </div>
         </motion.div>

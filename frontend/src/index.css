@@ -1332,6 +1332,19 @@
     font-family: var(--font-body);
   }
 
+  .kb-store-container {
+    width: 100%;
+    max-width: 1480px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .kb-store-container {
+      padding-inline: 2rem;
+    }
+  }
+
   .kb-hero-image {
     animation: kb-hero-breathe 18s ease-in-out infinite alternate;
   }

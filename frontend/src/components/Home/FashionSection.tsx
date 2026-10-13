@@ -180,7 +180,7 @@ const FashionSection: React.FC = () => {
 
   if (isLoading)
     return (
-      <div className="mx-auto w-full max-w-[1480px] px-4 py-12">
+      <div className="mx-auto w-full max-w-[1480px] px-4 py-12 md:px-8">
         <SectionHeading title="Fashion" italicPart="Hub" subtitle="Discover the latest trends" />
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-8">
           {[...Array(8)].map((_, i) => (

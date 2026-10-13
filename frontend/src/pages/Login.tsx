@@ -1121,7 +1121,7 @@ const Login = () => {
                                 className={`pl-9 h-9 rounded-xl transition-colors text-sm ${
                                   fieldState.invalid
                                     ? 'border-red-400 focus:border-red-500 focus:ring-red-500/20'
-                                    : 'border-slate-200 focus:border-purple-500 focus:ring-purple-500/20'
+                                    : 'border-slate-200 focus:border-[#b78115] focus:ring-[#b78115]/20'
                                 }`}
                                 placeholder="you@example.com"
                                 aria-invalid={fieldState.invalid}

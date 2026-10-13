@@ -126,7 +126,7 @@ const StoreHeader: React.FC = () => {
           className="w-full px-3 pt-2 transition-all duration-700 ease-in-out sm:px-4 lg:px-6"
         >
           <div
-            className={`relative mx-auto flex w-full max-w-[1480px] items-center justify-between gap-2 rounded-md px-3 py-2.5 transition-all duration-700 ease-in-out sm:px-4 xl:gap-3 xl:px-5 ${
+            className={`relative mx-auto flex w-full max-w-[1480px] items-center justify-between gap-2 rounded-md px-4 py-2.5 transition-all duration-700 ease-in-out md:px-8 xl:gap-3 ${
               effectiveScrolled ? 'shadow-xl' : 'shadow-lg'
             }`}
             style={{
@@ -227,7 +227,7 @@ const StoreHeader: React.FC = () => {
           }}
         >
           <div
-            className="rounded-md px-3 py-3 shadow-lg"
+            className="mx-auto w-full max-w-[1480px] rounded-md px-4 py-3 shadow-lg md:px-8"
             style={{
               background: headerBackground,
               backdropFilter: headerBackdrop,

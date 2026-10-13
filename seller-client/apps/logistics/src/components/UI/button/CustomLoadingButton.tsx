@@ -31,7 +31,7 @@ export default function CustomIconLoadingButton({
   ...rest
 }: CustomIconLoadingButtonProps) {
   const primary = '#B78115'
-  const primaryDark = '#5519A8'
+  const primaryDark = '#8F650F'
   const isDisabled = loading || disabled
   return (
     <Button
@@ -54,8 +54,8 @@ export default function CustomIconLoadingButton({
         '&:disabled': {
           opacity: 1,
           cursor: 'not-allowed',
-          backgroundColor: variant === 'solid' ? '#B89BDF' : '#F9FAFB',
-          color: textColor ?? (variant === 'solid' ? '#FFFFFF' : '#6B7280'),
+          backgroundColor: variant === 'solid' ? '#D7CBAE' : '#F9FAFB',
+          color: textColor ?? (variant === 'solid' ? '#5F5130' : '#6B7280'),
           borderColor: variant === 'text' ? 'rgba(17, 24, 39, 0.14)' : 'none',
         },
         ...styles,

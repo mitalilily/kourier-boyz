@@ -35,14 +35,17 @@ const VerifyEmail = () => {
   }, [verifyEmailMutation.isError, verifyEmailMutation.error, message])
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
-      {/* Decorative Elements */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-20 right-20 w-72 h-72 bg-blue-300 rounded-full blur-3xl animate-blob" />
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-300 rounded-full blur-3xl animate-blob animation-delay-2000" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-6 bg-[#f3f4f2] relative overflow-hidden">
+      <div
+        className="absolute inset-0 opacity-70"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(101,109,105,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(101,109,105,0.08) 1px, transparent 1px), repeating-linear-gradient(135deg, transparent 0 52px, rgba(183,129,21,0.10) 52px 54px)',
+          backgroundSize: '44px 44px, 44px 44px, 120px 120px',
+        }}
+      />
 
-      <Card className="w-full max-w-md shadow-2xl border-0 animate-slide-up relative z-10">
+      <Card className="w-full max-w-md border border-[#d9dcda] shadow-[0_24px_70px_rgba(32,35,33,0.14)] animate-slide-up relative z-10">
         {verificationStatus === 'loading' && (
           <Result
             icon={<Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />}
@@ -56,7 +59,7 @@ const VerifyEmail = () => {
             icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
             status="success"
             title="Email Verified Successfully!"
-            subTitle="Your email has been verified. Please wait for admin approval to access your account."
+            subTitle="Your email is verified. Continue to Seller Hub; courier verification remains managed in your courier console."
             extra={[
               <Link to="/login" key="login">
                 <Button type="primary" size="large">

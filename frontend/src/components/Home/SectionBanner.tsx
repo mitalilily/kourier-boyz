@@ -1,6 +1,7 @@
 import { useBanners } from '@/api/banners'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { BannerLayer, ParallaxBanner } from 'react-scroll-parallax'
 
 interface SectionBannerProps {
@@ -67,9 +68,13 @@ const SectionBanner: React.FC<SectionBannerProps> = ({ position, className }) =>
               </p>
             )}
             {banner.link && banner.linkText && (
-              <span className="inline-block px-6 py-2 bg-white text-gray-900 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 group-hover:scale-105">
-                {banner.linkText} →
-              </span>
+              <Link
+                to={banner.link}
+                className="kb-button mt-1 inline-flex border border-white/70 bg-white text-[#20201e] hover:border-[#dfb743] hover:bg-[#fff9e8]"
+              >
+                {banner.linkText}
+                <span aria-hidden="true">-&gt;</span>
+              </Link>
             )}
           </div>
         </div>
@@ -84,8 +89,8 @@ const SectionBanner: React.FC<SectionBannerProps> = ({ position, className }) =>
   const layers = createBannerLayers(currentBanner)
 
   return (
-    <div className="px-4 md:px-8 my-8">
-      <div className={`relative w-full overflow-hidden rounded-2xl group ${className || ''}`}>
+    <div className="kb-store-container my-8">
+      <div className={`group relative w-full overflow-hidden rounded-lg ${className || ''}`}>
         <ParallaxBanner
           layers={layers}
           className="w-full h-full"

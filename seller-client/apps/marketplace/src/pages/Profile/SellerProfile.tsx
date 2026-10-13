@@ -64,7 +64,6 @@ const SellerProfile = () => {
   const [form] = Form.useForm()
   const [passwordForm] = Form.useForm()
   const [storeForm] = Form.useForm()
-  const [showKycWarningModal, setShowKycWarningModal] = useState(false)
   const [showStoreModal, setShowStoreModal] = useState(false)
   const [logoFileList, setLogoFileList] = useState<UploadFile[]>([])
   const [profilePhotoFileList, setProfilePhotoFileList] = useState<UploadFile[]>([])
@@ -77,11 +76,6 @@ const SellerProfile = () => {
   const resendVerificationMutation = useResendVerificationEmail()
 
   const handleUpdateKycClick = () => {
-    window.location.assign('/home')
-  }
-
-  const handleConfirmKycUpdate = () => {
-    setShowKycWarningModal(false)
     window.location.assign('/home')
   }
 
@@ -437,7 +431,7 @@ const SellerProfile = () => {
         {/* Critical Alerts */}
         {user.rejectionReason && (
           <Alert
-            message="⚠️ KYC Rejected"
+            message="Courier verification needs attention"
             description={
               <Space direction="vertical" style={{ width: '100%' }}>
                 <div>
@@ -451,7 +445,7 @@ const SellerProfile = () => {
                   onClick={() => window.location.assign('/home')}
                   icon={<EditOutlined />}
                 >
-                  Open courier KYC
+                  Open courier verification
                 </Button>
               </Space>
             }
@@ -489,7 +483,7 @@ const SellerProfile = () => {
         {!user.isApproved && user.kycSubmitted && !user.rejectionReason && (
           <Alert
             message="⏳ Account Under Review"
-            description="Your courier KYC is under review. Marketplace status updates automatically when verification is complete."
+            description="Your courier verification is under review. Marketplace status updates automatically when verification is complete."
             type="warning"
             showIcon
             style={{ borderRadius: 12 }}
@@ -774,8 +768,8 @@ const SellerProfile = () => {
                         </Divider>
 
                         <Alert
-                          message="Business Details Managed via KYC"
-                          description="Your business name, GST number, and other business details are part of your KYC submission. To update them, use the 'Update KYC' button in the KYC Details tab."
+                          message="Business identity is managed in the courier console"
+                          description="Your verified business name and GST details are shared from the courier profile. Open the courier console whenever these legal details need to change."
                           type="info"
                           showIcon
                           style={{ marginBottom: 24, borderRadius: 8 }}
@@ -839,7 +833,7 @@ const SellerProfile = () => {
                 label: (
                   <span>
                     <SafetyCertificateOutlined />
-                    <span style={{ marginLeft: 8 }}>KYC & Business Details</span>
+                    <span style={{ marginLeft: 8 }}>Courier Verification</span>
                     {user.kycSubmitted && (
                       <Badge
                         count={user.isApproved ? '✓' : '⏳'}
@@ -861,15 +855,15 @@ const SellerProfile = () => {
                             {user.isApproved ? (
                               <Alert
                                 message="Account Verified"
-                                description="Your account is verified. You can update non-critical information like store logo and description below. To update legal documents or bank details, click 'Update KYC'."
+                                description="Your shared courier verification is approved. Store presentation remains editable from this marketplace workspace."
                                 type="success"
                                 showIcon
                                 style={{ borderRadius: 8 }}
                               />
                             ) : (
                               <Alert
-                                message="⏳ KYC Under Review"
-                                description="Your KYC is being reviewed by our admin team. You'll be notified via email once the review is complete."
+                                message="Courier verification under review"
+                                description="Verification is managed in your courier console and will sync here automatically when review is complete."
                                 type="info"
                                 showIcon
                                 style={{ borderRadius: 8 }}
@@ -886,7 +880,7 @@ const SellerProfile = () => {
                               icon={<EditOutlined />}
                               onClick={handleUpdateKycClick}
                             >
-                              Update KYC
+                              Open courier verification
                             </Button>
                           </Col>
                           {user.isApproved && (
@@ -1188,7 +1182,7 @@ const SellerProfile = () => {
                           <>
                             <Divider />
                             <Alert
-                              message="❌ KYC Rejected"
+                              message="Courier verification needs attention"
                               description={
                                 <Space direction="vertical" style={{ width: '100%' }}>
                                   <div>
@@ -1202,7 +1196,7 @@ const SellerProfile = () => {
                                     onClick={() => window.location.assign('/home')}
                                     icon={<EditOutlined />}
                                   >
-                                    Open courier KYC
+                                    Open courier verification
                                   </Button>
                                 </Space>
                               }
@@ -1218,7 +1212,7 @@ const SellerProfile = () => {
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
                         description={
                           <Space direction="vertical" size="small">
-                            <Title level={4}>KYC Not Submitted</Title>
+                            <Title level={4}>Courier verification pending</Title>
                             <Text type="secondary">
                               Complete verification once in your courier profile
                             </Text>
@@ -1557,40 +1551,6 @@ const SellerProfile = () => {
           </Form>
         </Modal>
 
-        {/* KYC Update Warning Modal */}
-        <Modal
-          title={
-            <Space>
-              <WarningOutlined style={{ color: '#faad14' }} />
-              <span>Update KYC Information</span>
-            </Space>
-          }
-          open={showKycWarningModal}
-          onOk={handleConfirmKycUpdate}
-          onCancel={() => setShowKycWarningModal(false)}
-          okText="Yes, Continue"
-          cancelText="Cancel"
-          okButtonProps={{ danger: true }}
-        >
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <Alert
-              message="Important Notice"
-              description="Updating your KYC information will require admin re-approval. During the review period:"
-              type="warning"
-              showIcon
-            />
-            <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
-              <li>✅ You can continue accessing your dashboard</li>
-              <li>✅ You can view your existing products</li>
-              <li>❌ You cannot add new products</li>
-              <li>❌ You cannot edit existing products</li>
-              <li>❌ Product management will be locked until re-approval</li>
-            </ul>
-            <Paragraph strong style={{ marginBottom: 0 }}>
-              Are you sure you want to proceed with updating your KYC?
-            </Paragraph>
-          </Space>
-        </Modal>
       </Space>
     </div>
   )

@@ -490,7 +490,7 @@ const Register = () => {
               </Link>
               <span className="text-slate-500">
                 Already have an account?{' '}
-                <Link to="/login" className="text-purple-600 hover:text-purple-700 font-bold">
+                <Link to="/login" className="text-[#9b7119] hover:text-[#74520d] font-bold">
                   Sign in
                 </Link>
               </span>

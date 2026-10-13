@@ -67,7 +67,7 @@ const Login = () => {
   }
 
   return (
-    <main className="min-h-screen flex bg-[#f5f6f4]">
+    <main className="min-h-screen flex bg-[#f5f6f4] text-[#202321]" style={{ colorScheme: 'light' }}>
       <section className="hidden lg:flex lg:w-[52%] relative overflow-hidden border-r border-[#d9dcda] bg-[#eef0ed] text-[#202321]">
         <div
           className="absolute inset-0 opacity-70"
