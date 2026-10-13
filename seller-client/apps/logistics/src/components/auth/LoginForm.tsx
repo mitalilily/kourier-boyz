@@ -8,7 +8,7 @@ export default function LoginForm() {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         width: '100%',
         maxWidth: '100vw',
         overflow: 'hidden',
@@ -20,7 +20,7 @@ export default function LoginForm() {
       <Box
         component="section"
         sx={{
-          minHeight: '100vh',
+          minHeight: '100dvh',
           display: { xs: 'none', lg: 'flex' },
           flexDirection: 'column',
           p: { lg: 6, xl: 8 },
@@ -115,9 +115,9 @@ export default function LoginForm() {
           alignItems: 'center',
           justifyContent: 'center',
           minWidth: 0,
-          minHeight: '100vh',
+          minHeight: '100dvh',
           px: { xs: 3, sm: 6, lg: 7, xl: 8 },
-          py: { xs: 4, sm: 6 },
+          py: { xs: 3, sm: 4, lg: 3 },
           backgroundColor: '#FFFFFF',
         }}
       >
@@ -131,7 +131,7 @@ export default function LoginForm() {
               width: { xs: 210, sm: 230 },
               height: 'auto',
               objectFit: 'contain',
-              mb: 5,
+              mb: { xs: 3, sm: 4 },
               p: 1,
               borderRadius: 2,
               background: 'linear-gradient(145deg, #ffffff, #f2f5f3)',
@@ -162,7 +162,7 @@ export default function LoginForm() {
           >
             Welcome back
           </Typography>
-          <Typography sx={{ color: '#6A706D', lineHeight: 1.7, mt: 1.2, mb: 4, fontSize: '0.95rem' }}>
+          <Typography sx={{ color: '#6A706D', lineHeight: 1.65, mt: 1.2, mb: 3, fontSize: '0.95rem' }}>
             Sign in to book, track, reconcile, and manage your Kourier Boyz console.
           </Typography>
 

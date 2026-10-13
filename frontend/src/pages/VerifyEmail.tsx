@@ -217,7 +217,7 @@ const VerifyEmail = () => {
   const showError = status === 'error'
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 via-white to-slate-100 p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+    <div className="min-h-[100dvh] flex items-center justify-center bg-linear-to-br from-slate-50 via-white to-[#f7f2e5] p-4 sm:p-6 lg:p-8 relative overflow-hidden">
       {/* Professional Grid Pattern Background */}
       <div className="absolute inset-0 bg-grid-slate-100/50 mask-[linear-gradient(0deg,white,rgba(255,255,255,0.6))] z-0" />
 
@@ -235,11 +235,13 @@ const VerifyEmail = () => {
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        <Card className="bg-white/95 backdrop-blur-sm shadow-xl border border-slate-200/50 rounded-3xl">
+        <Card className="bg-white/95 backdrop-blur-sm shadow-xl border border-slate-200/70 rounded-lg">
           <CardHeader className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-slate-900 via-blue-900 to-slate-800 rounded-xl mb-4 shadow-lg mx-auto">
-              <span className="text-2xl font-bold text-white">T</span>
-            </div>
+            <img
+              src="/brand/kourier-boyz-logo-transparent.png"
+              alt="Kourier Boyz"
+              className="mx-auto mb-3 h-16 w-full max-w-[260px] object-contain"
+            />
             <CardTitle className="text-3xl font-bold text-slate-900">
               Account Verification
             </CardTitle>
@@ -263,8 +265,8 @@ const VerifyEmail = () => {
             {/* Phone Verification Form */}
             {showPhoneVerify && (
               <div className="space-y-6">
-                <Alert className="border-blue-200 bg-blue-50">
-                  <AlertDescription className="text-blue-800">
+                <Alert className="border-[#e4cf9c] bg-[#fffaf0]">
+                  <AlertDescription className="text-[#725009]">
                     A verification code has been sent to your phone {phoneNumber || ''}. Enter it
                     below to complete phone verification.
                   </AlertDescription>

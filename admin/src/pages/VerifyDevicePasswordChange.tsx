@@ -9,135 +9,54 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/
 const VerifyDevicePasswordChange = () => {
   const { token } = useParams<{ token: string }>()
   const { message } = App.useApp()
-  const [verificationStatus, setVerificationStatus] = useState<'loading' | 'success' | 'error'>(
-    'loading',
-  )
-  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     const verifyDevice = async () => {
       if (!token) {
-        setVerificationStatus('error')
+        setStatus('error')
         setErrorMessage('Verification token is missing')
         return
       }
 
       try {
-        console.log('Attempting verification with token:', token.substring(0, 10) + '...')
-        const response = await axios.post(
-          `${API_BASE_URL}/admin/profile/verify-device-password-change/${token}`,
-        )
-        console.log('Verification response:', response.data)
-        setVerificationStatus('success')
-        message.success(response.data.message || 'Device verified and password changed successfully!')
-      } catch (err: unknown) {
-        console.error('Verification error:', err)
-        setVerificationStatus('error')
-        const axiosError = err as { 
-          response?: { 
-            data?: { 
-              error?: string
-              details?: string
-            }
-            status?: number
-          }
+        const response = await axios.post(`${API_BASE_URL}/admin/profile/verify-device-password-change/${token}`)
+        setStatus('success')
+        message.success(response.data.message || 'Device verified and password changed')
+      } catch (error: unknown) {
+        const requestError = error as {
+          response?: { data?: { error?: string; details?: string }; status?: number }
           message?: string
         }
-        
-        let errorMsg = 'Verification failed'
-        if (axiosError.response?.status === 400) {
-          errorMsg = axiosError.response?.data?.error || 'Invalid or expired verification token'
-        } else if (axiosError.response?.data?.error) {
-          errorMsg = axiosError.response.data.error
-          if (axiosError.response.data.details && import.meta.env.DEV) {
-            errorMsg += `: ${axiosError.response.data.details}`
-          }
-        } else if (axiosError.message) {
-          errorMsg = axiosError.message
-        } else if (!axiosError.response) {
-          errorMsg = 'Unable to connect to server. Please check your connection.'
-        }
-        
-        setErrorMessage(errorMsg)
-        message.error(errorMsg)
+        let detail = requestError.response?.data?.error || requestError.message || 'Verification failed'
+        if (!requestError.response) detail = 'Unable to connect to the server. Please check your connection.'
+        if (requestError.response?.data?.details && import.meta.env.DEV) detail += `: ${requestError.response.data.details}`
+        setStatus('error')
+        setErrorMessage(detail)
+        message.error(detail)
       }
     }
 
-    verifyDevice()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token])
-
-  if (verificationStatus === 'loading') {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-          backgroundColor: '#f5f5f5',
-        }}
-      >
-        <Card style={{ width: 400, textAlign: 'center' }}>
-          <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-          <p style={{ marginTop: 16, fontSize: 16 }}>Verifying device and changing password...</p>
-        </Card>
-      </div>
-    )
-  }
-
-  if (verificationStatus === 'success') {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-          backgroundColor: '#f5f5f5',
-        }}
-      >
-        <Result
-          icon={<CheckCircleOutlined style={{ color: '#52c41a' }} />}
-          title="Device Verified Successfully!"
-          subTitle="Your password has been changed and this device has been added to your trusted devices."
-          extra={
-            <Link to="/login">
-              <Button type="primary" size="large">
-                Go to Login
-              </Button>
-            </Link>
-          }
-        />
-      </div>
-    )
-  }
+    void verifyDevice()
+  }, [token, message])
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#f5f5f5',
-      }}
+    <main
+      className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[#f5f6f4] p-5 text-[#202321]"
+      style={{ backgroundImage: 'linear-gradient(rgba(101,109,105,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(101,109,105,0.08) 1px, transparent 1px)', backgroundSize: '38px 38px' }}
     >
-      <Result
-        icon={<CloseCircleOutlined style={{ color: '#ff4d4f' }} />}
-        title="Verification Failed"
-        subTitle={errorMessage || 'The verification link is invalid or has expired.'}
-        extra={
-          <Link to="/login">
-            <Button type="primary" size="large">
-              Go to Login
-            </Button>
-          </Link>
-        }
-      />
-    </div>
+      <div className="absolute inset-y-0 left-0 w-1.5 bg-[#b78115]" />
+      <div className="relative w-full max-w-lg">
+        <img src="/brand/kourier-boyz-logo-transparent.png" alt="Kourier Boyz" className="mx-auto mb-5 h-16 w-full max-w-[310px] object-contain" />
+        <Card className="rounded-lg border border-[#d9dcda] shadow-[0_24px_70px_rgba(32,35,33,0.12)]" styles={{ body: { padding: 'clamp(1rem, 3vw, 2rem)' } }}>
+          {status === 'loading' && <Result icon={<Spin indicator={<LoadingOutlined spin style={{ color: '#b78115' }} />} />} title="Verifying this device" subTitle="Confirming the secure password change request." />}
+          {status === 'success' && <Result icon={<CheckCircleOutlined style={{ color: '#3f7d56' }} />} status="success" title="Device verified" subTitle="Your password is updated and this browser is now a trusted device." extra={<Link to="/login"><Button type="primary" className="!bg-[#b78115] hover:!bg-[#8f650f]">Continue to sign in</Button></Link>} />}
+          {status === 'error' && <Result icon={<CloseCircleOutlined style={{ color: '#b42318' }} />} status="error" title="Verification unavailable" subTitle={errorMessage || 'This verification link is invalid or has expired.'} extra={<Link to="/login"><Button type="primary" className="!bg-[#b78115] hover:!bg-[#8f650f]">Back to sign in</Button></Link>} />}
+        </Card>
+      </div>
+    </main>
   )
 }
 
 export default VerifyDevicePasswordChange
-

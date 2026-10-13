@@ -67,7 +67,7 @@ const Login = () => {
   }
 
   return (
-    <main className="min-h-screen flex bg-[#f5f6f4] text-[#202321]" style={{ colorScheme: 'light' }}>
+    <main className="min-h-[100dvh] flex bg-[#f5f6f4] text-[#202321]" style={{ colorScheme: 'light' }}>
       <section className="hidden lg:flex lg:w-[52%] relative overflow-hidden border-r border-[#d9dcda] bg-[#eef0ed] text-[#202321]">
         <div
           className="absolute inset-0 opacity-70"
@@ -79,15 +79,15 @@ const Login = () => {
         />
         <div className="absolute inset-y-0 right-0 w-1 bg-[#d8b24a]" />
 
-        <div className="relative z-10 flex w-full items-center justify-center px-14 py-12">
+        <div className="relative z-10 flex w-full items-center justify-center px-12 py-8">
           <div className="w-full max-w-xl">
             <img
               src="/brand/kourier-boyz-logo-transparent.png"
               alt="Kourier Boyz"
-              className="w-full max-w-[500px] rounded-md border border-[#d1d5d2] bg-white px-6 py-4 object-contain shadow-[0_16px_42px_rgba(32,35,33,0.12)]"
+              className="w-full max-w-[440px] rounded-md border border-[#d1d5d2] bg-white px-6 py-3 object-contain shadow-[0_16px_42px_rgba(32,35,33,0.12)]"
             />
 
-            <div className="mt-14 max-w-lg">
+            <div className="mt-9 max-w-lg">
               <p className="text-sm font-semibold uppercase text-[#dfb743]">
                 Unified operations
               </p>
@@ -100,7 +100,7 @@ const Login = () => {
               </p>
             </div>
 
-            <div className="mt-12 grid grid-cols-3 border-y border-[#cfd3d0]">
+            <div className="mt-8 grid grid-cols-3 border-y border-[#cfd3d0]">
               <div className="py-5 pr-4">
                 <ShopOutlined className="text-xl text-[#dfb743]" />
                 <p className="mt-2 text-sm font-medium text-[#303532]">Marketplace</p>
@@ -137,7 +137,7 @@ const Login = () => {
 
           <Card
             className="overflow-hidden rounded-lg border border-[#d9dcda] shadow-[0_24px_70px_rgba(32,35,33,0.12)]"
-            styles={{ body: { padding: '2.5rem' } }}
+            styles={{ body: { padding: 'clamp(1.5rem, 4vw, 2.25rem)' } }}
           >
             <div className="mb-8">
               <Text className="text-sm font-semibold uppercase !text-[#9b7119]">

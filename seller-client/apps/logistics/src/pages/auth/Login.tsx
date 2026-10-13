@@ -1,4 +1,5 @@
 // pages/auth/Login.tsx
+import { Box, CircularProgress, Typography } from '@mui/material'
 import { Navigate, useLocation } from "react-router-dom";
 import LoginForm from "../../components/auth/LoginForm";
 import { useAuth } from "../../context/auth/AuthContext";
@@ -17,8 +18,18 @@ export default function Login() {
       ? `${from.pathname}${from.search || ""}${from.hash || ""}`
       : "/home";
 
-  // optional global loader while figuring out status
-  if (loading) return null;
+  if (loading) {
+    return (
+      <Box sx={{ minHeight: '100dvh', display: 'grid', placeItems: 'center', bgcolor: '#f5f6f4' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <CircularProgress size={34} sx={{ color: '#B78115' }} />
+          <Typography sx={{ mt: 2, color: '#626966', fontWeight: 700, fontSize: '0.85rem' }}>
+            Opening your Kourier Boyz console
+          </Typography>
+        </Box>
+      </Box>
+    )
+  }
 
   if (shop || isShopifyInstall) {
     const nextParams = new URLSearchParams()
