@@ -1,11 +1,13 @@
 import axios from 'axios'
+import { marketplacePublicApiUrl } from './runtime'
+import { MARKETPLACE_SELLER_TOKEN_KEY } from '../store/authStore'
 
-const API_BASE = import.meta.env.VITE_API_ROOT_URL || 'http://localhost:4000/api/marketplace'
+const API_BASE = marketplacePublicApiUrl
 
 const api = axios.create({ baseURL: API_BASE })
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('seller_token')
+  const token = localStorage.getItem(MARKETPLACE_SELLER_TOKEN_KEY)
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })

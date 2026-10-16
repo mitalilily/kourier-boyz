@@ -1,6 +1,8 @@
 import axios from 'axios'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import API from './axiosInstance'
+import { marketplacePublicApiUrl } from './runtime'
+import { MARKETPLACE_SELLER_TOKEN_KEY } from '../store/authStore'
 
 export type CertificateType =
   | 'FSSAI_LICENSE'
@@ -74,11 +76,10 @@ export const useCertificateTypes = () =>
     queryKey: ['certificate-types'],
     queryFn: async () => {
       // Use base API URL for public endpoint
-      const baseURL = import.meta.env.VITE_API_URL?.replace('/seller', '') || 'http://localhost:4000/api/marketplace'
-      const { data } = await axios.get(`${baseURL}/certificates/types`, {
+      const { data } = await axios.get(`${marketplacePublicApiUrl}/certificates/types`, {
         withCredentials: true,
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('seller_token') || ''}`,
+          Authorization: `Bearer ${localStorage.getItem(MARKETPLACE_SELLER_TOKEN_KEY) || ''}`,
         },
       })
       return data

@@ -1,17 +1,16 @@
 import axios from 'axios'
+import { marketplacePublicApiUrl } from './runtime'
+import { MARKETPLACE_SELLER_TOKEN_KEY } from '../store/authStore'
 
 // Create a separate axios instance for notifications (uses /api/notifications, not /api/seller/notifications)
 const NotificationsAPI = axios.create({
-  baseURL:
-    import.meta.env.VITE_API_ROOT_URL ||
-    import.meta.env.VITE_API_URL?.replace(/\/seller\/?$/, '') ||
-    'http://localhost:4000/api/marketplace',
+  baseURL: marketplacePublicApiUrl,
   withCredentials: true,
 })
 
 // Add auth token to requests
 NotificationsAPI.interceptors.request.use((config) => {
-  const token = localStorage.getItem('seller_token')
+  const token = localStorage.getItem(MARKETPLACE_SELLER_TOKEN_KEY)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }

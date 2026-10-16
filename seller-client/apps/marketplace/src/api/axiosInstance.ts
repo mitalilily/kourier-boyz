@@ -1,5 +1,9 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
-import { useAuthStore } from '../store/authStore'
+import {
+  MARKETPLACE_SELLER_DATA_KEY,
+  MARKETPLACE_SELLER_TOKEN_KEY,
+  useAuthStore,
+} from '../store/authStore'
 import { marketplacePublicApiUrl, marketplaceSellerApiUrl } from './runtime'
 
 // Authenticated seller API
@@ -16,7 +20,7 @@ export const PublicAPI = axios.create({
 
 // Add token to requests
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('seller_token')
+  const token = localStorage.getItem(MARKETPLACE_SELLER_TOKEN_KEY)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -53,8 +57,8 @@ API.interceptors.response.use(
     // But don't redirect if we're already on the login page (let it handle the error)
     if (errorCode === 'ACCOUNT_DEACTIVATED') {
       try {
-        localStorage.removeItem('seller_token')
-        localStorage.removeItem('seller_data')
+        localStorage.removeItem(MARKETPLACE_SELLER_TOKEN_KEY)
+        localStorage.removeItem(MARKETPLACE_SELLER_DATA_KEY)
         useAuthStore.setState({ token: null, user: null })
       } catch {
         void 0
@@ -73,8 +77,8 @@ API.interceptors.response.use(
         pendingQueue.forEach((cb) => cb(undefined))
         pendingQueue = []
         try {
-          localStorage.removeItem('seller_token')
-          localStorage.removeItem('seller_data')
+          localStorage.removeItem(MARKETPLACE_SELLER_TOKEN_KEY)
+          localStorage.removeItem(MARKETPLACE_SELLER_DATA_KEY)
           useAuthStore.setState({ token: null, user: null })
         } catch {
           void 0
@@ -110,7 +114,7 @@ API.interceptors.response.use(
           const refreshRes = await refreshClient.post('/auth/refresh', {})
           const newToken: string | undefined = refreshRes?.data?.token
           if (newToken) {
-            localStorage.setItem('seller_token', newToken)
+            localStorage.setItem(MARKETPLACE_SELLER_TOKEN_KEY, newToken)
             // Update auth store if available
             try {
               // Update token while preserving user data
@@ -138,8 +142,8 @@ API.interceptors.response.use(
       }
 
       try {
-        localStorage.removeItem('seller_token')
-        localStorage.removeItem('seller_data')
+        localStorage.removeItem(MARKETPLACE_SELLER_TOKEN_KEY)
+        localStorage.removeItem(MARKETPLACE_SELLER_DATA_KEY)
         useAuthStore.setState({ token: null, user: null })
       } catch {
         void 0

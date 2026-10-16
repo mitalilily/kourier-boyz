@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { marketplacePublicApiUrl } from './runtime'
 
 export type AgreementType =
   | 'marketplace-terms'
@@ -34,7 +35,7 @@ export interface Agreement {
 
 // Agreements endpoint is public (no auth required)
 const AGREEMENTS_API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL?.replace('/seller', '') || 'http://localhost:4000/api/marketplace',
+  baseURL: marketplacePublicApiUrl,
   withCredentials: true,
 })
 

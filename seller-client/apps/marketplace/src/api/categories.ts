@@ -1,4 +1,6 @@
 import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
+import { marketplacePublicApiUrl, marketplaceSellerApiUrl } from "./runtime";
+import { MARKETPLACE_SELLER_TOKEN_KEY } from "../store/authStore";
 
 export type CertificateType =
   | "FSSAI_LICENSE"
@@ -38,10 +40,8 @@ export interface Category {
 }
 
 // Using the main API base URL since categories are shared (not seller-specific)
-const SELLER_API_BASE =
-  import.meta.env.VITE_API_URL || "http://localhost:4000/api/marketplace/seller";
-const API_BASE =
-  import.meta.env.VITE_API_ROOT_URL || SELLER_API_BASE.replace(/\/seller\/?$/, "");
+const SELLER_API_BASE = marketplaceSellerApiUrl;
+const API_BASE = marketplacePublicApiUrl;
 
 // Create axios instance for categories (public endpoint, but may need token for some operations)
 const categoryApi = axios.create({
@@ -52,7 +52,7 @@ const categoryApi = axios.create({
 
 // Add token to requests if available
 categoryApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem("seller_token");
+  const token = localStorage.getItem(MARKETPLACE_SELLER_TOKEN_KEY);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -96,7 +96,7 @@ categoryApi.interceptors.response.use(
           await new Promise<void>((resolve) =>
             pendingQueue.push(() => resolve())
           );
-          const token = localStorage.getItem("seller_token");
+          const token = localStorage.getItem(MARKETPLACE_SELLER_TOKEN_KEY);
           if (token && originalRequest.headers) {
             (
               originalRequest.headers as Record<string, string>
@@ -113,7 +113,7 @@ categoryApi.interceptors.response.use(
         );
         const newToken: string | undefined = refreshRes?.data?.token;
         if (newToken) {
-          localStorage.setItem("seller_token", newToken);
+          localStorage.setItem(MARKETPLACE_SELLER_TOKEN_KEY, newToken);
           if (originalRequest.headers) {
             (
               originalRequest.headers as Record<string, string>

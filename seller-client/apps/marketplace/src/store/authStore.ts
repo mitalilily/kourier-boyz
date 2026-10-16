@@ -2,6 +2,9 @@ import axios from 'axios'
 import { create } from 'zustand'
 import { marketplaceSellerApiUrl } from '../api/runtime'
 
+export const MARKETPLACE_SELLER_TOKEN_KEY = 'kb_marketplace_seller_token'
+export const MARKETPLACE_SELLER_DATA_KEY = 'kb_marketplace_seller_data'
+
 export interface User {
   id: string
   name: string
@@ -110,10 +113,10 @@ const LEGACY_DEMO_SELLER_TOKEN = 'kourier-boyz-demo-seller'
 
 const getStoredToken = (): string | null => {
   if (typeof window === 'undefined') return null
-  const token = localStorage.getItem('seller_token')
+  const token = localStorage.getItem(MARKETPLACE_SELLER_TOKEN_KEY)
   if (token === LEGACY_DEMO_SELLER_TOKEN) {
-    localStorage.removeItem('seller_token')
-    localStorage.removeItem('seller_data')
+    localStorage.removeItem(MARKETPLACE_SELLER_TOKEN_KEY)
+    localStorage.removeItem(MARKETPLACE_SELLER_DATA_KEY)
     return null
   }
   return token
@@ -123,20 +126,20 @@ const getStoredToken = (): string | null => {
 const getStoredUser = (): User | null => {
   if (typeof window === 'undefined') return null
   try {
-    const storedData = localStorage.getItem('seller_data')
+    const storedData = localStorage.getItem(MARKETPLACE_SELLER_DATA_KEY)
     if (!storedData || storedData === 'undefined' || storedData === 'null') {
       return null
     }
     const user = JSON.parse(storedData) as User
     if (user.isDemo) {
-      localStorage.removeItem('seller_token')
-      localStorage.removeItem('seller_data')
+      localStorage.removeItem(MARKETPLACE_SELLER_TOKEN_KEY)
+      localStorage.removeItem(MARKETPLACE_SELLER_DATA_KEY)
       return null
     }
     return user
   } catch (error) {
     console.error('Error parsing stored user data:', error)
-    localStorage.removeItem('seller_data')
+    localStorage.removeItem(MARKETPLACE_SELLER_DATA_KEY)
     return null
   }
 }
@@ -146,7 +149,7 @@ const API_BASE_URL = marketplaceSellerApiUrl
 const sendLogoutRequest = async (): Promise<void> => {
   if (typeof window === 'undefined') return
   try {
-    const token = localStorage.getItem('seller_token')
+    const token = localStorage.getItem(MARKETPLACE_SELLER_TOKEN_KEY)
     await axios.post(
       `${API_BASE_URL}/auth/logout`,
       {},
@@ -165,22 +168,22 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: getStoredUser(),
   setAuth: (token, user) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('seller_token', token)
-      localStorage.setItem('seller_data', JSON.stringify(user))
+      localStorage.setItem(MARKETPLACE_SELLER_TOKEN_KEY, token)
+      localStorage.setItem(MARKETPLACE_SELLER_DATA_KEY, JSON.stringify(user))
     }
     set({ token, user })
   },
   setUser: (user) => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('seller_data', JSON.stringify(user))
+      localStorage.setItem(MARKETPLACE_SELLER_DATA_KEY, JSON.stringify(user))
     }
     set({ user })
   },
   logout: () => {
     if (typeof window !== 'undefined') {
       void sendLogoutRequest()
-      localStorage.removeItem('seller_token')
-      localStorage.removeItem('seller_data')
+      localStorage.removeItem(MARKETPLACE_SELLER_TOKEN_KEY)
+      localStorage.removeItem(MARKETPLACE_SELLER_DATA_KEY)
       localStorage.removeItem('cc_access')
       localStorage.removeItem('cc_refresh')
       localStorage.removeItem('kourier_boyz_demo_logistics')

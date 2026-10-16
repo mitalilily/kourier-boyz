@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
+import { marketplacePublicApiUrl } from './runtime'
+import { MARKETPLACE_SELLER_TOKEN_KEY } from '../store/authStore'
 
 // Create a separate axios instance for support tickets (they're under /api/support, not /api/seller)
 const getTicketAPI = () => {
-  const token = localStorage.getItem('seller_token')
+  const token = localStorage.getItem(MARKETPLACE_SELLER_TOKEN_KEY)
   const instance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL?.replace('/seller', '') || 'http://localhost:4000/api/marketplace',
+    baseURL: marketplacePublicApiUrl,
     withCredentials: true,
   })
   
