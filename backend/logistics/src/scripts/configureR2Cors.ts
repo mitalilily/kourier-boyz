@@ -15,6 +15,7 @@ const allowedOrigins = [
   ...new Set([
     'https://kourierboyz.com',
     'https://www.kourierboyz.com',
+    'https://seller.kourierboyz.com',
     'https://admin.kourierboyz.com',
     'http://localhost:5173',
     'http://localhost:5174',
