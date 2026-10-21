@@ -84,6 +84,64 @@ export const createMarketplaceDraft = async (req: Request, res: Response) => {
   }
 }
 
+export const cancelMarketplaceDraft = async (req: Request, res: Response) => {
+  const payload = req.body || {}
+  const userId = text(payload.logisticsUserId)
+  const marketplaceOrderId = text(payload.marketplaceOrderId)
+  if (!userId || !marketplaceOrderId) {
+    return res.status(400).json({
+      success: false,
+      message: 'Seller courier account and marketplace order are required',
+    })
+  }
+
+  try {
+    const [existing] = await db
+      .select()
+      .from(b2c_orders)
+      .where(
+        and(
+          eq(b2c_orders.user_id, userId),
+          eq(b2c_orders.source, 'marketplace'),
+          eq(b2c_orders.source_order_id, marketplaceOrderId),
+        ),
+      )
+      .limit(1)
+
+    if (!existing) {
+      return res.status(404).json({ success: false, message: 'Marketplace courier draft not found' })
+    }
+    if (existing.order_status === 'cancelled') {
+      return res.json({ success: true, data: existing, reused: true })
+    }
+    if (existing.awb_number || existing.shipment_id) {
+      return res.status(409).json({
+        success: false,
+        code: 'COURIER_BOOKING_EXISTS',
+        message: 'Cancel the booked courier shipment before cancelling this marketplace order',
+      })
+    }
+
+    const [cancelled] = await db
+      .update(b2c_orders)
+      .set({
+        order_status: 'cancelled',
+        pickup_status: 'cancelled',
+        updated_at: new Date(),
+      })
+      .where(eq(b2c_orders.id, existing.id))
+      .returning()
+
+    return res.json({ success: true, data: cancelled, reused: false })
+  } catch (error: any) {
+    console.error('Marketplace fulfillment cancellation failed', error)
+    return res.status(500).json({
+      success: false,
+      message: error?.message || 'Could not cancel courier draft',
+    })
+  }
+}
+
 export const bookMarketplaceDraft = async (req: Request, res: Response) => {
   const userId = text(req.body?.logisticsUserId)
   if (!userId) return res.status(400).json({ success: false, message: 'Seller courier account is required' })

@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   bookMarketplaceDraft,
+  cancelMarketplaceDraft,
   createMarketplaceDraft,
 } from '../controllers/marketplaceFulfillment.controller'
 import { requireInternalService } from '../middlewares/requireInternalService'
@@ -9,6 +10,7 @@ import { getShippingRatesController } from '../controllers/externalApi/shipping.
 const router = express.Router()
 router.use(requireInternalService)
 router.post('/orders', createMarketplaceDraft)
+router.post('/orders/cancel', cancelMarketplaceDraft)
 router.post('/orders/:orderId/book', bookMarketplaceDraft)
 router.post('/rates', (req: any, res) => {
   req.userId = String(req.body?.logisticsUserId || '').trim()

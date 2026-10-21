@@ -18,6 +18,7 @@ import {
   ShippingRateRequest,
   shippingProviderService,
 } from '../services/shippingProvider.service'
+import { kourierBoyzLogisticsService } from '../services/kourierBoyzLogistics.service'
 import { checkUserAccess } from '../utils/checkUserAccess'
 import { emailTemplates, sendEmail } from '../utils/email'
 import { generateInvoice } from '../utils/invoiceGenerator'
@@ -3416,6 +3417,25 @@ export const cancelSellerOrder = async (req: Request, res: Response) => {
         success: false,
         message: 'Seller shipment not found',
       })
+    }
+
+    if ((seller as any).logisticsUserId && kourierBoyzLogisticsService.isConfigured) {
+      try {
+        await kourierBoyzLogisticsService.cancelMarketplaceDraft({
+          logisticsUserId: (seller as any).logisticsUserId,
+          marketplaceOrderId: String(order._id),
+        })
+      } catch (error: any) {
+        const status = error?.response?.status
+        const payload = error?.response?.data
+        if (status !== 404) {
+          return res.status(status === 409 ? 409 : 502).json({
+            success: false,
+            message: payload?.message || 'Could not synchronize courier cancellation',
+            code: payload?.code || 'COURIER_CANCELLATION_SYNC_FAILED',
+          })
+        }
+      }
     }
 
     // Cancel the seller's shipment

@@ -34,6 +34,7 @@ import {
 } from '../utils/orderStatus'
 import { notifySellerLargeAdjustment, notifySellerRefund } from '../utils/sellerNotifications'
 import { generateTrackingUrl, getTrackingIdentifier } from '../utils/trackingUrl'
+import { kourierBoyzLogisticsService } from '../services/kourierBoyzLogistics.service'
 
 // Helper function to restore stock when order is cancelled
 const restoreOrderStock = async (orderItems: IOrderItem[]) => {
@@ -182,7 +183,10 @@ const findOrder = async (orderId: string) => {
         .populate('items.product', 'name slug mainImage sku images')
         .populate('items.variant', 'name sku mainImage images attributes')
         .populate('items.seller', 'name businessName')
-        .populate('sellerShipments.seller', 'name businessName storeSlug supportEmail storePhone')
+        .populate(
+          'sellerShipments.seller',
+          'name businessName storeSlug supportEmail storePhone logisticsUserId',
+        )
         .populate('user', '_id name email')
         .populate('coupon', 'code discountType')
     }
@@ -193,7 +197,10 @@ const findOrder = async (orderId: string) => {
         .populate('items.product', 'name slug mainImage sku images')
         .populate('items.variant', 'name sku mainImage images attributes')
         .populate('items.seller', 'name businessName')
-        .populate('sellerShipments.seller', 'name businessName storeSlug supportEmail storePhone')
+        .populate(
+          'sellerShipments.seller',
+          'name businessName storeSlug supportEmail storePhone logisticsUserId',
+        )
         .populate('user', '_id name email')
         .populate('coupon', 'code discountType')
     }
@@ -1235,6 +1242,28 @@ export const cancelOrder = async (req: Request, res: Response) => {
         success: false,
         message: reason || 'Order cannot be cancelled',
       })
+    }
+
+    for (const shipment of order.sellerShipments) {
+      const seller = shipment.seller as any
+      if (seller?.logisticsUserId && kourierBoyzLogisticsService.isConfigured) {
+        try {
+          await kourierBoyzLogisticsService.cancelMarketplaceDraft({
+            logisticsUserId: seller.logisticsUserId,
+            marketplaceOrderId: String(order._id),
+          })
+        } catch (error: any) {
+          const status = error?.response?.status
+          const payload = error?.response?.data
+          if (status !== 404) {
+            return res.status(status === 409 ? 409 : 502).json({
+              success: false,
+              message: payload?.message || 'Could not synchronize courier cancellation',
+              code: payload?.code || 'COURIER_CANCELLATION_SYNC_FAILED',
+            })
+          }
+        }
+      }
     }
 
     order.status = 'cancelled'

@@ -132,6 +132,14 @@ class KourierBoyzLogisticsService {
     return data
   }
 
+  async cancelMarketplaceDraft(payload: unknown) {
+    if (!this.internalClient || !this.apiKey) {
+      throw new Error('Kourier Boyz logistics service is not configured')
+    }
+    const { data } = await this.internalClient.post('/orders/cancel', payload)
+    return data
+  }
+
   async createReturn(payload: unknown) {
     const { data } = await this.getClient().post('/returns', payload)
     return data

@@ -1920,7 +1920,10 @@ export const cancelOrder = async (req: Request, res: Response) => {
     const { id } = req.params
 
     const order = await Order.findOne({ _id: id, user: user._id })
-      .populate('sellerShipments.seller', 'name businessName storeSlug supportEmail storePhone')
+      .populate(
+        'sellerShipments.seller',
+        'name businessName storeSlug supportEmail storePhone logisticsUserId',
+      )
       .populate('user', 'name email')
 
     if (!order) {
@@ -1937,6 +1940,28 @@ export const cancelOrder = async (req: Request, res: Response) => {
         success: false,
         message: reason || 'Order cannot be cancelled',
       })
+    }
+
+    for (const shipment of order.sellerShipments) {
+      const seller = shipment.seller as any
+      if (seller?.logisticsUserId && kourierBoyzLogisticsService.isConfigured) {
+        try {
+          await kourierBoyzLogisticsService.cancelMarketplaceDraft({
+            logisticsUserId: seller.logisticsUserId,
+            marketplaceOrderId: String(order._id),
+          })
+        } catch (error: any) {
+          const status = error?.response?.status
+          const payload = error?.response?.data
+          if (status !== 404) {
+            return res.status(status === 409 ? 409 : 502).json({
+              success: false,
+              message: payload?.message || 'Could not synchronize courier cancellation',
+              code: payload?.code || 'COURIER_CANCELLATION_SYNC_FAILED',
+            })
+          }
+        }
+      }
     }
 
     // Cancel the order
