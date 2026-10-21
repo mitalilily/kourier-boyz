@@ -344,7 +344,7 @@ const BecomeASeller = () => {
                   <Truck className="w-7 h-7 text-blue" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-4">
-                  Shipping Powered by Shipmozo
+                  Shipping Powered by Kourier Boyz
                 </h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
                   Access a network of multiple courier partners for reliable nationwide delivery. No
