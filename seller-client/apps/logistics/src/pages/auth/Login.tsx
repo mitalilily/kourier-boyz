@@ -1,22 +1,22 @@
-// pages/auth/Login.tsx
 import { Box, CircularProgress, Typography } from '@mui/material'
-import { Navigate, useLocation } from "react-router-dom";
-import LoginForm from "../../components/auth/LoginForm";
-import { useAuth } from "../../context/auth/AuthContext";
+import { Navigate, useLocation } from 'react-router-dom'
+import LoginForm from '../../components/auth/LoginForm'
+import { useAuth } from '../../context/auth/AuthContext'
 
 export default function Login() {
-  const { isAuthenticated, user, loading } = useAuth();
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const shop = String(params.get('shop') || '').trim();
-  const isShopifyInstall = params.get('shopifyInstall') === '1';
+  const { isAuthenticated, loading } = useAuth()
+  const location = useLocation()
+  const params = new URLSearchParams(location.search)
+  const shop = String(params.get('shop') || '').trim()
+  const isShopifyInstall = params.get('shopifyInstall') === '1'
+  const intent = params.get('intent')
   const from = (location.state as {
     from?: { pathname?: string; search?: string; hash?: string }
-  } | null)?.from;
+  } | null)?.from
   const returnTo =
-    from?.pathname && from.pathname !== "/"
-      ? `${from.pathname}${from.search || ""}${from.hash || ""}`
-      : "/home";
+    from?.pathname && from.pathname !== '/'
+      ? `${from.pathname}${from.search || ''}${from.hash || ''}`
+      : `/workspace${intent === 'marketplace' || intent === 'shipping' ? `?intent=${intent}` : ''}`
 
   if (loading) {
     return (
@@ -39,15 +39,7 @@ export default function Login() {
     return <Navigate to={`/shopify/install?${nextParams.toString()}`} replace />
   }
 
-  if (isAuthenticated) {
-    // not finished onboarding → push them to questions
-    if (!user?.onboardingComplete) {
-      return <Navigate to="/onboarding-questions" replace />;
-    }
-    // fully onboarded → straight to dashboard
-    return <Navigate to={returnTo} replace />;
-  }
+  if (isAuthenticated) return <Navigate to={returnTo} replace />
 
-  // unauthenticated → show the actual login form
-  return <LoginForm />;
+  return <LoginForm />
 }

@@ -104,7 +104,10 @@ export const isSalesChannelOrder = (order: Record<string, any> | null | undefine
     orderId.startsWith('woo_') ||
     integrationType === 'shopify' ||
     integrationType === 'woocommerce' ||
+    integrationType === 'marketplace' ||
+    orderId.startsWith('marketplace_') ||
     tags.includes('shopify_store:') ||
-    tags.includes('woocommerce_store:')
+    tags.includes('woocommerce_store:') ||
+    tags.includes('kourier_boyz_marketplace')
   )
 }

@@ -4,13 +4,13 @@ import {
   ShopOutlined,
 } from '@ant-design/icons'
 import { Button } from 'antd'
-import { Link } from 'react-router-dom'
 import MarketplacePublicShell from '../components/MarketplacePublicShell'
+import { logisticsConsoleUrl } from '../api/runtime'
 
 const benefits = [
   'List products and control inventory',
   'Process marketplace orders and returns',
-  'Use Kourier Boyz fulfilment when it suits you',
+  'Fulfil every marketplace order through your verified shipping account',
 ]
 
 const StoreEntry = () => {
@@ -37,8 +37,8 @@ const StoreEntry = () => {
           <h1>Open your store. Ship what sells.</h1>
           <p>
             Put your catalogue, customer orders, and delivery workflow in one clear seller workspace.
-            Sell through the marketplace when you want to, and choose Kourier Boyz fulfilment only
-            when it helps your business move faster.
+            Your courier account is the secure business identity behind the store, so verification,
+            pickup, tracking, and fulfilment stay connected from the start.
           </p>
 
           <div className="kb-store-entry-benefits">
@@ -51,14 +51,12 @@ const StoreEntry = () => {
           </div>
 
           <div className="kb-store-entry-actions">
-            <Link to="/register">
+            <a href={`${logisticsConsoleUrl}/?intent=marketplace`}>
               <Button type="primary" size="large" icon={<ShopOutlined />}>
-                Open your store <ArrowRightOutlined />
+                Continue with Kourier Boyz <ArrowRightOutlined />
               </Button>
-            </Link>
-            <Link to="/login" className="kb-store-entry-inline-link">
-              Already sell here? Sign in
-            </Link>
+            </a>
+            <a href={`${logisticsConsoleUrl}/?intent=shipping`} className="kb-store-entry-inline-link">Ship without opening a store</a>
           </div>
         </div>
 
@@ -66,7 +64,7 @@ const StoreEntry = () => {
           {[
             ['01', 'Create', 'Build a professional catalogue'],
             ['02', 'Sell', 'Manage orders and customers'],
-            ['03', 'Deliver', 'Book fulfilment when needed'],
+            ['03', 'Deliver', 'Fulfil through your courier account'],
           ].map(([number, title, detail]) => (
             <div key={number}>
               <span>{number}</span>

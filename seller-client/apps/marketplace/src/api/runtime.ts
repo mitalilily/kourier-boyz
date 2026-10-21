@@ -13,6 +13,10 @@ export const logisticsApiUrl =
   import.meta.env.VITE_LOGISTICS_API_URL ||
   (isLocalRuntime() ? 'http://localhost:4000/api' : '/api')
 
+export const logisticsConsoleUrl =
+  import.meta.env.VITE_LOGISTICS_CONSOLE_URL ||
+  (isLocalRuntime() ? 'http://localhost:5174' : window.location.origin)
+
 export const marketplaceSocketUrl =
   import.meta.env.VITE_SOCKET_URL ||
   (isLocalRuntime() ? 'http://localhost:4000' : window.location.origin)

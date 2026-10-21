@@ -25,6 +25,9 @@ type LogisticsIdentity = {
   name: string
   phone?: string
   businessName?: string
+  approved: boolean
+  onboardingComplete: boolean
+  kycStatus: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED'
 }
 
 const getLogisticsAuthorization = (req: Request) => {
@@ -69,6 +72,16 @@ const resolveLogisticsIdentity = async (req: Request): Promise<LogisticsIdentity
     name,
     phone: normalizeIndianPhone(company.contactNumber || company.companyContactNumber),
     businessName: String(company.brandName || company.businessName || '').trim() || undefined,
+    approved: Boolean(profile.approved || profile.domesticKyc?.status === 'verified'),
+    onboardingComplete: Boolean(profile.onboardingComplete),
+    kycStatus:
+      profile.domesticKyc?.status === 'verified'
+        ? 'APPROVED'
+        : profile.domesticKyc?.status === 'rejected'
+          ? 'REJECTED'
+          : profile.onboardingComplete
+            ? 'PENDING'
+            : 'NOT_SUBMITTED',
   }
 }
 
@@ -310,7 +323,32 @@ export const resumeSellerFromLogistics = async (req: Request, res: Response) => 
     }
 
     if (!seller) {
-      return res.json({ status: 'registration_required', profile: identity })
+      seller = await User.create({
+        name: identity.name,
+        email: identity.email,
+        phone: identity.phone,
+        businessName: identity.businessName,
+        role: 'seller',
+        logisticsUserId: identity.userId,
+        isEmailVerified: true,
+        isPhoneVerified: Boolean(identity.phone),
+        isApproved: identity.approved,
+        kycSubmitted: identity.onboardingComplete,
+        kycStatus: identity.kycStatus,
+        storeStatus: 'inactive',
+        sellerLifecycleStatus: 'ACTIVE',
+      })
+    } else {
+      seller.name = seller.name || identity.name
+      seller.phone = seller.phone || identity.phone
+      seller.businessName = seller.businessName || identity.businessName
+      if (seller.kycStatus !== 'SUSPENDED') {
+        seller.isApproved = identity.approved
+        seller.kycSubmitted = identity.onboardingComplete
+        seller.kycStatus = identity.kycStatus
+      }
+      seller.isEmailVerified = true
+      await seller.save()
     }
 
     if (seller.sellerLifecycleStatus === 'DEACTIVATED') {

@@ -111,6 +111,11 @@ export const b2c_orders = pgTable(
 
   integration_type: varchar('integration_type').default('delhivery'),
 
+  source: varchar('source', { length: 40 }).notNull().default('manual'),
+  source_order_id: varchar('source_order_id', { length: 100 }),
+  source_seller_id: varchar('source_seller_id', { length: 100 }),
+  source_meta: jsonb('source_meta'),
+
   // Order source flag
   is_external_api: boolean('is_external_api').default(false), // true if created via external API, false if created locally
 
@@ -125,6 +130,11 @@ export const b2c_orders = pgTable(
     merchantOrderNumberUnique: uniqueIndex('b2c_orders_user_order_number_unique').on(
       table.user_id,
       table.order_number,
+    ),
+    merchantSourceOrderUnique: uniqueIndex('b2c_orders_user_source_order_unique').on(
+      table.user_id,
+      table.source,
+      table.source_order_id,
     ),
   }),
 )

@@ -13,7 +13,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { FiCheckCircle, FiPackage, FiSettings, FiShoppingBag } from 'react-icons/fi'
 import { MdArrowBack, MdArrowForward } from 'react-icons/md'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import StepOneForm from '../../components/onboarding/StepOneForm'
 import StepThree from '../../components/onboarding/StepThree'
 import StepTwoForm from '../../components/onboarding/StepTwoForm'
@@ -61,6 +61,8 @@ export default function UserOnboarding() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const location = useLocation()
+  const intent = new URLSearchParams(location.search).get('intent')
 
   const { user: userData, loading: fetchingUserData, refetchUser } = useAuth()
   const { mutateAsync: completeOnboarding, isPending } = useCompleteUserOnboarding()
@@ -125,7 +127,7 @@ export default function UserOnboarding() {
         setStep((prev) => prev + 1)
       } else {
         queryClient.invalidateQueries({ queryKey: ['userProfile'], exact: true })
-        navigate('/home')
+        navigate(intent === 'marketplace' ? '/profile/kyc_details?intent=marketplace' : '/home')
       }
     } catch (error) {
       console.error('Failed to complete onboarding step', error)
@@ -140,14 +142,14 @@ export default function UserOnboarding() {
     if (!userData) return
 
     if (userData.onboardingComplete) {
-      navigate('/home')
+      navigate(intent === 'marketplace' ? '/profile/kyc_details?intent=marketplace' : '/home')
       return
     }
 
     const resumeStep = (userData.onboardingStep ?? 0) + 1
     const clamped = Math.min(Math.max(resumeStep, 1), steps.length)
     setStep(clamped)
-  }, [userData, navigate])
+  }, [userData, navigate, intent])
 
   useEffect(() => {
     if (!userData || !Object.keys(userData).length) return

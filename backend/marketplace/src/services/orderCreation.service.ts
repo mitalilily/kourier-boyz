@@ -13,6 +13,7 @@ import { getPhoneFromUser } from '../utils/phoneDecryptionHelper'
 import { calculateShippingCharge } from '../utils/shippingCalculator'
 import { sendSms } from '../utils/sms'
 import { getSmsTemplate, SmsTemplateType } from '../utils/smsTemplates'
+import { kourierBoyzLogisticsService } from './kourierBoyzLogistics.service'
 
 /**
  * Create orders from a payment intent after payment is confirmed via webhook
@@ -69,7 +70,7 @@ export const createOrderFromPaymentIntent = async (
 
   const sellerIds = Array.from(sellerIdsSet).map((id) => new mongoose.Types.ObjectId(id))
   const sellers = await User.find({ _id: { $in: sellerIds } }).select(
-    'name businessName storeSlug supportEmail supportPhone storePhone phone defaultShippingRate gstNumber',
+    'name businessName storeSlug supportEmail supportPhone storePhone phone defaultShippingRate gstNumber logisticsUserId',
   )
   const sellerMap = new Map(sellers.map((s) => [s._id.toString(), s]))
 
@@ -349,6 +350,80 @@ export const createOrderFromPaymentIntent = async (
     })
 
     await order.save()
+
+    if (seller?.logisticsUserId && kourierBoyzLogisticsService.isConfigured) {
+      try {
+        const dimensions = (product as any).shippingDimensions || (product as any).dimensions || {}
+        const draftResponse = await kourierBoyzLogisticsService.createMarketplaceDraft({
+          logisticsUserId: seller.logisticsUserId,
+          marketplaceSellerId: seller._id.toString(),
+          marketplaceOrderId: String(order._id),
+          marketplaceShipmentId: order.sellerShipments[0]?._id?.toString(),
+          orderNumber: `KBM-${String(order._id).slice(-16).toUpperCase()}`,
+          orderDate: order.createdAt?.toISOString?.() || new Date().toISOString(),
+          orderAmount: itemTotal,
+          paymentType: order.paymentMethod,
+          shippingCharges: shipping,
+          discount: itemDiscount,
+          giftWrap: order.giftWrap ? 1 : 0,
+          batchCode,
+          buyer: {
+            name: order.shippingAddress.name,
+            phone: order.shippingAddress.phone,
+            email: user.email,
+            address: [order.shippingAddress.addressLine1, order.shippingAddress.addressLine2]
+              .filter(Boolean)
+              .join(', '),
+            city: order.shippingAddress.city,
+            state: order.shippingAddress.state,
+            country: order.shippingAddress.country,
+            pincode: order.shippingAddress.postalCode,
+          },
+          products: [
+            {
+              productName: product.name,
+              price: snapshotPrice,
+              quantity: intentItem.quantity,
+              sku: product.sku,
+              hsnCode: intentItem.hsnSacCode,
+              discount: itemDiscount,
+              taxRate: intentItem.gstRatePercent,
+            },
+          ],
+          package: {
+            weight: Number((product as any).weight || 0.5),
+            length: Number(dimensions.length || 10),
+            breadth: Number(dimensions.width || dimensions.breadth || 10),
+            height: Number(dimensions.height || 10),
+          },
+        })
+        const draft = draftResponse?.data
+        if (draft?.id && order.sellerShipments[0]) {
+          order.sellerShipments[0].kourierBoyzLogistics = {
+            ...(order.sellerShipments[0].kourierBoyzLogistics || {}),
+            order_id: String(draft.id),
+            order_number: String(draft.order_number || ''),
+            draft_synced_at: new Date(),
+          }
+          order.markModified('sellerShipments')
+          await order.save()
+        }
+      } catch (syncError: any) {
+        console.error('[Order Creation] Courier draft sync failed', {
+          orderId: String(order._id),
+          sellerId,
+          message: syncError?.message || String(syncError),
+        })
+        if (order.sellerShipments[0]) {
+          order.sellerShipments[0].kourierBoyzLogistics = {
+            ...(order.sellerShipments[0].kourierBoyzLogistics || {}),
+            sync_error: syncError?.message || 'Courier draft sync failed',
+          }
+          order.markModified('sellerShipments')
+          await order.save().catch(() => undefined)
+        }
+      }
+    }
     createdOrders.push(order)
 
     // Update stock

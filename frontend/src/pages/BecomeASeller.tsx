@@ -79,19 +79,19 @@ const BecomeASeller = () => {
   const handleStartSelling = () => {
     if (!isAuthenticated) {
       // Not logged in → redirect to seller signup
-      window.location.href = getSellerPanelUrl('/register')
+      window.location.href = getSellerPanelUrl('/?intent=marketplace')
     } else if (user?.role !== 'seller') {
       // Logged in but not a seller → redirect to seller signup
-      window.location.href = getSellerPanelUrl('/register')
+      window.location.href = getSellerPanelUrl('/?intent=marketplace')
     } else {
       // Logged in and is a seller → redirect to seller dashboard
-      window.location.href = getSellerPanelUrl('/')
+      window.location.href = getSellerPanelUrl('/?intent=marketplace')
     }
   }
 
   const handleSellerLogin = () => {
     // Always redirect to seller login
-    window.location.href = getSellerPanelUrl('/login')
+    window.location.href = getSellerPanelUrl('/?intent=marketplace')
   }
 
   const valueCards = [
@@ -107,8 +107,8 @@ const BecomeASeller = () => {
     },
     {
       icon: Truck,
-      title: 'Nationwide Shipping via Shipmozo',
-      description: 'Access multiple courier partners for reliable nationwide delivery.',
+      title: 'Nationwide Shipping via Kourier Boyz',
+      description: 'Access multiple courier partners through the shipping account connected to your store.',
     },
     {
       icon: HeadphonesIcon,
@@ -130,13 +130,13 @@ const BecomeASeller = () => {
   const howItWorksSteps = [
     {
       step: 1,
-      title: 'Sign up as a Seller',
-      description: 'Create your seller account with basic business information.',
+      title: 'Create one Kourier Boyz account',
+      description: 'Use the same verified business identity for shipping and marketplace selling.',
     },
     {
       step: 2,
-      title: 'Complete KYC & Bank Details',
-      description: 'Verify your identity and add bank details for settlements.',
+      title: 'Complete courier KYC once',
+      description: 'Verify your identity in the courier console; the marketplace securely reuses that status.',
     },
     {
       step: 3,

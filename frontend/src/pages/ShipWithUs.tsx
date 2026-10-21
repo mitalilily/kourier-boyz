@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { getSellerPanelUrl } from '@/lib/sellerPanelUrl'
 
 const ShipWithUs = () => {
-  const sellerUrl = getSellerPanelUrl('/')
+  const sellerUrl = getSellerPanelUrl('/?intent=shipping')
 
   return (
     <main className="kb-site min-h-screen bg-white pt-28 lg:pt-24">

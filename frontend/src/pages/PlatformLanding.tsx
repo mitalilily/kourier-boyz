@@ -66,7 +66,7 @@ const testimonials = [
 
 const faqs = [
   ['Do I need to sell on the marketplace to use shipping?', 'No. You can use Kourier Boyz only for orders from your website, social channels, marketplaces, retail counter, or any other source.'],
-  ['Can I open a store without using the courier aggregator?', 'Yes. Marketplace selling and courier aggregation are independent tools. Use either one, or connect both when it helps your operation.'],
+  ['Can I open a store without a shipping account?', 'Your Kourier Boyz shipping account is the verified business identity behind every marketplace store. You can use shipping without a store, while marketplace orders always use the connected fulfilment workflow.'],
   ['Can buyers track marketplace orders?', 'Yes. Buyers receive order updates and can use the public tracking experience for supported shipments.'],
   ['What happens when my business grows?', 'Your seller account can add catalogue, inventory, marketplace orders, shipping, COD, and reporting without moving to a separate system.'],
 ]
@@ -387,12 +387,12 @@ const PlatformLanding = () => {
       <section className="kb-section kb-pattern-weave">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
           <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
-            <div><span className="kb-kicker">Designed for seller choice</span><h2 className="kb-title mt-3">Use the platform your way.</h2><p className="kb-copy mt-4">No forced bundle. Start with courier aggregation, marketplace selling, or both. Your operations remain useful at every stage.</p></div>
+            <div><span className="kb-kicker">Designed for seller choice</span><h2 className="kb-title mt-3">Start where your business needs you.</h2><p className="kb-copy mt-4">Use courier aggregation on its own, or add a marketplace store when you are ready. One verified shipping account keeps identity, pickup, tracking, and fulfilment connected.</p></div>
             <div className="divide-y divide-black/10 border-y border-black/10">
               {[
                 [PackagePlus, 'Courier tools only', 'Ship orders from any sales channel, with rate comparison, labels, tracking, and COD visibility.'],
-                [Store, 'Marketplace only', 'List products, manage stock, receive orders, and use your preferred fulfilment setup.'],
-                [Zap, 'Marketplace + shipping', 'Connect catalogue, buyer orders, pickup booking, tracking, returns, and reporting end to end.'],
+                [Store, 'Add your marketplace store', 'Reuse your verified courier identity, then configure your catalogue, stock, pricing, and storefront.'],
+                [Zap, 'Sell and fulfil together', 'Marketplace orders are recorded in seller operations and move into the connected shipping workflow automatically.'],
               ].map(([Icon, title, copy]) => (
                 <div key={title as string} className="grid gap-4 py-7 sm:grid-cols-[48px_1fr]"><span className="kb-silver-icon flex h-11 w-11 items-center justify-center text-[#8a620d]"><Icon className="h-5 w-5" /></span><div><h3 className="text-xl font-semibold">{title as string}</h3><p className="mt-2 leading-7 text-[#686864]">{copy as string}</p></div></div>
               ))}
@@ -414,7 +414,7 @@ const PlatformLanding = () => {
 
       <section className="kb-section kb-pattern-dot-matrix">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[0.65fr_1.35fr] lg:px-10">
-          <div><span className="kb-kicker">Straight answers</span><h2 className="kb-title mt-3">Before you get started.</h2><p className="kb-copy mt-4">The marketplace and courier aggregator are connected, but never compulsory as a bundle.</p></div>
+          <div><span className="kb-kicker">Straight answers</span><h2 className="kb-title mt-3">Before you get started.</h2><p className="kb-copy mt-4">Shipping works independently. Marketplace selling adds to the same verified seller account, so fulfilment never becomes a disconnected second system.</p></div>
           <div className="border-t border-black/10">
             {faqs.map(([question, answer], index) => (
               <details key={question} className="kb-hover-faq group border-b border-black/10 py-1" open={index === 0}>

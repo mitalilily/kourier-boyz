@@ -21,6 +21,7 @@ const routerBasename =
 /* ---------- Lazy-loaded components ---------- */
 // Onboarding & Dashboard
 const UserOnboarding = lazy(() => import('../pages/onboarding/UserOnboarding'))
+const WorkspaceChooser = lazy(() => import('../pages/workspace/WorkspaceChooser'))
 const Dashboard = lazy(() => import('../pages/dashboard/Dashboard'))
 
 // Orders
@@ -152,6 +153,14 @@ export default function AppRoutes() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/tracking" element={<PublicTrackingRoute />} />
           <Route path="/tracking/:awb" element={<PublicTrackingRoute />} />
+          <Route
+            path="/workspace"
+            element={
+              <RequireAuth>
+                <WorkspaceChooser />
+              </RequireAuth>
+            }
+          />
           {/* onboarding */}
           <Route
             path="/onboarding-questions"

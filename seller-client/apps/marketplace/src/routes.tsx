@@ -13,7 +13,6 @@ import CustomerDetail from './pages/CustomerDetail'
 import Customers from './pages/Customers'
 import Dashboard from './pages/Dashboard'
 import ForgotPassword from './pages/ForgotPassword'
-import Login from './pages/Login'
 import SellerNotifications from './pages/Notifications'
 import OrderDetail from './pages/Orders/OrderDetail'
 import OrdersList from './pages/Orders/OrdersList'
@@ -21,7 +20,6 @@ import ProductForm from './pages/Products/ProductForm'
 import ProductList from './pages/Products/ProductList'
 import ProductView from './pages/Products/ProductView'
 import SellerProfile from './pages/Profile/SellerProfile'
-import Register from './pages/Register'
 import ReportsPage from './pages/Reports'
 import ResetPassword from './pages/ResetPassword'
 import ReturnsPage from './pages/Returns'
@@ -38,6 +36,7 @@ import VerifyEmail from './pages/VerifyEmail'
 import RouteErrorBoundary from './components/RouteErrorBoundary'
 import PublicSellerRoute from './components/PublicSellerRoute'
 import CourierSessionBridge from './components/CourierSessionBridge'
+import StoreEntry from './pages/StoreEntry'
 
 const AppRoutes = () => {
   return (
@@ -50,7 +49,7 @@ const AppRoutes = () => {
           path="/login"
           element={
             <PublicSellerRoute>
-              <Login />
+              <StoreEntry />
             </PublicSellerRoute>
           }
         />
@@ -58,7 +57,7 @@ const AppRoutes = () => {
           path="/register"
           element={
             <PublicSellerRoute>
-              <Register />
+              <StoreEntry />
             </PublicSellerRoute>
           }
         />

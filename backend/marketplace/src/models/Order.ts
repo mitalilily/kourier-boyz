@@ -95,6 +95,8 @@ export interface IOrderSellerShipment {
     label_url?: string
     tracking_link?: string
     estimated_delivery_date?: string
+    draft_synced_at?: Date
+    sync_error?: string
   }
   manifest?: {
     manifest_id?: string
@@ -512,6 +514,8 @@ const SellerShipmentSchema = new Schema<IOrderSellerShipment>(
       label_url: String,
       tracking_link: String,
       estimated_delivery_date: String,
+      draft_synced_at: Date,
+      sync_error: String,
     },
     manifest: {
       manifest_id: String,

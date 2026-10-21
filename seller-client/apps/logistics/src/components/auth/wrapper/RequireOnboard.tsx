@@ -22,7 +22,8 @@ export default function RequireOnboard({
 
   /* 3️⃣  Logged‑in AND already onboarded → send to main app */
   if (user?.onboardingComplete) {
-    return <Navigate to="/home" replace />;
+    const intent = new URLSearchParams(location.search).get('intent')
+    return <Navigate to={intent === 'marketplace' ? '/profile/kyc_details?intent=marketplace' : '/home'} replace />;
   }
 
   /* 4️⃣  Logged‑in BUT NOT onboarded → let them see onboarding page */

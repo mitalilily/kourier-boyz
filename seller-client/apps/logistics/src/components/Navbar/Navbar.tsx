@@ -8,6 +8,7 @@ import GlobalSearch from './GlobalSearch'
 import QuickActions from './QuickActions'
 import UserMenu from './UserMenu'
 import WalletMenu from './WalletMenu'
+import WorkspaceSwitcher from './WorkspaceSwitcher'
 
 interface NavbarProps {
   handleDrawerToggle: () => void
@@ -138,6 +139,7 @@ export default function Navbar({ handleDrawerToggle, pinned = false, onPinChange
           flexShrink={0}
           sx={{ minWidth: 0 }}
         >
+          <WorkspaceSwitcher />
           {isCompactNavbar ? (
             <>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>

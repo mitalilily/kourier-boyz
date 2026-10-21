@@ -7,6 +7,7 @@ import { normalizeShipmozoOrderNumber } from '../utils/shippingOrderNumber'
 import { kourierBoyzLogisticsService } from './kourierBoyzLogistics.service'
 
 type LegacyLikeRateRequest = {
+  logistics_user_id?: string
   order_id?: string
   destination: string
   origin?: string
@@ -25,6 +26,9 @@ export type ShippingRateRequest = LegacyLikeRateRequest
 export type KourierBoyzLogisticsRateRequest = ShippingRateRequest
 
 type LegacyLikeShipmentPayload = {
+  logistics_user_id?: string
+  existing_logistics_order_id?: string
+  marketplace_order_id?: string
   order_number: string
   payment_type: 'cod' | 'prepaid'
   order_amount: number

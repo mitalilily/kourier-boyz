@@ -71,6 +71,8 @@ import publicToolsRoutes from './routes/publicTools.routes'
 import userRoutes from './routes/userRoutes'
 import walletRoutes from './routes/walletRoutes'
 import weightReconciliationRoutes from './routes/weightReconciliation.routes'
+import merchantCapabilitiesRoutes from './routes/merchantCapabilities.routes'
+import marketplaceFulfillmentRoutes from './routes/marketplaceFulfillment.routes'
 
 // Routes imports
 // import other routes here...
@@ -172,6 +174,8 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/api/user', userRoutes)
 app.use('/api/profile', profileRoutes)
+app.use('/api/merchant', merchantCapabilitiesRoutes)
+app.use('/api/internal/marketplace', marketplaceFulfillmentRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/innofulfill', innofulfillRoutes)
 app.use('/api/integrations', integrationRoutes)

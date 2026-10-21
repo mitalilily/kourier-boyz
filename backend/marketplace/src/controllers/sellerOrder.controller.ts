@@ -1187,6 +1187,7 @@ export const getSellerShipmentRates = async (req: Request, res: Response) => {
       weight,
       dimensions,
     })
+    payload.logistics_user_id = seller.logisticsUserId
 
     const rates = await shippingProviderService.getRates(payload)
     console.log('rates', rates)
@@ -1337,7 +1338,10 @@ export const createSellerShipment = async (req: Request, res: Response) => {
       })
     }
 
-    if (sellerShipment.kourierBoyzLogistics?.order_id) {
+    if (
+      sellerShipment.kourierBoyzLogistics?.order_id &&
+      sellerShipment.kourierBoyzLogistics?.awb_number
+    ) {
       return res.json({
         success: true,
         message: 'Shipment was already created earlier and has been reused',
@@ -1365,6 +1369,9 @@ export const createSellerShipment = async (req: Request, res: Response) => {
     const consigneeEmail = (ownedOrder.user as any)?.email
 
     const shipmentPayload: ShippingCreateShipmentRequest = {
+      logistics_user_id: seller.logisticsUserId,
+      existing_logistics_order_id: sellerShipment.kourierBoyzLogistics?.order_id,
+      marketplace_order_id: ownedOrder._id?.toString(),
       order_number: buildForwardShipmentOrderNumber({
         orderNumber: ownedOrder.orderNumber,
         orderId: ownedOrder._id?.toString(),
@@ -1885,6 +1892,10 @@ export const requestPickup = async (req: Request, res: Response) => {
       })
 
       const shipmentPayload: ShippingCreateShipmentRequest = {
+        logistics_user_id: seller.logisticsUserId,
+        existing_logistics_order_id:
+          sellerShipment.kourierBoyzLogistics?.order_id,
+        marketplace_order_id: ownedOrder._id?.toString(),
         order_number: compactOrderNumber,
         payment_type: ownedOrder.paymentMethod === 'cod' ? 'cod' : 'prepaid',
         order_amount: sellerTotals.itemSubtotal,

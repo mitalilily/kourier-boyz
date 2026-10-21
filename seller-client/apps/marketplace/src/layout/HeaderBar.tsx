@@ -12,6 +12,7 @@ import {
   ShoppingOutlined,
   ThunderboltOutlined,
   UserOutlined,
+  CarOutlined,
 } from '@ant-design/icons'
 import {
   App,
@@ -43,6 +44,7 @@ import { useAuthStore } from '../store/authStore'
 import { type SellerNotification, useSellerNotificationStore } from '../store/notificationStore'
 import { useSellerTourStore } from '../store/sellerTourStore'
 import { marketplaceSocketUrl } from '../api/runtime'
+import { logisticsConsoleUrl } from '../api/runtime'
 
 const { Header } = Layout
 
@@ -535,6 +537,24 @@ const HeaderBar = () => {
         align="center"
         style={{ flexShrink: 0 }}
       >
+        {!isMobile && (
+          <Space.Compact>
+            <Button
+              icon={<CarOutlined />}
+              onClick={() => window.location.assign(`${logisticsConsoleUrl}/?kb_console_route=/home`)}
+              style={{ borderRadius: 0, fontWeight: 700 }}
+            >
+              Shipping
+            </Button>
+            <Button
+              type="primary"
+              icon={<ShoppingOutlined />}
+              style={{ borderRadius: 0, background: '#252926', borderColor: '#252926', fontWeight: 800 }}
+            >
+              Marketplace
+            </Button>
+          </Space.Compact>
+        )}
         {/* Email verification reminder for sellers */}
         {user?.role === 'seller' && !user.isEmailVerified && (
           <Space size="small">
