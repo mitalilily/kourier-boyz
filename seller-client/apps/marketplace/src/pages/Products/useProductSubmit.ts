@@ -4,7 +4,12 @@ import type { NavigateFunction } from 'react-router-dom'
 import type { ProductFormData } from '../../api/products'
 import { useAuthStore } from '../../store/authStore'
 import type { VariantState } from './productFormUtils'
-import { processVariantsForSubmission, validateGstHsn } from './productFormUtils'
+import {
+  getHostedUploadUrl,
+  processVariantsForSubmission,
+  validateGstHsn,
+  type ProductUploadFile,
+} from './productFormUtils'
 import { calculatePricing } from './components/PricingInventoryTab/utils'
 
 type UseProductSubmitParams = {
@@ -18,9 +23,9 @@ type UseProductSubmitParams = {
   filterMetadata: Array<{ key: string; values: string[] }>
   specifications: Array<{ key?: string; value: string }>
   tags: string[]
-  mainImageList: Array<{ originFileObj?: File; url?: string }>
-  imagesList: Array<{ originFileObj?: File; url?: string }>
-  videosList?: Array<{ originFileObj?: File; url?: string }>
+  mainImageList: ProductUploadFile[]
+  imagesList: ProductUploadFile[]
+  videosList?: ProductUploadFile[]
   product: { variants?: unknown; hasVariants?: boolean } | null | undefined
   sizeChartData?: {
     title: string;
@@ -71,6 +76,16 @@ const useProductSubmit = ({
 
   const onFinish = async (values: ProductFormData) => {
     try {
+      const productMedia = [...mainImageList, ...imagesList, ...videosList]
+      if (productMedia.some((file) => file.status === 'uploading')) {
+        message.warning('Please wait for all media uploads to finish before saving the product.')
+        return
+      }
+      if (productMedia.some((file) => file.status === 'error')) {
+        message.error('One or more media uploads failed. Remove or retry them before saving.')
+        return
+      }
+
       // Ensure shippingCharge is set - use defaultShippingRate if not provided
       // This ensures that even if the seller doesn't touch the field, the default rate is saved
       // Check both form values and form field value (in case field wasn't touched)
@@ -481,12 +496,8 @@ const useProductSubmit = ({
         }
       }
 
-      // Use __publicUrl (Cloudflare URL set after presign) so we don't rely on .url (can be overwritten by preview)
-      const getCloudflareUrl = (file: { url?: string; __publicUrl?: string } | undefined) =>
-        (file as { __publicUrl?: string } | undefined)?.__publicUrl ?? file?.url
-
       // Handle main image: prefer Cloudflare URL over binary
-      const mainCloudflareUrl = getCloudflareUrl(mainImageList[0])
+      const mainCloudflareUrl = getHostedUploadUrl(mainImageList[0])
       if (isHostedUrl(mainCloudflareUrl)) {
         formData.existingMainImage = mainCloudflareUrl!
       } else if (mainImageList[0]?.originFileObj) {
@@ -498,7 +509,7 @@ const useProductSubmit = ({
       const existingImageUrls: string[] = []
 
       imagesList.forEach((file) => {
-        const cloudflareUrl = getCloudflareUrl(file)
+        const cloudflareUrl = getHostedUploadUrl(file)
         if (isHostedUrl(cloudflareUrl)) {
           existingImageUrls.push(cloudflareUrl!)
         } else if (file.originFileObj) {
@@ -515,7 +526,7 @@ const useProductSubmit = ({
         const existingVideoUrls: string[] = []
 
         videosList.forEach((file) => {
-          const cloudflareUrl = getCloudflareUrl(file)
+          const cloudflareUrl = getHostedUploadUrl(file)
           if (isHostedUrl(cloudflareUrl)) {
             existingVideoUrls.push(cloudflareUrl!)
           } else if (file.originFileObj) {
@@ -601,14 +612,18 @@ const useProductSubmit = ({
 
       const isPublishingActive = formData.status === 'active'
       const publishIssues: string[] = []
-      if (!formData.name || !formData.name.trim()) publishIssues.push('Product name')
-      if (!formData.description || !formData.description.trim()) publishIssues.push('Description')
-      if (formData.price === undefined || formData.price === null) publishIssues.push('Price')
-      if (!formData.category) publishIssues.push('Category')
-
       if (isPublishingActive) {
+        if (!formData.name || !formData.name.trim()) publishIssues.push('Product name')
+        if (!formData.description || !formData.description.trim()) publishIssues.push('Description')
+        if (formData.price === undefined || formData.price === null) publishIssues.push('Price')
+        if (!formData.category) publishIssues.push('Category')
         const hasMainImage = !!formData.mainImage || !!formData.existingMainImage
         if (!hasMainImage) publishIssues.push('Main image')
+      }
+
+      if (publishIssues.length > 0) {
+        message.error(`Complete these fields before publishing: ${publishIssues.join(', ')}.`)
+        return
       }
 
       if (hasVariants) {

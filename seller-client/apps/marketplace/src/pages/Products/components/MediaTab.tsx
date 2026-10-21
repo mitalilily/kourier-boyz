@@ -17,7 +17,7 @@ import {
 import type { UploadRequestFile } from 'rc-upload/lib/interface'
 import { useMemo } from 'react'
 import { deleteProductMedia, getProductMediaPresign } from '../../../api/products'
-import { getUniqueAttributeValues } from '../productFormUtils'
+import { getHostedUploadUrl, getUniqueAttributeValues } from '../productFormUtils'
 
 type RcFile = Parameters<NonNullable<Parameters<typeof Upload>[0]['beforeUpload']>>[0]
 type UploadRequestOption = Parameters<NonNullable<Parameters<typeof Upload>[0]['customRequest']>>[0]
@@ -175,10 +175,7 @@ const MediaTab = ({
   const getRemoteUrl = (file: UploadFile | string | null | undefined): string | null => {
     if (!file) return null
     if (typeof file === 'string') return file
-    if (typeof file === 'object' && file.url && !('originFileObj' in file && file.originFileObj)) {
-      return file.url
-    }
-    return null
+    return getHostedUploadUrl(file) || null
   }
 
   const isNewUpload = (file: UploadFile | string | null | undefined): boolean => {
@@ -240,15 +237,15 @@ const MediaTab = ({
           fileRef.url = publicUrl
           fileRef.__publicUrl = publicUrl
           fileRef.__isNewUpload = true
-          if ('originFileObj' in fileRef) {
-            delete (fileRef as { originFileObj?: unknown }).originFileObj
-          }
           const replaceUrl = fileRef.__replaceUrl
           if (replaceUrl) {
             void deleteProductMedia({ url: replaceUrl })
             delete fileRef.__replaceUrl
           }
-          onSuccess?.({ url: publicUrl }, uploadFile as unknown as UploadRequestFile)
+          onSuccess?.(
+            { url: publicUrl, publicUrl, __publicUrl: publicUrl, __isNewUpload: true },
+            uploadFile as unknown as UploadRequestFile,
+          )
         } else {
           onError?.(new Error('Upload failed'))
         }

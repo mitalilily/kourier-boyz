@@ -1411,6 +1411,10 @@ export const createProduct = async (req: Request, res: Response) => {
       }
     }
 
+    if (finalStatus !== 'draft' && !hasVariantsEnabled && !mainImageUrl) {
+      return res.status(400).json({ error: 'Main image is required before publishing the product' })
+    }
+
     const product = new Product({
       seller: sellerId,
       name,
@@ -1935,6 +1939,15 @@ export const createProduct = async (req: Request, res: Response) => {
     }
     if (error.message?.startsWith('Invalid ')) {
       return res.status(400).json({ error: error.message })
+    }
+    if (err instanceof mongoose.Error.ValidationError) {
+      const validationMessages = Object.values(err.errors).map((validationError) =>
+        validationError.message,
+      )
+      return res.status(400).json({
+        error: validationMessages[0] || 'Product validation failed',
+        details: validationMessages,
+      })
     }
     res.status(500).json({ error: 'Server error' })
   }

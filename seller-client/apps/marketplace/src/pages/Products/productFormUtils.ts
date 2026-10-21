@@ -85,6 +85,38 @@ export type VariantState = {
   igstRatePercent?: number
 }
 
+type ProductUploadResponse = {
+  url?: unknown
+  publicUrl?: unknown
+  __publicUrl?: unknown
+}
+
+export type ProductUploadFile = {
+  originFileObj?: File
+  url?: string
+  status?: UploadFile['status']
+  response?: ProductUploadResponse
+  __publicUrl?: string
+}
+
+export const getHostedUploadUrl = (file: unknown): string | undefined => {
+  if (!file || typeof file !== 'object') return undefined
+
+  const upload = file as ProductUploadFile
+  const candidates = [
+    upload.__publicUrl,
+    upload.url,
+    upload.response?.__publicUrl,
+    upload.response?.publicUrl,
+    upload.response?.url,
+  ]
+
+  return candidates.find(
+    (candidate): candidate is string =>
+      typeof candidate === 'string' && /^https?:\/\//i.test(candidate),
+  )
+}
+
 const ALLOWED_GST_RATES = [0, 5, 12, 18, 28] as const
 const VALID_HSN_LENGTHS = [4, 6, 8] as const
 
@@ -372,12 +404,10 @@ export const processVariantsForSubmission = (params: {
         const raw = variant.mainImage as unknown
         const isHostedUrl = (u: string | undefined) =>
           u && typeof u === 'string' && (u.startsWith('http://') || u.startsWith('https://'))
-        const getCloudflareUrl = (o: { __publicUrl?: string; url?: string } | undefined) =>
-          o?.__publicUrl ?? o?.url
         if (typeof raw === 'string' && isHostedUrl(raw)) return raw
         if (raw && typeof raw === 'object') {
           const possible = raw as { originFileObj?: File; url?: string; __publicUrl?: string }
-          const u = getCloudflareUrl(possible)
+          const u = getHostedUploadUrl(possible)
           if (isHostedUrl(u)) return u
           if (possible.originFileObj) return possible.originFileObj
         }
@@ -390,12 +420,10 @@ export const processVariantsForSubmission = (params: {
             const raw = img as unknown
             const isHostedUrl = (u: string | undefined) =>
               u && typeof u === 'string' && (u.startsWith('http://') || u.startsWith('https://'))
-            const getCloudflareUrl = (o: { __publicUrl?: string; url?: string } | undefined) =>
-              o?.__publicUrl ?? o?.url
             if (typeof raw === 'string' && isHostedUrl(raw)) return raw
             if (raw && typeof raw === 'object') {
               const uploadFile = raw as { originFileObj?: File; url?: string; __publicUrl?: string }
-              const u = getCloudflareUrl(uploadFile)
+              const u = getHostedUploadUrl(uploadFile)
               if (isHostedUrl(u)) return u
               return uploadFile.originFileObj
             }
@@ -409,12 +437,10 @@ export const processVariantsForSubmission = (params: {
             const raw = vid as unknown
             const isHostedUrl = (u: string | undefined) =>
               u && typeof u === 'string' && (u.startsWith('http://') || u.startsWith('https://'))
-            const getCloudflareUrl = (o: { __publicUrl?: string; url?: string } | undefined) =>
-              o?.__publicUrl ?? o?.url
             if (typeof raw === 'string' && isHostedUrl(raw)) return raw
             if (raw && typeof raw === 'object') {
               const uploadFile = raw as { originFileObj?: File; url?: string; __publicUrl?: string }
-              const u = getCloudflareUrl(uploadFile)
+              const u = getHostedUploadUrl(uploadFile)
               if (isHostedUrl(u)) return u
               return uploadFile.originFileObj
             }
