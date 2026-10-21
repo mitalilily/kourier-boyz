@@ -3418,6 +3418,12 @@ export const cancelSellerOrder = async (req: Request, res: Response) => {
         message: 'Seller shipment not found',
       })
     }
+    if (sellerShipment.status === 'cancelled') {
+      return res.status(400).json({
+        success: false,
+        message: 'Order is already cancelled',
+      })
+    }
 
     if ((seller as any).logisticsUserId && kourierBoyzLogisticsService.isConfigured) {
       try {

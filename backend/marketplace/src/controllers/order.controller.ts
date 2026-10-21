@@ -1964,6 +1964,19 @@ export const cancelOrder = async (req: Request, res: Response) => {
       }
     }
 
+    const activeSellerIds = new Set(
+      order.sellerShipments
+        .filter((shipment) => shipment.status !== 'cancelled')
+        .map((shipment) => {
+          const seller = shipment.seller as any
+          return String(seller?._id || seller || '')
+        })
+        .filter(Boolean),
+    )
+    const itemsToRestore = order.items.filter((item) =>
+      activeSellerIds.has(String((item.seller as any)?._id || item.seller || '')),
+    )
+
     // Cancel the order
     order.status = 'cancelled'
     order.sellerShipments.forEach((shipment) => {
@@ -1976,7 +1989,7 @@ export const cancelOrder = async (req: Request, res: Response) => {
     await order.save()
 
     // Restore stock for all items in the order
-    await restoreOrderStock(order.items)
+    await restoreOrderStock(itemsToRestore)
 
     // Notify sellers via socket
     const sellerIds = new Set<string>()

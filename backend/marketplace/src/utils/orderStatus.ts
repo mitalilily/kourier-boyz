@@ -459,6 +459,14 @@ export const canCancelOrder = (order: MutableOrder): { canCancel: boolean; reaso
     return { canCancel: false, reason: 'Order is already cancelled' }
   }
 
+  if (
+    Array.isArray((order as any).sellerShipments) &&
+    (order as any).sellerShipments.length > 0 &&
+    (order as any).sellerShipments.every((shipment: any) => shipment?.status === 'cancelled')
+  ) {
+    return { canCancel: false, reason: 'Order is already cancelled' }
+  }
+
   // If a return flow has already started on this order (any non-REJECTED status),
   // do not allow cancellation. This covers cases where a customer has requested
   // a return or a reverse pickup is in progress.
