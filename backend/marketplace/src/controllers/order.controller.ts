@@ -17,6 +17,7 @@ import { getPhoneFromUser } from '../utils/phoneDecryptionHelper'
 import { calculateShippingCharge } from '../utils/shippingCalculator'
 import { sendSms } from '../utils/sms'
 import { getSmsTemplate, SmsTemplateType } from '../utils/smsTemplates'
+import { kourierBoyzLogisticsService } from '../services/kourierBoyzLogistics.service'
 import {
   calculateCgstSgstAmounts,
   calculateGstAmount,
@@ -869,7 +870,7 @@ export const createOrder = async (req: Request, res: Response) => {
     )
     const sellerProfiles = uniqueSellerIds.length
       ? await User.find({ _id: { $in: uniqueSellerIds } }).select(
-          'name businessName storeSlug supportEmail supportPhone storePhone phone defaultShippingRate',
+          'name email businessName storeSlug supportEmail supportPhone storePhone phone defaultShippingRate logisticsUserId',
         )
       : []
     const sellerProfileMap = new Map(
@@ -879,7 +880,7 @@ export const createOrder = async (req: Request, res: Response) => {
     // Get all products with shipping info for calculation
     const productIds = orderItems.map((item) => item.product)
     const products = await Product.find({ _id: { $in: productIds } }).select(
-      'freeShipping requiresShipping shippingCharge',
+      'name sku freeShipping requiresShipping shippingCharge shippingWeight shippingDimensions weight dimensions hsnSacCode gstRatePercent',
     )
     const productMap = new Map(products.map((prod) => [String(prod._id), prod]))
 
@@ -1032,6 +1033,75 @@ export const createOrder = async (req: Request, res: Response) => {
       })
 
       await order.save()
+
+      // Every marketplace order must appear in the seller's courier workspace before
+      // any carrier is selected or charged. The internal endpoint is idempotent on
+      // seller + marketplace order, so retries cannot create duplicate drafts.
+      if (sellerDoc?.logisticsUserId && kourierBoyzLogisticsService.isConfigured) {
+        try {
+          const dimensions = productDoc?.shippingDimensions || productDoc?.dimensions || {}
+          const draftResponse = await kourierBoyzLogisticsService.createMarketplaceDraft({
+            logisticsUserId: sellerDoc.logisticsUserId,
+            marketplaceSellerId: sellerDoc._id.toString(),
+            marketplaceOrderId: String(order._id),
+            marketplaceShipmentId: order.sellerShipments[0]?._id?.toString(),
+            orderNumber: order.orderNumber,
+            orderDate: order.createdAt?.toISOString?.() || new Date().toISOString(),
+            orderAmount: itemTotal,
+            paymentType: order.paymentMethod,
+            shippingCharges: shipping,
+            discount: itemDiscount,
+            giftWrap: order.giftWrap ? 1 : 0,
+            batchCode,
+            buyer: {
+              name: shippingAddress.name || shippingAddress.fullName,
+              phone: shippingAddress.phone,
+              email: user.email,
+              address: [shippingAddress.addressLine1, shippingAddress.addressLine2]
+                .filter(Boolean)
+                .join(', '),
+              city: shippingAddress.city,
+              state: shippingAddress.state,
+              country: shippingAddress.country,
+              pincode: shippingAddress.postalCode,
+            },
+            products: [
+              {
+                productName: productDoc?.name || 'Marketplace product',
+                price: orderItem.price,
+                quantity: orderItem.quantity,
+                sku: productDoc?.sku,
+                hsnCode: productDoc?.hsnSacCode,
+                discount: itemDiscount,
+                taxRate: productDoc?.gstRatePercent,
+              },
+            ],
+            package: {
+              weight: Number(productDoc?.shippingWeight || productDoc?.weight || 0.5),
+              length: Number(dimensions.length || 10),
+              breadth: Number(dimensions.width || dimensions.breadth || 10),
+              height: Number(dimensions.height || 10),
+            },
+          })
+          const draft = draftResponse?.data
+          if (draft?.id && order.sellerShipments[0]) {
+            order.sellerShipments[0].kourierBoyzLogistics = {
+              ...(order.sellerShipments[0].kourierBoyzLogistics || {}),
+              order_id: String(draft.id),
+              order_number: String(draft.order_number || ''),
+              draft_synced_at: new Date(),
+            }
+            order.markModified('sellerShipments')
+            await order.save()
+          }
+        } catch (syncError: any) {
+          console.error(
+            `[Marketplace fulfillment] Failed to create courier draft for order ${order._id}:`,
+            syncError?.response?.data || syncError?.message || syncError,
+          )
+        }
+      }
+
       createdOrders.push(order)
 
       // Update product stock for this item
