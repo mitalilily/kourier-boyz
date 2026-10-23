@@ -154,7 +154,7 @@ const BrandRequestModal = ({ open, onClose, onSuccess }: BrandRequestModalProps)
         </Button>,
       ]}
     >
-      <Form form={form} layout="vertical">
+      <Form form={form} layout="vertical" initialValues={{ brand_type: 'OWN' }}>
         <Form.Item
           name="brand_name"
           label="Brand Name"
@@ -168,7 +168,7 @@ const BrandRequestModal = ({ open, onClose, onSuccess }: BrandRequestModalProps)
           label="Brand Type"
           rules={[{ required: true, message: 'Brand type is required' }]}
         >
-          <Radio.Group value={brandType} onChange={handleBrandTypeChange}>
+          <Radio.Group onChange={handleBrandTypeChange}>
             <Radio value="OWN">Own Brand</Radio>
             <Radio value="OTHER">Other Brand</Radio>
           </Radio.Group>

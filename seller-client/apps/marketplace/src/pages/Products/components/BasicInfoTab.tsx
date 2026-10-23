@@ -1,5 +1,6 @@
 import { Alert, Card, Checkbox, Col, Form, Input, Row, Select, type FormInstance } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import type { Category } from '../../../api/categories'
 import { useApprovedBrands } from '../../../api/brandQueries'
 import { useMyCertificates } from '../../../api/certificates'
@@ -383,9 +384,9 @@ const BasicInfoTab = ({ form, categories }: BasicInfoTabProps) => {
                   showIcon
                   style={{ fontSize: '12px' }}
                   action={
-                    <a href="/brands" style={{ fontSize: '12px' }}>
+                    <Link to="/brands" style={{ fontSize: '12px' }}>
                       Go to Brands
-                    </a>
+                    </Link>
                   }
                 />
               </Form.Item>

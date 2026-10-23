@@ -1,5 +1,6 @@
 import { useFooterSettings } from '@/api/footer'
 import { useSubscribeNewsletter } from '@/api/subscribers'
+import { SUPPORT_EMAIL, SUPPORT_PHONE_NUMBERS } from '@/config/contact'
 import {
   ArrowRight,
   Facebook,
@@ -101,8 +102,13 @@ const Footer = () => {
               {settings?.description || 'A connected marketplace and courier platform for buyers, independent shippers, and growing Indian sellers.'}
             </p>
             <div className="mt-7 grid gap-3 text-sm text-[#454b48]">
-              <a href={`mailto:${settings?.email || 'support@kourierboyz.com'}`} className="kb-footer-contact"><Mail className="h-4 w-4" />{settings?.email || 'support@kourierboyz.com'}</a>
-              {settings?.phone && <a href={`tel:${settings.phone}`} className="kb-footer-contact"><Phone className="h-4 w-4" />{settings.phone}</a>}
+              <a href={`mailto:${settings?.email || SUPPORT_EMAIL}`} className="kb-footer-contact"><Mail className="h-4 w-4" />{settings?.email || SUPPORT_EMAIL}</a>
+              {SUPPORT_PHONE_NUMBERS.map((phone) => (
+                <a key={phone.href} href={phone.href} className="kb-footer-contact">
+                  <Phone className="h-4 w-4" />
+                  {phone.label}
+                </a>
+              ))}
               {settings?.address && <span className="kb-footer-contact"><MapPin className="h-4 w-4" />{settings.address}</span>}
             </div>
           </div>

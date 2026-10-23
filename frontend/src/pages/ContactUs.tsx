@@ -1,6 +1,7 @@
 'use client'
 
 import { useSubmitContactForm } from '@/api/support'
+import { SUPPORT_EMAIL, SUPPORT_PHONE_NUMBERS } from '@/config/contact'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -241,7 +242,7 @@ const ContactUs = () => {
           </div>
         )}
 
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="grid gap-6 mb-8 md:grid-cols-2">
           {/* Contact Cards */}
           <Card className="bg-white/95 backdrop-blur-sm shadow-lg border border-slate-200/50 hover:shadow-xl transition-shadow">
             <CardContent className="p-6">
@@ -251,7 +252,12 @@ const ContactUs = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">Email Us</h3>
-                  <p className="text-sm text-slate-600">support@kourierboyz.com</p>
+                  <a
+                    href={`mailto:${SUPPORT_EMAIL}`}
+                    className="text-sm text-slate-600 transition-colors hover:text-[#9a6b10]"
+                  >
+                    {SUPPORT_EMAIL}
+                  </a>
                 </div>
               </div>
             </CardContent>
@@ -265,7 +271,17 @@ const ContactUs = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">Call Us</h3>
-                  <p className="text-sm text-slate-600">+91 1234567890</p>
+                  <div className="mt-1 flex flex-col gap-1">
+                    {SUPPORT_PHONE_NUMBERS.map((phone) => (
+                      <a
+                        key={phone.href}
+                        href={phone.href}
+                        className="text-sm font-medium text-slate-700 transition-colors hover:text-[#9a6b10]"
+                      >
+                        {phone.label}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </CardContent>

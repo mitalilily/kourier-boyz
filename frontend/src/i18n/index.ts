@@ -66,7 +66,7 @@ const resources = {
         subscribe: 'Subscribe',
         brandDescription:
           'Shop useful products, send parcels, and run marketplace orders with dependable delivery support.',
-        contactPhoneLabel: '',
+        contactPhoneLabel: '+91 95090 82096 / +91 82393 24002',
         contactEmailLabel: 'support@kourierboyz.com',
         contactAddress: '',
         legalNotice: 'Copyright {{year}} Kourier Boyz. All rights reserved.',
@@ -162,7 +162,7 @@ const resources = {
         subscribe: 'सदस्यता लें',
         brandDescription:
           'टेटोज़ आपको भरोसेमंद गुणवत्ता तेज़ी और देखभाल के साथ प्रदान करता है। हम ऐसे उत्पाद लाते हैं जो आपके जीवन को आसान बनाते हैं और सेवा जिस पर आप भरोसा कर सकते हैं।',
-        contactPhoneLabel: '',
+        contactPhoneLabel: '+91 95090 82096 / +91 82393 24002',
         contactEmailLabel: 'support@kourierboyz.com',
         contactAddress: '',
         legalNotice: 'Copyright {{year}} Kourier Boyz. All rights reserved.',

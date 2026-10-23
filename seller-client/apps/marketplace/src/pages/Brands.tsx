@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons'
 import {
   Alert,
+  Breadcrumb,
   Button,
   Card,
   Descriptions,
@@ -32,7 +33,7 @@ import { type Brand, type DocumentType, useBrand, useSellerBrands, useUploadBran
 import type { BrandDocument } from '../api/brands'
 import BrandRequestModal from '../components/BrandRequestModal'
 
-const { Text } = Typography
+const { Text, Title } = Typography
 
 const statusConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
   PENDING: {
@@ -273,18 +274,42 @@ const Brands = () => {
   return (
     <>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Breadcrumb
+          items={[
+            { title: 'Marketplace workspace' },
+            { title: 'Catalog Management' },
+            { title: 'Brands' },
+          ]}
+        />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: 16,
+            flexWrap: 'wrap',
+          }}
+        >
+          <div>
+            <Title level={2} style={{ margin: 0, color: '#202321' }}>
+              Brands
+            </Title>
+            <Text type="secondary">
+              Submit brand ownership documents and track each approval from one place.
+            </Text>
+          </div>
+          <Button
+            type="primary"
+            size="large"
+            icon={<PlusOutlined />}
+            onClick={() => setModalOpen(true)}
+            data-tour="request-brand-btn"
+          >
+            Request Brand Approval
+          </Button>
+        </div>
         <Card
-          title="Brand Management"
-          extra={
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setModalOpen(true)}
-              data-tour="request-brand-btn"
-            >
-              Request Brand Approval
-            </Button>
-          }
+          title="Brand approval requests"
         >
           {approvedBrandsCount === 0 && brands && brands.length > 0 && (
             <Alert

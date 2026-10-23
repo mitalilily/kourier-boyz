@@ -18,6 +18,7 @@ import { FaBalanceScaleLeft, FaBox } from 'react-icons/fa'
 import { FaClipboardList as FaFileAlt, FaMoneyBill, FaToolbox, FaUser } from 'react-icons/fa6'
 import { HiDocumentReport } from 'react-icons/hi'
 import {
+  MdCategory,
   MdDashboard,
   MdOutlineAccountBalanceWallet,
   MdOutlineAddBusiness,
@@ -41,6 +42,7 @@ export interface SubItem {
   path: string
   icon?: JSX.Element
   workspace?: 'courier' | 'marketplace'
+  groupLabel?: string
 }
 
 export interface NavItem {
@@ -312,42 +314,63 @@ export default function Sidebar({
 
         return {
           ...item,
+          text: 'Marketplace Workspace',
           children: [
             {
               text: 'Seller Dashboard',
               path: '/dashboard',
               icon: <MdDashboard size={ICON_SIZE_MD} />,
               workspace: 'marketplace' as const,
+              groupLabel: 'Workspace',
             },
             {
-              text: 'Products & Inventory',
+              text: 'Products',
               path: '/products',
               icon: <FaBox size={ICON_SIZE_FA} />,
               workspace: 'marketplace' as const,
+              groupLabel: 'Catalog Management',
+            },
+            {
+              text: 'Categories',
+              path: '/categories',
+              icon: <MdCategory size={ICON_SIZE_MD} />,
+              workspace: 'marketplace' as const,
+              groupLabel: 'Catalog Management',
+            },
+            {
+              text: 'Brands',
+              path: '/brands',
+              icon: <MdStorefront size={ICON_SIZE_MD} />,
+              workspace: 'marketplace' as const,
+              groupLabel: 'Catalog Management',
             },
             {
               text: 'Marketplace Orders',
               path: '/orders',
               icon: <FaFileAlt size={ICON_SIZE_FA} />,
               workspace: 'marketplace' as const,
+              groupLabel: 'Sales & Fulfillment',
             },
             {
               text: 'Returns',
               path: '/returns',
               icon: <MdOutlineKeyboardReturn size={ICON_SIZE_MD} />,
               workspace: 'marketplace' as const,
+              groupLabel: 'Sales & Fulfillment',
             },
             {
               text: 'Settlements',
               path: '/settlements',
               icon: <FaMoneyBill size={ICON_SIZE_FA} />,
               workspace: 'marketplace' as const,
+              groupLabel: 'Sales & Fulfillment',
             },
             {
               text: 'Store Settings',
               path: '/store-settings',
               icon: <RiSettings2Line size={ICON_SIZE_RI} />,
               workspace: 'marketplace' as const,
+              groupLabel: 'Store',
             },
           ],
         }
@@ -580,15 +603,36 @@ export default function Sidebar({
               {hasChildren && shouldShowExpanded && (
                 <Collapse in={expandedItemText === text} timeout="auto" unmountOnExit>
                   <List component="div" disablePadding sx={{ pl: 2 }}>
-                    {children?.map((child) => {
+                    {children?.map((child, childIndex) => {
                       const childIsMarketplace = child.workspace === 'marketplace'
                       const childIsActive = isActive(
                         child.path,
                         childIsMarketplace ? routerPathname : pathname,
                       )
+                      const showGroupLabel =
+                        child.groupLabel &&
+                        (childIndex === 0 ||
+                          children[childIndex - 1]?.groupLabel !== child.groupLabel)
                       return (
-                        <ListItemButton
-                          key={child.path}
+                        <Box key={`${child.groupLabel || 'item'}-${child.path}`}>
+                          {showGroupLabel && (
+                            <Typography
+                              component="div"
+                              sx={{
+                                px: 1.15,
+                                pt: childIndex === 0 ? 0.35 : 1.05,
+                                pb: 0.35,
+                                color: '#8A8F8C',
+                                fontSize: '0.64rem',
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.08em',
+                              }}
+                            >
+                              {child.groupLabel}
+                            </Typography>
+                          )}
+                          <ListItemButton
                           {...(externalNavigation && !childIsMarketplace
                             ? ({ component: 'a', href: buildConsoleHref(child.path) } as const)
                             : ({ component: NavLink, to: child.path } as const))}
@@ -612,18 +656,19 @@ export default function Sidebar({
                               color: childIsActive ? BRAND_BLUE : '#4F5552',
                             },
                           }}
-                        >
-                          <ListItemIcon
-                            sx={{
-                              minWidth: 32,
-                              color: '#202321',
-                              fontSize: '1rem',
-                            }}
                           >
-                            {child.icon}
-                          </ListItemIcon>
-                          <ListItemText primary={child.text} />
-                        </ListItemButton>
+                            <ListItemIcon
+                              sx={{
+                                minWidth: 32,
+                                color: '#202321',
+                                fontSize: '1rem',
+                              }}
+                            >
+                              {child.icon}
+                            </ListItemIcon>
+                            <ListItemText primary={child.text} />
+                          </ListItemButton>
+                        </Box>
                       )
                     })}
                   </List>
@@ -665,15 +710,36 @@ export default function Sidebar({
           <List sx={{ py: 1 }}>
             {filteredItems
               .find((item) => item.text === hoveredItemText)
-              ?.children?.map((child) => {
+              ?.children?.map((child, childIndex, children) => {
                 const childIsMarketplace = child.workspace === 'marketplace'
                 const active = isActive(
                   child.path,
                   childIsMarketplace ? routerPathname : pathname,
                 )
+                const showGroupLabel =
+                  child.groupLabel &&
+                  (childIndex === 0 ||
+                    children[childIndex - 1]?.groupLabel !== child.groupLabel)
                 return (
-                  <ListItemButton
-                    key={child.path}
+                  <Box key={`${child.groupLabel || 'item'}-${child.path}`}>
+                    {showGroupLabel && (
+                      <Typography
+                        component="div"
+                        sx={{
+                          px: 1.5,
+                          pt: childIndex === 0 ? 0.5 : 1.2,
+                          pb: 0.35,
+                          color: '#8A8F8C',
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.08em',
+                        }}
+                      >
+                        {child.groupLabel}
+                      </Typography>
+                    )}
+                    <ListItemButton
                     {...(externalNavigation && !childIsMarketplace
                       ? ({ component: 'a', href: buildConsoleHref(child.path) } as const)
                       : ({ component: NavLink, to: child.path } as const))}
@@ -710,24 +776,25 @@ export default function Sidebar({
                         },
                       },
                     }}
-                  >
-                    {child.icon && (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'inherit',
-                          fontSize: '1.2rem',
-                        }}
-                      >
-                        {child.icon}
-                      </Box>
-                    )}
-                    <Typography variant="body2" sx={{ fontWeight: active ? 600 : 500 }}>
-                      {child.text}
-                    </Typography>
-                  </ListItemButton>
+                    >
+                      {child.icon && (
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'inherit',
+                            fontSize: '1.2rem',
+                          }}
+                        >
+                          {child.icon}
+                        </Box>
+                      )}
+                      <Typography variant="body2" sx={{ fontWeight: active ? 600 : 500 }}>
+                        {child.text}
+                      </Typography>
+                    </ListItemButton>
+                  </Box>
                 )
               })}
           </List>
