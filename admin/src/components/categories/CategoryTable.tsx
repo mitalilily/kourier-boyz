@@ -2,6 +2,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   EyeOutlined,
+  PlusOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import type { TableProps } from "antd";
@@ -80,6 +81,7 @@ const buildFlattenedCategories = (categories: Category[]): TableCategory[] => {
 interface CategoryTableProps {
   categories: Category[];
   onEdit: (category: Category) => void;
+  onAddSubcategory: (category: Category) => void;
   onDelete: (id: string) => void;
   loading?: boolean;
   selectedRowKeys: string[];
@@ -91,6 +93,7 @@ interface CategoryTableProps {
 const CategoryTable = ({
   categories,
   onEdit,
+  onAddSubcategory,
   onDelete,
   loading,
   selectedRowKeys,
@@ -103,7 +106,8 @@ const CategoryTable = ({
   const permissions = useModulePermissions("categories");
 
   // Only show Actions column if user has at least one action permission
-  const showActionsColumn = permissions.canUpdate || permissions.canDelete;
+  const showActionsColumn =
+    permissions.canCreate || permissions.canUpdate || permissions.canDelete;
 
   const columns: TableProps<TableCategory>["columns"] = [
     {
@@ -288,9 +292,9 @@ const CategoryTable = ({
     //   ),
     // },
     {
-      title: "Subcategories",
+      title: <span className="whitespace-nowrap">Subcategories</span>,
       key: "subcategories",
-      width: 120,
+      width: 160,
       align: "center",
       render: (_: unknown, record: TableCategory) => {
         const subcategoryCount = record.subcategories?.length || 0;
@@ -337,10 +341,22 @@ const CategoryTable = ({
           {
             title: "Actions",
             key: "actions",
-            width: 120,
+            width: 220,
             fixed: "right" as const,
             render: (_: unknown, record: TableCategory) => (
-              <div className="flex gap-2">
+              <div className="flex items-center gap-1 whitespace-nowrap">
+                <PermissionButton
+                  module="categories"
+                  permission="create"
+                  type="link"
+                  size="small"
+                  icon={<PlusOutlined />}
+                  onClick={() => onAddSubcategory(record)}
+                  className="px-1"
+                  title={`Add a subcategory under ${record.name}`}
+                >
+                  Subcategory
+                </PermissionButton>
                 <PermissionButton
                   module="categories"
                   permission="update"

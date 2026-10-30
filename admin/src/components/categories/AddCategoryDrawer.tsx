@@ -23,6 +23,7 @@ interface AddCategoryDrawerProps {
   onClose: () => void
   onAdded: (formData: FormData, form: { resetFields: () => void }) => void
   category?: Category | null
+  parentCategoryId?: string | null
   loading?: boolean
 }
 
@@ -31,6 +32,7 @@ const AddCategoryDrawer = ({
   onClose,
   onAdded,
   category,
+  parentCategoryId,
   loading,
 }: AddCategoryDrawerProps) => {
   const [form] = Form.useForm()
@@ -132,14 +134,21 @@ const AddCategoryDrawer = ({
       )
     } else {
       form.resetFields()
+      form.setFieldsValue({
+        parent: parentCategoryId || null,
+        status: 'active',
+        top: false,
+        requiredCertificates: [],
+        overrideParentCertificateRule: false,
+      })
       setMainFile([])
       setHoverFile([])
       setBannerFiles([])
       setOwnCertificates([])
       setInheritedCertificates([])
-      setSelectedParentId(null)
+      setSelectedParentId(parentCategoryId || null)
     }
-  }, [category, form, open])
+  }, [category, form, open, parentCategoryId])
 
   // Auto-generate slug from name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -279,7 +288,7 @@ const AddCategoryDrawer = ({
 
   return (
     <Drawer
-      title={category ? 'Edit Category' : 'Add New Category'}
+      title={category ? 'Edit Category' : parentCategoryId ? 'Add Subcategory' : 'Add New Category'}
       placement="right"
       width={720}
       onClose={onClose}
@@ -290,7 +299,7 @@ const AddCategoryDrawer = ({
             Cancel
           </Button>
           <Button type="primary" onClick={handleSave} loading={loading}>
-            {category ? 'Update' : 'Create'} Category
+            {category ? 'Update' : 'Create'} {parentCategoryId && !category ? 'Subcategory' : 'Category'}
           </Button>
         </div>
       }

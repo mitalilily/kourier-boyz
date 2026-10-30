@@ -55,6 +55,7 @@ const CategoryPage = () => {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [parentCategoryId, setParentCategoryId] = useState<string | null>(null);
 
   // Add or Update category
   const handleAddOrUpdate = (
@@ -70,6 +71,7 @@ const CategoryPage = () => {
             setDrawerOpen(false);
             form.resetFields();
             setEditingCategory(null);
+            setParentCategoryId(null);
           },
           onError: () => toast.error("Failed to update category"),
         }
@@ -80,6 +82,7 @@ const CategoryPage = () => {
           toast.success("Category created successfully!");
           setDrawerOpen(false);
           form.resetFields();
+          setParentCategoryId(null);
         },
         onError: () => toast.error("Failed to create category"),
       });
@@ -89,6 +92,19 @@ const CategoryPage = () => {
   // Edit button click
   const handleEdit = (category: Category) => {
     setEditingCategory(category);
+    setParentCategoryId(null);
+    setDrawerOpen(true);
+  };
+
+  const handleAddSubcategory = (category: Category) => {
+    const categoryId = category._id || category.id;
+    if (!categoryId) {
+      toast.error("Unable to determine the parent category");
+      return;
+    }
+
+    setEditingCategory(null);
+    setParentCategoryId(categoryId);
     setDrawerOpen(true);
   };
 
@@ -264,6 +280,7 @@ const CategoryPage = () => {
             icon={<PlusOutlined />}
             onClick={() => {
               setEditingCategory(null);
+              setParentCategoryId(null);
               setDrawerOpen(true);
             }}
           >
@@ -320,6 +337,7 @@ const CategoryPage = () => {
         <CategoryTable
           categories={categories}
           onEdit={handleEdit}
+          onAddSubcategory={handleAddSubcategory}
           onDelete={handleDelete}
           loading={isLoading}
           selectedRowKeys={selectedRowKeys}
@@ -335,9 +353,11 @@ const CategoryPage = () => {
         onClose={() => {
           setDrawerOpen(false);
           setEditingCategory(null);
+          setParentCategoryId(null);
         }}
         onAdded={handleAddOrUpdate}
         category={editingCategory}
+        parentCategoryId={parentCategoryId}
         loading={createCategory.isPending || updateCategory.isPending}
       />
     </div>
