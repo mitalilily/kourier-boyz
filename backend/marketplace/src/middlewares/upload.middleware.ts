@@ -30,6 +30,28 @@ export const upload = multer({
   },
 })
 
+// Product imports must not use the generic image-only uploader above. That
+// uploader rejects CSV files before the product import controller is reached.
+const productCsvFileFilter = (_req: any, file: Express.Multer.File, cb: any) => {
+  const isCsvName = file.originalname.toLowerCase().endsWith('.csv')
+  const allowedMimes = ['text/csv', 'application/csv', 'application/vnd.ms-excel', 'text/plain']
+
+  if (isCsvName && allowedMimes.includes(file.mimetype)) {
+    cb(null, true)
+  } else {
+    cb(new Error('Invalid file type. Upload a CSV file.'), false)
+  }
+}
+
+export const uploadProductCsv = multer({
+  storage,
+  fileFilter: productCsvFileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 1,
+  },
+}).single('file')
+
 // Category-specific upload configuration
 export const uploadCategoryImages = multer({
   storage,

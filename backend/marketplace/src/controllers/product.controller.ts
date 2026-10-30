@@ -33,6 +33,7 @@ import {
   sanitizeFileName,
   uploadToR2,
 } from '../utils/r2Upload'
+import { CsvParseError, csvBoolean, csvList, csvRowToRecord, parseCsv } from '../utils/productCsv'
 
 const uploadFilesToR2 = async (
   files: Express.Multer.File[] | undefined,
@@ -4534,11 +4535,16 @@ export const exportProductsCSV = async (req: Request, res: Response) => {
       'comparePrice',
       'costPrice',
       'categoryId',
+      'brandId',
       'brand',
       'stock',
+      'lowStockThreshold',
       'sku',
       'status',
       'isFeatured',
+      'tags',
+      'mainImage',
+      'images',
     ]
 
     const rows = products.map((p) => [
@@ -4549,11 +4555,16 @@ export const exportProductsCSV = async (req: Request, res: Response) => {
       String(p.comparePrice ?? ''),
       String(p.costPrice ?? ''),
       String(p.category),
+      String((p as any).brand_id ?? ''),
       p.brand || '',
       String(p.stock ?? ''),
+      String(p.lowStockThreshold ?? ''),
       p.sku || '',
-      p.status || 'draft',
+      p.status === 'draft' || p.status === 'inactive' ? p.status : 'active',
       String(p.isFeatured || false),
+      (p.tags || []).join('|'),
+      p.mainImage || '',
+      (p.images || []).join('|'),
     ])
 
     const csv = [
@@ -4579,67 +4590,236 @@ export const importProductsCSV = async (req: Request, res: Response) => {
     const file = (req as any).file as Express.Multer.File
     if (!file) return res.status(400).json({ error: 'CSV file is required' })
 
-    const content = file.buffer.toString('utf-8')
-    const lines = content.split(/\r?\n/).filter(Boolean)
-    if (lines.length < 2) return res.status(400).json({ error: 'CSV has no data' })
+    const rows = parseCsv(file.buffer.toString('utf-8'))
+    if (rows.length < 2) return res.status(400).json({ error: 'CSV has no data rows' })
+    if (rows.length - 1 > 500) {
+      return res.status(400).json({ error: 'A CSV import can contain at most 500 products' })
+    }
 
-    const header = lines[0].split(',').map((h) => h.trim().replace(/^"|"$/g, ''))
-    const idx = (name: string) => header.indexOf(name)
+    const headers = rows[0]
+    const normalizedHeaders = headers.map((header) => header.trim().toLowerCase().replace(/^\uFEFF/, '').replace(/[ _-]/g, ''))
+    if (!normalizedHeaders.includes('name') || !normalizedHeaders.includes('description')) {
+      return res.status(400).json({ error: 'CSV must include name and description columns' })
+    }
+    if (!normalizedHeaders.includes('category') && !normalizedHeaders.includes('categoryid')) {
+      return res.status(400).json({ error: 'CSV must include category or categoryId column' })
+    }
+
+    const seller = await User.findById(sellerId).select(
+      'role kycStatus isApproved kycSubmitted storeDescription shippingPolicy returnPolicy storeLogo storeEmail storePhone supportEmail sellerAgreementSigned returnRefundPolicyAccepted',
+    )
+    if (!seller || seller.role !== 'seller') return res.status(404).json({ error: 'Seller not found' })
+
+    const isKycApproved =
+      seller.kycStatus === 'APPROVED' || (seller.isApproved === true && seller.kycSubmitted === true)
+    if (!isKycApproved) {
+      return res.status(403).json({ error: 'KYC must be approved before importing products' })
+    }
+
+    const incompleteStore = [
+      seller.storeDescription,
+      seller.shippingPolicy,
+      seller.returnPolicy,
+      seller.storeLogo,
+      seller.storeEmail,
+      seller.storePhone,
+      seller.supportEmail,
+      seller.sellerAgreementSigned,
+      seller.returnRefundPolicyAccepted,
+    ].some((value) => !value)
+
+    const errors: Array<{ row: number; message: string }> = []
+    const addError = (row: number, message: string) => {
+      if (errors.length < 100) errors.push({ row, message })
+    }
+    const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const categoryCache = new Map<string, string | null>()
+    const brandCache = new Map<string, { id: string; name: string } | null>()
+    const certificateCache = new Map<string, boolean>()
+
+    const resolveCategory = async (value: string): Promise<string | null> => {
+      const key = value.trim().toLowerCase()
+      if (categoryCache.has(key)) return categoryCache.get(key) || null
+
+      let category: any = null
+      if (mongoose.isValidObjectId(value)) {
+        category = await Category.findOne({ _id: value, status: 'active' }).select('_id').lean()
+      } else {
+        const exact = new RegExp(`^${escapeRegex(value.trim())}$`, 'i')
+        const matches = await Category.find({
+          status: 'active',
+          $or: [{ name: exact }, { slug: exact }],
+        })
+          .select('_id')
+          .limit(2)
+          .lean()
+        category = matches.length === 1 ? matches[0] : null
+      }
+
+      const id = category?._id?.toString() || null
+      categoryCache.set(key, id)
+      return id
+    }
+
+    const resolveBrand = async (value: string): Promise<{ id: string; name: string } | null> => {
+      const key = value.trim().toLowerCase()
+      if (brandCache.has(key)) return brandCache.get(key) || null
+
+      let brand: any = null
+      if (mongoose.isValidObjectId(value)) {
+        brand = await Brand.findOne({ _id: value, seller_id: sellerId, status: 'APPROVED' })
+          .select('_id brand_name')
+          .lean()
+      } else {
+        const exact = new RegExp(`^${escapeRegex(value.trim())}$`, 'i')
+        brand = await Brand.findOne({ seller_id: sellerId, brand_name: exact, status: 'APPROVED' })
+          .select('_id brand_name')
+          .lean()
+      }
+
+      const resolved = brand ? { id: brand._id.toString(), name: brand.brand_name } : null
+      brandCache.set(key, resolved)
+      return resolved
+    }
 
     let created = 0
     let skipped = 0
-    for (let i = 1; i < lines.length; i++) {
-      const cols =
-        lines[i]
-          .match(/((?:"[^"]*(?:""[^"]*)*"|[^,]*))(?:,|$)/g)
-          ?.map((c) => c.replace(/,$/, '').replace(/^"|"$/g, '').replace(/""/g, '"')) || []
-      const name = cols[idx('name')]
-      const description = cols[idx('description')] || ''
-      if (!name || !description) {
-        skipped++
+    const statusSummary: Record<string, number> = {}
+    for (let index = 1; index < rows.length; index += 1) {
+      const rowNumber = index + 1
+      const record = csvRowToRecord(headers, rows[index])
+      const name = record.name
+      const description = record.description
+      const requestedStatus = (record.status || 'draft').toLowerCase()
+      const categoryValue = record.categoryid || record.category
+      const rawPrice = record.price
+      const rawStock = record.stock
+      const mainImage = record.mainimage || csvList(record.images)[0] || ''
+      const images = Array.from(new Set([mainImage, ...csvList(record.images)].filter(Boolean)))
+
+      if (!name || !description || !categoryValue) {
+        skipped += 1
+        addError(rowNumber, 'name, description, and category are required')
         continue
       }
-      const price = Number(cols[idx('price')] || 0)
-      const comparePrice = cols[idx('comparePrice')] ? Number(cols[idx('comparePrice')]) : undefined
-      const costPrice = cols[idx('costPrice')] ? Number(cols[idx('costPrice')]) : undefined
-      const category = cols[idx('categoryId')] || undefined
-      const brand = cols[idx('brand')] || undefined
-      const stock = Number(cols[idx('stock')] || 0)
-      const sku = cols[idx('sku')] || undefined
-      const status = (cols[idx('status')] as any) || 'draft'
-      const isFeatured = (cols[idx('isFeatured')] || 'false') === 'true'
-
-      const slug = generateSlug(name)
-      const exists = await Product.findOne({ seller: sellerId, slug })
-      if (exists) {
-        skipped++
+      if (!['draft', 'active', 'inactive'].includes(requestedStatus)) {
+        skipped += 1
+        addError(rowNumber, 'status must be draft, active, or inactive')
         continue
       }
 
-      const doc = new Product({
-        seller: sellerId,
-        name,
-        slug,
-        description,
-        shortDescription: cols[idx('shortDescription')] || undefined,
-        price,
-        comparePrice,
-        costPrice,
-        category: category || undefined,
-        brand,
-        stock,
-        sku: sku || `SKU-${Date.now()}-${i}`,
-        status,
-        isFeatured,
-        mainImage: '',
-        images: [],
-      })
-      await doc.save()
-      created++
+      const categoryId = await resolveCategory(categoryValue)
+      if (!categoryId) {
+        skipped += 1
+        addError(rowNumber, 'category was not found or is not active')
+        continue
+      }
+
+      const price = rawPrice === '' || rawPrice === undefined ? undefined : Number(rawPrice)
+      const comparePrice = record.compareprice ? Number(record.compareprice) : undefined
+      const costPrice = record.costprice ? Number(record.costprice) : undefined
+      const stock = rawStock === '' || rawStock === undefined ? 0 : Number(rawStock)
+      const lowStockThreshold = record.lowstockthreshold ? Number(record.lowstockthreshold) : undefined
+      if (
+        (price !== undefined && (!Number.isFinite(price) || price < 0)) ||
+        (comparePrice !== undefined && (!Number.isFinite(comparePrice) || comparePrice < 0)) ||
+        (costPrice !== undefined && (!Number.isFinite(costPrice) || costPrice < 0)) ||
+        !Number.isFinite(stock) ||
+        stock < 0 ||
+        !Number.isInteger(stock) ||
+        (lowStockThreshold !== undefined &&
+          (!Number.isFinite(lowStockThreshold) || lowStockThreshold < 0 || !Number.isInteger(lowStockThreshold)))
+      ) {
+        skipped += 1
+        addError(rowNumber, 'price and stock fields must be valid non-negative numbers')
+        continue
+      }
+
+      let brand: { id: string; name: string } | null = null
+      const brandValue = record.brandid || record.brand
+      if (brandValue) brand = await resolveBrand(brandValue)
+      if (requestedStatus !== 'draft' && !brand) {
+        skipped += 1
+        addError(rowNumber, 'an approved seller brand is required for a non-draft product')
+        continue
+      }
+      if (brandValue && !brand) {
+        skipped += 1
+        addError(rowNumber, 'brand was not found or is not approved for this seller')
+        continue
+      }
+      if (requestedStatus !== 'draft' && (price === undefined || price <= 0 || !mainImage)) {
+        skipped += 1
+        addError(rowNumber, 'non-draft products need a positive price and a mainImage URL')
+        continue
+      }
+
+      const skuInput = record.sku || `SKU-${Date.now()}-${index}`
+      const duplicateSku = await Product.exists({ seller: sellerId, sku: skuInput })
+      if (duplicateSku) {
+        skipped += 1
+        addError(rowNumber, `SKU ${skuInput} already exists in this catalogue`)
+        continue
+      }
+
+      let slug = generateSlug(name)
+      let suffix = 1
+      while (await Product.exists({ slug })) slug = `${generateSlug(name)}-${suffix++}`
+
+      let requiresApproval = false
+      if (requestedStatus !== 'draft') {
+        if (!certificateCache.has(categoryId)) {
+          const requiredCertificates = await getRequiredCertificatesForCategory(categoryId)
+          const certificateCheck = await checkSellerCertificates(sellerId, requiredCertificates)
+          certificateCache.set(categoryId, !certificateCheck.hasAllCertificates)
+        }
+        requiresApproval = certificateCache.get(categoryId) || false
+      }
+
+      let finalStatus: 'draft' | 'active' | 'inactive' | 'out_of_stock' | 'pending_approval' = 'draft'
+      if (requestedStatus === 'draft' || incompleteStore || !seller.isApproved) {
+        finalStatus = 'draft'
+      } else if (requiresApproval) {
+        finalStatus = 'pending_approval'
+      } else if (requestedStatus === 'inactive') {
+        finalStatus = 'inactive'
+      } else {
+        finalStatus = stock > 0 ? 'active' : 'out_of_stock'
+      }
+
+      try {
+        await new Product({
+          seller: sellerId,
+          name,
+          slug,
+          description,
+          shortDescription: record.shortdescription || undefined,
+          price,
+          comparePrice,
+          costPrice,
+          category: categoryId,
+          brand: brand?.name || record.brand || undefined,
+          brand_id: brand?.id,
+          stock,
+          lowStockThreshold,
+          sku: skuInput,
+          status: finalStatus,
+          isFeatured: csvBoolean(record.isfeatured) || false,
+          mainImage,
+          images,
+          tags: csvList(record.tags),
+        }).save()
+        created += 1
+        statusSummary[finalStatus] = (statusSummary[finalStatus] || 0) + 1
+      } catch (error: any) {
+        skipped += 1
+        addError(rowNumber, error?.code === 11000 ? 'a product with this SKU or name already exists' : error?.message || 'product could not be saved')
+      }
     }
 
-    res.json({ created, skipped })
+    res.json({ created, skipped, errors, statusSummary })
   } catch (err: unknown) {
+    if (err instanceof CsvParseError) return res.status(400).json({ error: err.message })
     console.error('Error importing CSV:', err)
     res.status(500).json({ error: 'Server error' })
   }

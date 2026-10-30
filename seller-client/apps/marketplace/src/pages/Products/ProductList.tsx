@@ -116,6 +116,7 @@ const ProductList = () => {
   const importCsvMutation = useImportProductsCSV()
   const [importOpen, setImportOpen] = useState(false)
   const [importFile, setImportFile] = useState<File | null>(null)
+  const [importErrors, setImportErrors] = useState<Array<{ row: number; message: string }>>([])
 
   // Sellers can build and maintain their catalogue while courier KYC is reviewed.
   const canManageProducts = true
@@ -529,7 +530,8 @@ const ProductList = () => {
             </div>
             <Space wrap>
               <Button
-                disabled
+                disabled={!canManageProducts || exportCsvMutation.isPending}
+                loading={exportCsvMutation.isPending}
                 onClick={async () => {
                   try {
                     const blob = await exportCsvMutation.mutateAsync()
@@ -546,7 +548,14 @@ const ProductList = () => {
               >
                 Export CSV
               </Button>
-              <Button disabled type="default" onClick={() => setImportOpen(true)}>
+              <Button
+                disabled={!canManageProducts}
+                type="default"
+                onClick={() => {
+                  setImportErrors([])
+                  setImportOpen(true)
+                }}
+              >
                 Import CSV
               </Button>
               <Tooltip
@@ -702,11 +711,19 @@ const ProductList = () => {
               if (!importFile) return message.warning('Select a CSV file')
               try {
                 const res = await importCsvMutation.mutateAsync(importFile)
-                message.success(`Imported ${res.created}, skipped ${res.skipped}`)
-                setImportOpen(false)
-                setImportFile(null)
+                setImportErrors(res.errors || [])
+                if (res.created > 0) {
+                  message.success(`Imported ${res.created} product${res.created === 1 ? '' : 's'}`)
+                }
+                if (res.skipped > 0) {
+                  message.warning(`${res.skipped} row${res.skipped === 1 ? '' : 's'} skipped; review the row errors`)
+                }
+                if (res.created > 0 && res.skipped === 0) {
+                  setImportOpen(false)
+                  setImportFile(null)
+                }
               } catch {
-                message.error('Failed to import CSV')
+                message.error('Failed to import CSV. Check that the file follows the template.')
               }
             }}
             okButtonProps={{ loading: importCsvMutation.isPending }}
@@ -716,9 +733,10 @@ const ProductList = () => {
                 <Text>Follow these rules for smooth imports:</Text>
                 <ul className="list-disc pl-5 mt-2 text-sm text-gray-600">
                   <li>Use UTF-8 CSV with a header row.</li>
-                  <li>Images can be URLs; multiple images separated by |</li>
+                  <li>Use an active category name, slug, or category ID. Images must be URLs; separate multiple images with |.</li>
+                  <li>Non-draft rows need an approved seller brand (brand or brandId), a positive price, and a main image.</li>
                   <li>Allowed status: draft, active, inactive</li>
-                  <li>Unknown columns are ignored; missing required fields cause row skips.</li>
+                  <li>Each row is validated independently, so invalid rows are skipped without blocking valid products.</li>
                 </ul>
                 <div className="mt-3">
                   <Button
@@ -804,6 +822,22 @@ const ProductList = () => {
                 <p className="ant-upload-text">Click or drag CSV file to this area to upload</p>
                 <p className="ant-upload-hint">Only .csv files are supported</p>
               </Upload.Dragger>
+              {importErrors.length > 0 && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  message="Some rows were not imported"
+                  description={
+                    <ul className="mb-0 pl-5">
+                      {importErrors.map((error) => (
+                        <li key={`${error.row}-${error.message}`}>
+                          Row {error.row}: {error.message}
+                        </li>
+                      ))}
+                    </ul>
+                  }
+                />
+              )}
             </Space>
           </Modal>
 

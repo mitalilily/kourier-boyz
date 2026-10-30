@@ -34,7 +34,7 @@ import {
   upsertSellerCustomAttribute,
 } from '../controllers/product.controller'
 import { authorize, protect } from '../middlewares/authMiddleware'
-import { upload, uploadProductFiles } from '../middlewares/upload.middleware'
+import { upload, uploadProductCsv, uploadProductFiles } from '../middlewares/upload.middleware'
 
 const router = express.Router()
 
@@ -110,6 +110,6 @@ router.delete('/variants/:variantId', deleteProductVariant)
 
 // CSV Import/Export
 router.get('/export/csv', exportProductsCSV)
-router.post('/import/csv', upload.single('file'), importProductsCSV)
+router.post('/import/csv', uploadProductCsv, importProductsCSV)
 
 export default router

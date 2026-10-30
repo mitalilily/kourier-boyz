@@ -932,7 +932,12 @@ export const importProductsCSV = async (file: File) => {
   const { data } = await API.post(`/products/import/csv`, form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
-  return data as { created: number; skipped: number }
+  return data as {
+    created: number
+    skipped: number
+    errors?: Array<{ row: number; message: string }>
+    statusSummary?: Record<string, number>
+  }
 }
 
 // Variants
