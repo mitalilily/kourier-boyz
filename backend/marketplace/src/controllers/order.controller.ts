@@ -870,7 +870,7 @@ export const createOrder = async (req: Request, res: Response) => {
     )
     const sellerProfiles = uniqueSellerIds.length
       ? await User.find({ _id: { $in: uniqueSellerIds } }).select(
-          'name email businessName storeSlug supportEmail supportPhone storePhone phone defaultShippingRate logisticsUserId',
+          'name email businessName storeSlug supportEmail supportPhone storePhone phone defaultShippingRate gstNumber logisticsUserId pickupAddresses',
         )
       : []
     const sellerProfileMap = new Map(
@@ -1040,6 +1040,9 @@ export const createOrder = async (req: Request, res: Response) => {
       if (sellerDoc?.logisticsUserId && kourierBoyzLogisticsService.isConfigured) {
         try {
           const dimensions = productDoc?.shippingDimensions || productDoc?.dimensions || {}
+          const marketplacePickup =
+            sellerDoc.pickupAddresses?.find((address: any) => address?.isDefault) ||
+            sellerDoc.pickupAddresses?.[0]
           const draftResponse = await kourierBoyzLogisticsService.createMarketplaceDraft({
             logisticsUserId: sellerDoc.logisticsUserId,
             marketplaceSellerId: sellerDoc._id.toString(),
@@ -1082,6 +1085,20 @@ export const createOrder = async (req: Request, res: Response) => {
               breadth: Number(dimensions.width || dimensions.breadth || 10),
               height: Number(dimensions.height || 10),
             },
+            pickup: marketplacePickup
+              ? {
+                  warehouse_name: marketplacePickup.warehouseName,
+                  name: marketplacePickup.contactName || marketplacePickup.warehouseName,
+                  address: marketplacePickup.addressLine1,
+                  address_2: marketplacePickup.addressLine2,
+                  city: marketplacePickup.city,
+                  state: marketplacePickup.state,
+                  pincode: marketplacePickup.postalCode,
+                  country: marketplacePickup.country || 'India',
+                  phone: marketplacePickup.contactPhone,
+                  gst_number: sellerDoc.gstNumber,
+                }
+              : undefined,
           })
           const draft = draftResponse?.data
           if (draft?.id && order.sellerShipments[0]) {

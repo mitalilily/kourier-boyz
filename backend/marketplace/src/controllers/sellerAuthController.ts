@@ -5,14 +5,12 @@ import { OAuth2Client } from 'google-auth-library'
 import jwt from 'jsonwebtoken'
 import Agreement from '../models/Agreement'
 import User from '../models/User'
-import { shippingProviderService } from '../services/shippingProvider.service'
 import { emailTemplates, generateToken, sendEmail } from '../utils/email'
 import { generatePDFFromHTML } from '../utils/pdfGenerator'
 import { getPhoneFromUser } from '../utils/phoneDecryptionHelper'
 import { uploadToR2 } from '../utils/r2Upload'
 
 const isProduction = process.env.NODE_ENV === 'production'
-const PICKUP_SYNC_ERROR = 'SHIPPING_PROVIDER_SYNC_FAILED'
 const PICKUP_INVALID_PAYLOAD_ERROR = 'INVALID_PICKUP_ADDRESSES_PAYLOAD'
 const PICKUP_WAREHOUSE_REQUIRED_ERROR = 'PICKUP_WAREHOUSE_REQUIRED'
 const PICKUP_WAREHOUSE_DUPLICATE_ERROR = 'PICKUP_WAREHOUSE_DUPLICATE'
@@ -1481,67 +1479,15 @@ export const updateStoreInfo = async (req: Request, res: Response) => {
           }
         })
 
-        try {
-          const syncedAddresses = await Promise.all(
-            normalizedAddresses.map(async (address: any) => {
-              try {
-                const payloadAddress = {
-                  addressLine1: address.addressLine1,
-                  addressLine2: address.addressLine2,
-                  city: address.city,
-                  state: address.state,
-                  postalCode: address.postalCode,
-                  country: address.country || 'India',
-                  contactName: address.contactName,
-                  contactPhone: address.contactPhone,
-                }
-
-                const payloadOptions = {
-                  sellerEmail: seller.email,
-                  gstNumber: seller.gstNumber,
-                  isPrimary: address.isDefault || false,
-                  isPickupEnabled: true,
-                  warehouseName: address.warehouseName,
-                  rtoAddress: address.rtoSameAsPickup ? undefined : address.rtoAddress,
-                }
-
-                let shippingProviderResponse
-                if (address.kourierBoyzLogisticsPickupAddressId) {
-                  shippingProviderResponse = await shippingProviderService.createOrUpdatePickupAddress(
-                    payloadAddress,
-                    payloadOptions,
-                    address.kourierBoyzLogisticsPickupAddressId,
-                  )
-                } else {
-                  shippingProviderResponse = await shippingProviderService.createOrUpdatePickupAddress(
-                    payloadAddress,
-                    payloadOptions,
-                  )
-                }
-
-                if (shippingProviderResponse.data?.id) {
-                  return {
-                    ...address,
-                    kourierBoyzLogisticsPickupAddressId: shippingProviderResponse.data.id,
-                  }
-                }
-
-                throw new Error(PICKUP_SYNC_ERROR)
-              } catch (error: any) {
-                console.error(
-                  `Failed to sync pickup address with Shipmozo for seller ${seller.email}:`,
-                  error.response?.data || error.message || error,
-                )
-                throw new Error(PICKUP_SYNC_ERROR)
-              }
-            }),
-          )
-
-          seller.pickupAddresses = syncedAddresses
-        } catch (error) {
-          console.error('Error syncing pickup addresses with Shipmozo:', error)
-          throw new Error(PICKUP_SYNC_ERROR)
-        }
+        // Store Settings owns the marketplace fulfilment address. Courier pickup
+        // registration is intentionally deferred to the Logistics booking flow,
+        // where it runs under the seller's own logistics account. This prevents a
+        // courier integration failure from discarding a valid marketplace address.
+        seller.pickupAddresses = normalizedAddresses.map((address: any) => {
+          const marketplaceAddress = { ...address }
+          delete marketplaceAddress.kourierBoyzLogisticsPickupAddressId
+          return marketplaceAddress
+        })
       } else if (Array.isArray(parsedAddresses)) {
         // Update pickup addresses
         // Note: Frontend should only send pickupAddresses when on the shipping tab
@@ -1849,10 +1795,6 @@ export const updateStoreInfo = async (req: Request, res: Response) => {
             .json({ error: 'Provide complete RTO address details or mark it as same as pickup.' })
         case PICKUP_PHONE_INVALID_ERROR:
           return res.status(400).json({ error: 'Phone numbers must contain exactly 10 digits.' })
-        case PICKUP_SYNC_ERROR:
-          return res
-            .status(503)
-            .json({ error: 'Unable to sync pickup addresses right now. Please try again later.' })
         default:
           break
       }

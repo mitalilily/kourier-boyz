@@ -19,6 +19,7 @@ export const createMarketplaceDraft = async (req: Request, res: Response) => {
   }
 
   try {
+    const pickup = payload.pickup && typeof payload.pickup === 'object' ? payload.pickup : null
     const [existing] = await db
       .select()
       .from(b2c_orders)
@@ -73,6 +74,8 @@ export const createMarketplaceDraft = async (req: Request, res: Response) => {
         source_order_id: marketplaceOrderId,
         source_seller_id: text(payload.marketplaceSellerId),
         source_meta: { batchCode: payload.batchCode || null, marketplaceShipmentId: payload.marketplaceShipmentId || null },
+        pickup_location_id: text(pickup?.warehouse_name) || null,
+        pickup_details: pickup,
         tags: 'kourier_boyz_marketplace',
       })
       .returning()

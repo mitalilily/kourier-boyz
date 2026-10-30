@@ -70,7 +70,7 @@ export const createOrderFromPaymentIntent = async (
 
   const sellerIds = Array.from(sellerIdsSet).map((id) => new mongoose.Types.ObjectId(id))
   const sellers = await User.find({ _id: { $in: sellerIds } }).select(
-    'name businessName storeSlug supportEmail supportPhone storePhone phone defaultShippingRate gstNumber logisticsUserId',
+    'name businessName storeSlug supportEmail supportPhone storePhone phone defaultShippingRate gstNumber logisticsUserId pickupAddresses',
   )
   const sellerMap = new Map(sellers.map((s) => [s._id.toString(), s]))
 
@@ -354,6 +354,9 @@ export const createOrderFromPaymentIntent = async (
     if (seller?.logisticsUserId && kourierBoyzLogisticsService.isConfigured) {
       try {
         const dimensions = (product as any).shippingDimensions || (product as any).dimensions || {}
+        const marketplacePickup =
+          seller.pickupAddresses?.find((address: any) => address?.isDefault) ||
+          seller.pickupAddresses?.[0]
         const draftResponse = await kourierBoyzLogisticsService.createMarketplaceDraft({
           logisticsUserId: seller.logisticsUserId,
           marketplaceSellerId: seller._id.toString(),
@@ -396,6 +399,20 @@ export const createOrderFromPaymentIntent = async (
             breadth: Number(dimensions.width || dimensions.breadth || 10),
             height: Number(dimensions.height || 10),
           },
+          pickup: marketplacePickup
+            ? {
+                warehouse_name: marketplacePickup.warehouseName,
+                name: marketplacePickup.contactName || marketplacePickup.warehouseName,
+                address: marketplacePickup.addressLine1,
+                address_2: marketplacePickup.addressLine2,
+                city: marketplacePickup.city,
+                state: marketplacePickup.state,
+                pincode: marketplacePickup.postalCode,
+                country: marketplacePickup.country || 'India',
+                phone: marketplacePickup.contactPhone,
+                gst_number: seller.gstNumber,
+              }
+            : undefined,
         })
         const draft = draftResponse?.data
         if (draft?.id && order.sellerShipments[0]) {

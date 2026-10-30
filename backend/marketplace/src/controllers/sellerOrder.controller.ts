@@ -240,14 +240,6 @@ const pickSellerAddress = (seller: IUser, preferredId?: string) => {
       let matched = addresses.find(
         (address: any) => address?._id?.toString && address._id.toString() === preferredId,
       )
-      // If not found by _id, try matching by the synced shipping-provider pickup address ID
-      if (!matched) {
-        matched = addresses.find(
-          (address: any) =>
-            address?.kourierBoyzLogisticsPickupAddressId &&
-            String(address.kourierBoyzLogisticsPickupAddressId) === preferredId,
-        )
-      }
       if (matched) return matched
     }
     const defaultAddress = addresses.find((address: any) => address.isDefault)
@@ -327,11 +319,9 @@ const buildRateRequest = (
     shipment_type: 'b2c',
   }
 
-  if (address.kourierBoyzLogisticsPickupAddressId) {
-    payload.pickup_id = address.kourierBoyzLogisticsPickupAddressId
-  } else {
-    payload.origin = address.postalCode
-  }
+  // Marketplace store addresses are the booking source of truth. The logistics
+  // service receives the full address only when a seller books a shipment.
+  payload.origin = address.postalCode
 
   return { payload, pickupAddress: address }
 }
@@ -1431,7 +1421,6 @@ export const createSellerShipment = async (req: Request, res: Response) => {
         name: seller.businessName || seller.name,
         gst: seller.gstNumber,
       },
-      warehouse_id: pickupAddress.kourierBoyzLogisticsPickupAddressId || undefined,
     }
 
     courierLogContext = {
@@ -1951,7 +1940,6 @@ export const requestPickup = async (req: Request, res: Response) => {
           name: seller.businessName || seller.name,
           gst: seller.gstNumber,
         },
-        warehouse_id: pickupAddress.kourierBoyzLogisticsPickupAddressId || undefined,
       }
 
       courierLogContext = {
